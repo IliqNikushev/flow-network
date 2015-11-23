@@ -111,9 +111,9 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(94, 415);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(81, 22);
+            this.label9.Size = new System.Drawing.Size(49, 22);
             this.label9.TabIndex = 18;
-            this.label9.Text = "Connect";
+            this.label9.Text = "Pipe";
             // 
             // label8
             // 
