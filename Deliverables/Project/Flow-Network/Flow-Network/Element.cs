@@ -11,6 +11,14 @@ namespace Flow_Network
     {
         public static List<Element> AllElements { get { return Main.AllElements; } }
 
+        public void RefreshConnections(Element e = null)
+        {
+            foreach (ConnectionZone.Path connection in this.Connections)
+            {
+                connection.Adjust(e);
+            }
+        }
+
         public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this || x.To.Parent == this); } }
 
         public Point Center { get { return new Point(this.X + this.Width / 2, this.Y + this.Height / 2); } }

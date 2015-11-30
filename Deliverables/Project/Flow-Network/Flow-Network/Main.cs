@@ -73,7 +73,10 @@ namespace Flow_Network
                 if (lastAction == null)
                     lastActionToUndoLbl.Text = "";
                 else
-                lastActionToUndoLbl.Text = lastAction.ToString();
+                    lastActionToUndoLbl.Text = lastAction.ToString();
+
+                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                    plDraw.Invalidate();
             };
 
             UndoStack.OnRedoAltered += (numberLeft, lastAction) =>
@@ -83,6 +86,9 @@ namespace Flow_Network
                     lastActionUndone.Text = "";
                 else
                     lastActionUndone.Text = lastAction.ToString();
+
+                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                    plDraw.Invalidate();
             };
         }
 
@@ -148,7 +154,9 @@ namespace Flow_Network
 
         void HandleDeleteToolClick()
         {
-
+            Element e = FindCollisionUnder(mousePosition);
+            if(e!=null)
+                RemoveElement(e);
         }
 
         void HandleCreateElementToolClick()
@@ -201,13 +209,20 @@ namespace Flow_Network
                 ConnectionZone.Path result = new ConnectionZone.Path(new ConnectionZone(new Point(), PathStart),
                     new ConnectionZone(new Point(), PathEnd));
 
-                result.OnAdjusted += () =>
+                result.OnCreated += () =>
                 {
                     AllPaths.Add(result);
                     plDraw.Invalidate();
                 };
 
+                result.OnAdjusted += () =>
+                {
+                    plDraw.Invalidate();
+                };
+
                 result.Adjust();
+
+                UndoStack.AddAction(new UndoableActions.AddConnection(result));
 
                 PathStart = null;
                 PathEnd = null;
@@ -246,7 +261,12 @@ namespace Flow_Network
         void plDraw_MoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            dragElement.PictureBox.Location = e.Location;
+            if (dragElement.PictureBox.Location != e.Location)
+            {
+                dragElement.PictureBox.Location = e.Location;
+                dragElement.RefreshConnections();
+                plDraw.Invalidate();
+            }
         }
         #endregion
         void plDraw_HandleDynamicIcon(object sender, MouseEventArgs evnt)
@@ -304,6 +324,12 @@ namespace Flow_Network
             AllElements.Remove(e);
             plDraw.Controls.Remove(e.PictureBox);
             UndoStack.AddAction(new UndoableActions.RemoveElement(e, plDraw));
+
+            foreach (Element item in AllElements)
+            {
+                if (item == e) continue;
+                item.RefreshConnections(e);
+            }
         }
 
         void AddElement(Element e, Point position)
@@ -317,6 +343,12 @@ namespace Flow_Network
             AllElements.Add(e);
 
             UndoStack.AddAction(new UndoableActions.AddElement(e));
+
+            foreach (Element item in AllElements)
+            {
+                if (item == e) continue;
+                    item.RefreshConnections(e);
+            }
         }
 
         void AddElement<T>(Point position) where T : Element
@@ -385,7 +417,7 @@ namespace Flow_Network
                 rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<Splitter>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<Merger>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Cancel", 120);
+                rightClickPanel.AddButton("Cancel", 120).Name = "cancel";
 
                 foreach (var item in rightClickPanel.Controls)
                 {
@@ -415,6 +447,8 @@ namespace Flow_Network
                 }
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = true;
             }
+
+            rightClickPanel.Controls.Find("cancel", false)[0].Enabled = true;
 
             rightClickPanel.Location = rightClickMousePosition;
             rightClickPanel.Visible = true;
