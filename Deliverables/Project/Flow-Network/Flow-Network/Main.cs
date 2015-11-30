@@ -218,6 +218,7 @@ namespace Flow_Network
                 result.OnAdjusted += () =>
                 {
                     plDraw.Invalidate();
+                    plDraw.BackColor = Color.Bisque;
                 };
 
                 result.Adjust();
@@ -264,7 +265,10 @@ namespace Flow_Network
             if (dragElement.PictureBox.Location != e.Location)
             {
                 dragElement.PictureBox.Location = e.Location;
-                dragElement.RefreshConnections();
+                foreach (Element ex in AllElements)
+                {
+                    ex.RefreshConnections(dragElement);
+                }
                 plDraw.Invalidate();
             }
         }

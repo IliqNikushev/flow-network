@@ -22,10 +22,10 @@ namespace Flow_Network
         public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this || x.To.Parent == this); } }
 
         public Point Center { get { return new Point(this.X + this.Width / 2, this.Y + this.Height / 2); } }
-        public Point A { get { return new Point(this.X, this.Y + this.Height); } }
-        public Point B { get { return new Point(this.X + this.Width, this.Y + this.Height); } }
-        public Point C { get { return new Point(this.X + this.Width, this.Y); } }
-        public Point D { get { return new Point(this.X, this.Y); } }
+        public Point A { get { return new Point(this.X-1, this.Y + this.Height+2); } }
+        public Point B { get { return new Point(this.X + this.Width+1, this.Y + this.Height+1); } }
+        public Point C { get { return new Point(this.X + this.Width, this.Y-2); } }
+        public Point D { get { return new Point(this.X, this.Y-2); } }
 
         public int Width { get { return this.PictureBox.Width; } }
         public int Height { get { return this.PictureBox.Height; } }
@@ -40,6 +40,7 @@ namespace Flow_Network
             this.PictureBox.Width = 32;
             this.PictureBox.Height = 32;
             this.PictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            
         }
         public int X
         {
