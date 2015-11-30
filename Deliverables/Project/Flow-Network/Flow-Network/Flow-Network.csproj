@@ -46,8 +46,11 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="AdjustableSplitter.cs" />
+    <Compile Include="Collision.cs" />
     <Compile Include="Component.cs" />
+    <Compile Include="Conn.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="Elem.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
