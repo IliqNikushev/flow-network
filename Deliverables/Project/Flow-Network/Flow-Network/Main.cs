@@ -72,6 +72,19 @@ namespace Flow_Network
             plDraw.MouseMove += (x, y)
                 =>
                 {
+                    if (ActiveTool == ActiveToolType.Select)
+                    {
+                        Element e = FindCollisionUnder(mousePosition);
+                        if (e != null)
+                        {
+                            this.Cursor = Cursors.SizeAll;
+                        }
+                        else
+                            this.Cursor = Cursors.Arrow;
+                    }
+                    else
+                        this.Cursor = Cursors.Arrow;
+
                     mousePosition = y.Location;
                     if (ActiveTool == ActiveToolType.None)
                     {
@@ -105,7 +118,7 @@ namespace Flow_Network
 
                     if (ActiveTool == ActiveToolType.Pipe)
                     {
-                        Element hovered = FindCollisionElement(mousePosition);
+                        Element hovered = FindCollisionUnder(mousePosition);
                         if (hovered == null) return;
 
                         if (PathStart == null) PathStart = hovered;
@@ -174,6 +187,7 @@ namespace Flow_Network
                         toAdd.PictureBox.Enabled = false;
                         toAdd.PictureBox.MouseMove += (q, qq) =>
                         {
+                            return;
                             mousePosition = toAdd.PictureBox.Location;
                             mousePosition.Offset(plDraw.Location);
 
@@ -196,6 +210,17 @@ namespace Flow_Network
 
                 };
                 
+        }
+
+        private Element FindCollisionUnder(Point mousePosition)
+        {
+            return AllElements.FirstOrDefault(q =>
+                {
+                    if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
+                        if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
+                            return true;
+                    return false;
+                });
         }
 
         private Element FindCollisionElement(Point mousePosition)
@@ -249,7 +274,9 @@ namespace Flow_Network
                 
             } 
             currentActive = s;
-            if (currentActive == pictureBox2)
+            if (currentActive == pictureBox1)
+                ActiveTool = ActiveToolType.Select;
+            else if (currentActive == pictureBox2)
                 ActiveTool = ActiveToolType.Pump;
             else if (currentActive == pictureBox3)
                 ActiveTool = ActiveToolType.Sink;
