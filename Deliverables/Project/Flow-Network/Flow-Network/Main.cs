@@ -43,45 +43,66 @@ namespace Flow_Network
             Resources.SplitterIcon = this.pictureBox4.Image;
             Resources.AdjSplitterIcon = this.pictureBox5.Image;
             iconBelowCursor = new PictureBox();
-            iconBelowCursor.Width = 24;
-            iconBelowCursor.Height = 24;
+            iconBelowCursor.Width = 16;
+            iconBelowCursor.Height = 16;
             iconBelowCursor.BackColor = Color.AliceBlue;
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
             Point mousePosition = new Point(0,0);
             plDraw.MouseMove += (x, y)
-                => mousePosition = y.Location;
+                =>
+                {
+                    mousePosition = y.Location;
+                    if (ActiveTool == ActiveToolType.None)
+                    {
+                        iconBelowCursor.Visible = false;
+                        iconBelowCursor.BackColor = Color.Bisque;
+                    }
+                    else
+                    {
+                        iconBelowCursor.Visible = true;
+                        Point point = y.Location;
+                        point.Offset(plDraw.Location);
+                        point.Offset(16, 16);
+                        this.iconBelowCursor.Location = point;
+                        if(HasCollision(mousePosition))
+                        {
+                            iconBelowCursor.BackColor = Color.Red;
+                        }
+                        else iconBelowCursor.BackColor = Color.Green;
+                        iconBelowCursor.BringToFront();
+                    }
+                };
 
             plDraw.Click += (x,y) =>
                 {
                     if (ActiveTool == ActiveToolType.None) return;
 
-                    if (this.elements.Where(q =>
-                        {
-                            Point position = mousePosition;
-
-                            if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
-                                if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
-                                    return true;
-                            return false;
-                        }
-                        ).Any())
+                    if(HasCollision(mousePosition))
+                    {
                         return;
+                    }
 
                     Element toAdd = null;
 
                     if (ActiveTool == ActiveToolType.Pump)
                     {
                         toAdd = new Pump();
+                        toAdd.PictureBox.Width = 32;
+                        toAdd.PictureBox.Height = 32;
                     }
                     else if (ActiveTool == ActiveToolType.Sink)
                     {
                         toAdd = new Sink();
+                        toAdd.PictureBox.Width = 50;
+                        toAdd.PictureBox.Height = 50;
                     }
                     else if (ActiveTool == ActiveToolType.Splitter)
                     {
                         toAdd = new Splitter();
+                        toAdd.PictureBox.Width = 100;
+                        toAdd.PictureBox.Height = 100;
                     }
                     else if (ActiveTool == ActiveToolType.AdjustableSplitter)
                     {
@@ -93,8 +114,6 @@ namespace Flow_Network
                     }
                     if(toAdd != null)
                     {
-                        toAdd.PictureBox.Width = 32;
-                        toAdd.PictureBox.Height = 32;
 
                         toAdd.PictureBox.MouseMove += (q, qq) =>
                         {
@@ -115,12 +134,25 @@ namespace Flow_Network
 
                         this.plDraw.Controls.Add(toAdd.PictureBox);
                         elements.Add(toAdd);
+                        iconBelowCursor.BackColor = Color.Red;
                     }
 
                 };
                 
         }
-        
+        private bool HasCollision(Point mousePosition)
+        {
+            return this.elements.FirstOrDefault(q =>
+                        {
+                            Point position = mousePosition;
+
+                            if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
+                                if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
+                                    return true;
+                            return false;
+                        }
+                        ) != null;
+        }
 
         //private Point MouseDownLocation;
 
@@ -174,25 +206,6 @@ namespace Flow_Network
             s.BackColor = Color.Gold;
         }
 
-        private void plDraw_MouseMove(object sender, MouseEventArgs e)
-        {
-            
-            if(currentActive==null)
-            {
-                iconBelowCursor.Visible = false;
-                iconBelowCursor.BackColor = Color.Bisque;
-            }
-            else
-            {
-                iconBelowCursor.Visible = true;
-                Point point = e.Location;
-                point.Offset(plDraw.Location);
-                point.Offset(16, 16);
-                this.iconBelowCursor.Location = point;
-                iconBelowCursor.BackColor = Color.Gold;
-                iconBelowCursor.BringToFront();
-            }
-        }
 
 
     }

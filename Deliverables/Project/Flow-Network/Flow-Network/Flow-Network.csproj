@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="Action.cs" />
     <Compile Include="AdjustableSplitter.cs" />
-    <Compile Include="Component.cs" />
     <Compile Include="Connection.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Main.cs">
@@ -58,6 +57,11 @@
     <Compile Include="Merger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Pump.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="Sink.cs" />
@@ -69,14 +73,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -101,9 +100,6 @@
     <None Include="Resources\A. splitter.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\sink.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\splitter.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -116,13 +112,16 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pump.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\pump.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pump1.ico" />
+    <None Include="Resources\merger.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sink.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\splitter.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
