@@ -53,6 +53,8 @@
             this.pbPump = new System.Windows.Forms.PictureBox();
             this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox9 = new System.Windows.Forms.PictureBox();
+            this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.plDraw.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbAdjSplitter)).BeginInit();
@@ -62,6 +64,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbPump)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -184,6 +188,8 @@
             // 
             this.plDraw.BackColor = System.Drawing.Color.Bisque;
             this.plDraw.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.plDraw.Controls.Add(this.pictureBox10);
+            this.plDraw.Controls.Add(this.pictureBox9);
             this.plDraw.Controls.Add(this.btnLoad);
             this.plDraw.Controls.Add(this.btnSave);
             this.plDraw.Location = new System.Drawing.Point(223, 24);
@@ -193,20 +199,26 @@
             // 
             // btnLoad
             // 
-            this.btnLoad.Location = new System.Drawing.Point(84, 549);
+            this.btnLoad.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.btnLoad.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.btnLoad.Location = new System.Drawing.Point(75, 541);
             this.btnLoad.Name = "btnLoad";
-            this.btnLoad.Size = new System.Drawing.Size(75, 23);
+            this.btnLoad.Size = new System.Drawing.Size(76, 31);
             this.btnLoad.TabIndex = 1;
             this.btnLoad.Text = "LOAD";
+            this.btnLoad.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnLoad.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnLoad.UseVisualStyleBackColor = true;
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(3, 549);
+            this.btnSave.Location = new System.Drawing.Point(3, 541);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(75, 23);
+            this.btnSave.Size = new System.Drawing.Size(72, 31);
             this.btnSave.TabIndex = 0;
             this.btnSave.Text = "SAVE";
+            this.btnSave.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnSave.UseVisualStyleBackColor = true;
             // 
             // pictureBox6
@@ -305,6 +317,28 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.onClickHandler);
             // 
+            // pictureBox9
+            // 
+            this.pictureBox9.Enabled = false;
+            this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
+            this.pictureBox9.Location = new System.Drawing.Point(79, 544);
+            this.pictureBox9.Name = "pictureBox9";
+            this.pictureBox9.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox9.TabIndex = 2;
+            this.pictureBox9.TabStop = false;
+            // 
+            // pictureBox10
+            // 
+            this.pictureBox10.Enabled = false;
+            this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
+            this.pictureBox10.Location = new System.Drawing.Point(3, 544);
+            this.pictureBox10.Name = "pictureBox10";
+            this.pictureBox10.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox10.TabIndex = 3;
+            this.pictureBox10.TabStop = false;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
@@ -345,6 +379,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbPump)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -376,6 +412,8 @@
         private System.Windows.Forms.Panel plDraw;
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.PictureBox pictureBox10;
+        private System.Windows.Forms.PictureBox pictureBox9;
     }
 }
 
