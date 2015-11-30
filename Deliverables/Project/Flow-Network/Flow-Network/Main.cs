@@ -28,14 +28,33 @@ namespace Flow_Network
 
         ActiveToolType ActiveTool = ActiveToolType.None;
 
+        List<Connection.Path> paths = new List<Connection.Path>();
 
         PictureBox iconBelowCursor;
 
-        List<Element> elements = new List<Element>();
+        public static List<Element> AllElements = new List<Element>();
+
+        Element PathStart;
+        Element PathEnd;
+
+        bool changed = false;
 
         public Main()
         {
             InitializeComponent();
+
+            plDraw.Paint += (x, y) =>
+            {
+                foreach (Connection.Path path in this.paths)
+                {
+                    Point previous = path.From;
+                    foreach (Point point in path.PathPoints)
+                    {
+                        y.Graphics.DrawLine(Pens.Black, previous, point);
+                        previous = point;
+                    }
+                }
+            };
 
             Resources.PumpIcon = this.pictureBox2.Image;
             Resources.SinkIcon = this.pictureBox3.Image;
@@ -79,6 +98,44 @@ namespace Flow_Network
                 {
                     if (ActiveTool == ActiveToolType.None) return;
 
+                    if (ActiveTool == ActiveToolType.Delete)
+                    {
+                        return;
+                    }
+
+                    if (ActiveTool == ActiveToolType.Pipe)
+                    {
+                        Element hovered = FindCollisionElement(mousePosition);
+                        if (hovered == null) return;
+
+                        if (PathStart == null) PathStart = hovered;
+                        else PathEnd = hovered;
+
+                        if (PathStart != null && PathEnd != null)
+                        {
+                            Connection.Path result = new Connection.Path(new Connection(new Point(), PathStart),
+                                new Connection(new Point(), PathEnd));
+
+                            result.OnAdjusted += () =>
+                                {
+                                    paths.Add(result);
+                                    plDraw.Invalidate();
+                                };
+
+                            result.Adjust();
+
+                            PathStart = null;
+                            PathEnd = null;
+                        }
+
+                        return;
+                    }
+
+                    if (ActiveTool == ActiveToolType.Select)
+                    {
+                        return;
+                    }
+
                     if(HasCollision(mousePosition))
                     {
                         return;
@@ -114,7 +171,7 @@ namespace Flow_Network
                     }
                     if(toAdd != null)
                     {
-
+                        toAdd.PictureBox.Enabled = false;
                         toAdd.PictureBox.MouseMove += (q, qq) =>
                         {
                             mousePosition = toAdd.PictureBox.Location;
@@ -133,25 +190,30 @@ namespace Flow_Network
                         toAdd.Y = mousePosition.Y;
 
                         this.plDraw.Controls.Add(toAdd.PictureBox);
-                        elements.Add(toAdd);
+                        AllElements.Add(toAdd);
                         iconBelowCursor.BackColor = Color.Red;
                     }
 
                 };
                 
         }
+
+        private Element FindCollisionElement(Point mousePosition)
+        {
+            return AllElements.FirstOrDefault(q =>
+            {
+                Point position = mousePosition;
+
+                if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
+                    if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
+                        return true;
+                return false;
+            });
+        }
+
         private bool HasCollision(Point mousePosition)
         {
-            return this.elements.FirstOrDefault(q =>
-                        {
-                            Point position = mousePosition;
-
-                            if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
-                                if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
-                                    return true;
-                            return false;
-                        }
-                        ) != null;
+            return FindCollisionElement(mousePosition) != null;
         }
 
         //private Point MouseDownLocation;
