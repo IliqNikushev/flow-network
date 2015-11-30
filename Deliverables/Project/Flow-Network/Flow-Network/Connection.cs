@@ -113,35 +113,19 @@ namespace Flow_Network
                 Point start = this.From;
                 Point end = this.To;
 
-               // activeAdjuster = new System.Threading.Thread(() =>
-               // {
+                activeAdjuster = new System.Threading.Thread(() =>
+               {
                     try
                     {
-                        Collision.LastCollision = null;
-                        bool connected = false;
-                        while (!connected)
+                        Collision lastCollision = null;
+                        while (true)
                         {
-                            Collision collision = Collision.FindBetween(start, end, this.From, this.To);
-                            if (!collision) connected = true;
+                            
+                            Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref lastCollision, Element.AllElements);
+                            if (!collision) break;
                             else
                             {
-
-                                //{
-                                //    //bool left = start.X < end.X;
-                                //    //bool up = start.Y < end.Y;
-
-                                //    if (!this.MidPoints.Contains(collision.LeftCloserMargin))
-                                //        margin = collision.LeftCloserMargin;
-                                //    else if (!this.MidPoints.Contains(collision.RightCloserMargin))
-                                //        margin = collision.RightCloserMargin;
-                                //    else if (!this.MidPoints.Contains(collision.InverseCloserMargin))
-                                //        margin = collision.InverseCloserMargin;
-                                //}
-
                                 Point margin = collision.CloserMargin;
-
-                                //todo                                        
-                                //check if between width WHENEVER 3x midpoints
 
                                 //1 3;2 4
                                 if (collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
@@ -265,8 +249,8 @@ namespace Flow_Network
                     catch (System.Threading.ThreadAbortException)
                     {
                     }
-                //});
-                //activeAdjuster.Start();
+                });
+                activeAdjuster.Start();
             }
         }
 

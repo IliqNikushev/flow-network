@@ -9,8 +9,6 @@ namespace Flow_Network
 {
     class Collision
     {
-        public static Collision LastCollision;
-
         public Point CloserMargin { get; private set; }
         public Point Intersection { get; private set; }
 
@@ -104,7 +102,7 @@ namespace Flow_Network
             return collision != null;
         }
 
-        public static Collision FindBetween(Point from, Point to, Connection fromEl, Connection toEl, List<Element> elements = null)
+        public static Collision FindBetween(Point from, Point to, Connection fromEl, Connection toEl,ref Collision lastCollision, List<Element> elements = null)
         {
             if (elements == null) elements = Element.AllElements;
 
@@ -123,12 +121,10 @@ namespace Flow_Network
                     interects = Intersects(element.C, element.B, from, to, out intersection);
                 if (interects)
                 {
-                    Collision previous = LastCollision;
-
                     Collision collision = new Collision(intersection, element, from, to);
-                    LastCollision = collision;
-                    if (previous != null)
-                        if (collision.Element == previous.Element) continue;
+                    if (lastCollision != null)
+                        if (collision.Element == lastCollision.Element) continue;
+                    lastCollision = collision;
                     return collision;
                 }
             }

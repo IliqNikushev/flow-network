@@ -37,7 +37,10 @@ namespace Flow_Network
         Element PathStart;
         Element PathEnd;
 
-        bool changed = false;
+        Element dragElement;
+        Point dragStart;
+
+        Point mousePosition = new Point(0,0);
 
         public Main()
         {
@@ -68,22 +71,19 @@ namespace Flow_Network
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
-            Point mousePosition = new Point(0,0);
             plDraw.MouseMove += (x, y)
                 =>
                 {
                     if (ActiveTool == ActiveToolType.Select)
                     {
                         Element e = FindCollisionUnder(mousePosition);
-                        if (e != null)
+                        if (e != null || dragElement != null)
                         {
                             this.Cursor = Cursors.SizeAll;
                         }
                         else
                             this.Cursor = Cursors.Arrow;
                     }
-                    else
-                        this.Cursor = Cursors.Arrow;
 
                     mousePosition = y.Location;
                     if (ActiveTool == ActiveToolType.None)
@@ -107,9 +107,60 @@ namespace Flow_Network
                     }
                 };
 
+            plDraw.MouseDown += (x, y) =>
+            {
+                if (ActiveTool == ActiveToolType.Select)
+                {
+                    if (dragElement == null)
+                    {
+                        dragElement = FindCollisionUnder(mousePosition);
+                        if(dragElement != null)
+                            dragStart = dragElement.PictureBox.Location;
+                    }
+                    else
+                    {
+                        dragElement.PictureBox.Location = mousePosition;
+                    }
+                }
+            };
+
+            plDraw.MouseMove += (x, y) =>
+            {
+                if (dragElement == null) return;
+                dragElement.PictureBox.Location = y.Location;
+            };
+
+            plDraw.MouseUp += (x, y) =>
+            {
+                if (HasCollision(mousePosition)) return;
+                if (dragElement != null)
+                {
+                    dragElement = null;
+                    plDraw.Cursor = Cursors.Arrow;
+                }
+            };
+
             plDraw.Click += (x,y) =>
                 {
                     if (ActiveTool == ActiveToolType.None) return;
+
+                    if (((MouseEventArgs)y).Button == MouseButtons.Right)
+                    {
+                        HandleRightClick();
+                        return;
+                    }
+
+                    if (ActiveTool == ActiveToolType.Select)
+                    {
+                        return;
+                    }
+
+                    if (((MouseEventArgs)y).Button == MouseButtons.Right)
+                        if (dragElement != null)
+                        {
+                            dragElement.PictureBox.Location = dragStart;
+                            dragElement = null;
+                        }
 
                     if (ActiveTool == ActiveToolType.Delete)
                     {
@@ -185,20 +236,6 @@ namespace Flow_Network
                     if(toAdd != null)
                     {
                         toAdd.PictureBox.Enabled = false;
-                        toAdd.PictureBox.MouseMove += (q, qq) =>
-                        {
-                            return;
-                            mousePosition = toAdd.PictureBox.Location;
-                            mousePosition.Offset(plDraw.Location);
-
-
-                            Point point = mousePosition;
-                            point.X += qq.X;
-                            point.Y += qq.Y;
-                            point.Offset(16, 16);
-
-                            iconBelowCursor.Location = point;
-                        };
 
                         toAdd.X = mousePosition.X; // x,y = mouse position
                         toAdd.Y = mousePosition.Y;
@@ -212,10 +249,108 @@ namespace Flow_Network
                 
         }
 
+        [Flags]
+        enum RightClickOptions
+        {
+            Sink,
+            Pump,
+            Splitter,
+            Merger,
+            Adjustable,
+            Remove,
+            Cancel
+        }
+
+        Panel rightClickPanel;
+        Point rightClickMousePosition = new Point();
+
+        private void HandleRightClick()
+        {
+            if (ActiveTool == ActiveToolType.Select)
+                if (dragElement != null)
+                {
+                    dragElement.PictureBox.Location = dragStart;
+                    dragElement = null;
+
+                    return;
+                }
+
+            RightClickOptions options = ~RightClickOptions.Remove;
+            rightClickMousePosition = mousePosition;
+
+            if (HasCollision(rightClickMousePosition))
+            {
+                Element e = FindCollisionUnder(rightClickMousePosition);
+                if (e != null)
+                    options = RightClickOptions.Remove;
+            }
+
+            if (rightClickPanel == null)
+            {
+                rightClickPanel = new Panel();
+                plDraw.Controls.Add(rightClickPanel);
+
+                rightClickPanel.Width = 100;
+                rightClickPanel.Height = 140;
+
+                rightClickPanel.AddButton("Remove", 0, (x, y) =>
+                {
+                    Element e = FindCollisionUnder(rightClickMousePosition);
+                    if (e == null) return;
+                    else
+                    {
+                        AllElements.Remove(e);
+                        plDraw.Controls.Remove(e.PictureBox);
+                    }
+                }).Name = "remove";
+                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { });
+                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { });
+                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { });
+                rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { });
+                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { });
+                rightClickPanel.AddButton("Cancel", 120);
+
+                foreach (var item in rightClickPanel.Controls)
+                {
+                    if (item is Button)
+                    {
+                        (item as Button).Click += (x, y) => rightClickPanel.Visible = false;
+                    }
+                }
+            }
+            foreach (var item in rightClickPanel.Controls)
+            {
+                if (item is Button)
+                {
+                    (item as Button).Enabled = true;
+                }
+            }
+            if (!options.HasFlag(RightClickOptions.Remove))
+                rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
+            else
+            {
+                foreach (var item in rightClickPanel.Controls)
+                {
+                    if (item is Button)
+                    {
+                        (item as Button).Enabled = false;
+                    }
+                }
+                rightClickPanel.Controls.Find("remove", false)[0].Enabled = true;
+            }
+
+            rightClickPanel.Location = rightClickMousePosition;
+            rightClickPanel.Visible = true;
+            rightClickPanel.BringToFront();
+            rightClickPanel.BackColor = Color.FromArgb(255, 157, 157, 157);
+        }
+
         private Element FindCollisionUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
                 {
+                    if (q == dragElement) return false;
+
                     if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
                         if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
                             return true;
@@ -227,6 +362,7 @@ namespace Flow_Network
         {
             return AllElements.FirstOrDefault(q =>
             {
+                if (q == dragElement) return false;
                 Point position = mousePosition;
 
                 if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
@@ -297,6 +433,24 @@ namespace Flow_Network
 
 
 
+    }
+}
+
+static class E
+{
+    public static Button AddButton(this Panel panel, string text, int top, EventHandler onClick = null)
+    {
+        Button button = new Button();
+        button.Text = text;
+        button.Width = panel.Width;
+        button.Height = 20;
+        button.Top = top;
+        if(onClick != null)
+            button.Click += onClick;
+
+        panel.Controls.Add(button);
+
+        return button;
     }
 }
 
