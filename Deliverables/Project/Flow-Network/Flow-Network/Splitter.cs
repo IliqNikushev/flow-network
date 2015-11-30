@@ -7,7 +7,7 @@ namespace Flow_Network
 {
     public class Splitter : Element
     {
-        public Connection Up
+        public ConnectionZone Up
         {
             get
             {
@@ -18,7 +18,7 @@ namespace Flow_Network
             }
         }
 
-        public Connection Down
+        public ConnectionZone Down
         {
             get
             {
@@ -29,7 +29,7 @@ namespace Flow_Network
             }
         }
 
-        public Connection In
+        public ConnectionZone In
         {
             get
             {

@@ -7,7 +7,7 @@ namespace Flow_Network
 {
     public class Pump : Element
     {
-        public Connection Out
+        public ConnectionZone Out
         {
             get
             {

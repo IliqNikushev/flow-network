@@ -7,7 +7,7 @@ namespace Flow_Network
 {
     public class AdjustableSplitter : Splitter
     {
-        public Connection Adjust()
+        public ConnectionZone Adjust()
         {
             throw new System.NotImplementedException();
         }

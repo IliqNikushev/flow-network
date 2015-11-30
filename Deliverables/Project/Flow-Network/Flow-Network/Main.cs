@@ -23,41 +23,30 @@ namespace Flow_Network
             Sink,
             Pipe,
             None
-
         }
 
-        ActiveToolType ActiveTool = ActiveToolType.None;
-
-        List<Connection.Path> paths = new List<Connection.Path>();
-
-        PictureBox iconBelowCursor;
-
         public static List<Element> AllElements = new List<Element>();
+        public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
-        Element PathStart;
-        Element PathEnd;
+        private ActiveToolType ActiveTool = ActiveToolType.None;
+       
+        private PictureBox iconBelowCursor;
 
-        Element dragElement;
-        Point dragStart;
+        private Element PathStart;
+        private Element PathEnd;
 
-        Point mousePosition = new Point(0,0);
+        private Element dragElement;
+        private Point dragStart;
+
+        private Point mousePosition = new Point(0, 0);
+
+        PictureBox currentActiveToolPbox;
 
         public Main()
         {
             InitializeComponent();
 
-            plDraw.Paint += (x, y) =>
-            {
-                foreach (Connection.Path path in this.paths)
-                {
-                    Point previous = path.From;
-                    foreach (Point point in path.PathPoints)
-                    {
-                        y.Graphics.DrawLine(Pens.Black, previous, point);
-                        previous = point;
-                    }
-                }
-            };
+            plDraw.Paint += plDraw_DrawPaths;
 
             Resources.PumpIcon = this.pictureBox2.Image;
             Resources.SinkIcon = this.pictureBox3.Image;
@@ -71,184 +60,238 @@ namespace Flow_Network
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
-            plDraw.MouseMove += (x, y)
-                =>
-                {
-                    if (ActiveTool == ActiveToolType.Select)
-                    {
-                        Element e = FindCollisionUnder(mousePosition);
-                        if (e != null || dragElement != null)
-                        {
-                            this.Cursor = Cursors.SizeAll;
-                        }
-                        else
-                            this.Cursor = Cursors.Arrow;
-                    }
+            plDraw.MouseMove += plDraw_HandleDynamicIcon;
+            plDraw.MouseMove += plDraw_MoveDragElement;
+            plDraw.MouseDown += plDraw_HandleStartDrag;
+            plDraw.MouseUp += plDraw_HandleStopDrag;
 
-                    mousePosition = y.Location;
-                    if (ActiveTool == ActiveToolType.None)
-                    {
-                        iconBelowCursor.Visible = false;
-                        iconBelowCursor.BackColor = Color.Bisque;
-                    }
-                    else
-                    {
-                        iconBelowCursor.Visible = true;
-                        Point point = y.Location;
-                        point.Offset(plDraw.Location);
-                        point.Offset(16, 16);
-                        this.iconBelowCursor.Location = point;
-                        if(HasCollision(mousePosition))
-                        {
-                            iconBelowCursor.BackColor = Color.Red;
-                        }
-                        else iconBelowCursor.BackColor = Color.Green;
-                        iconBelowCursor.BringToFront();
-                    }
-                };
-
-            plDraw.MouseDown += (x, y) =>
-            {
-                if (ActiveTool == ActiveToolType.Select)
-                {
-                    if (dragElement == null)
-                    {
-                        dragElement = FindCollisionUnder(mousePosition);
-                        if(dragElement != null)
-                            dragStart = dragElement.PictureBox.Location;
-                    }
-                    else
-                    {
-                        dragElement.PictureBox.Location = mousePosition;
-                    }
-                }
-            };
-
-            plDraw.MouseMove += (x, y) =>
-            {
-                if (dragElement == null) return;
-                dragElement.PictureBox.Location = y.Location;
-            };
-
-            plDraw.MouseUp += (x, y) =>
-            {
-                if (HasCollision(mousePosition)) return;
-                if (dragElement != null)
-                {
-                    dragElement = null;
-                    plDraw.Cursor = Cursors.Arrow;
-                }
-            };
-
-            plDraw.Click += (x,y) =>
-                {
-                    if (ActiveTool == ActiveToolType.None) return;
-
-                    if (((MouseEventArgs)y).Button == MouseButtons.Right)
-                    {
-                        HandleRightClick();
-                        return;
-                    }
-
-                    if (ActiveTool == ActiveToolType.Select)
-                    {
-                        return;
-                    }
-
-                    if (((MouseEventArgs)y).Button == MouseButtons.Right)
-                        if (dragElement != null)
-                        {
-                            dragElement.PictureBox.Location = dragStart;
-                            dragElement = null;
-                        }
-
-                    if (ActiveTool == ActiveToolType.Delete)
-                    {
-                        return;
-                    }
-
-                    if (ActiveTool == ActiveToolType.Pipe)
-                    {
-                        Element hovered = FindCollisionUnder(mousePosition);
-                        if (hovered == null) return;
-
-                        if (PathStart == null) PathStart = hovered;
-                        else PathEnd = hovered;
-
-                        if (PathStart != null && PathEnd != null)
-                        {
-                            Connection.Path result = new Connection.Path(new Connection(new Point(), PathStart),
-                                new Connection(new Point(), PathEnd));
-
-                            result.OnAdjusted += () =>
-                                {
-                                    paths.Add(result);
-                                    plDraw.Invalidate();
-                                };
-
-                            result.Adjust();
-
-                            PathStart = null;
-                            PathEnd = null;
-                        }
-
-                        return;
-                    }
-
-                    if (ActiveTool == ActiveToolType.Select)
-                    {
-                        return;
-                    }
-
-                    if(HasCollision(mousePosition))
-                    {
-                        return;
-                    }
-
-                    Element toAdd = null;
-
-                    if (ActiveTool == ActiveToolType.Pump)
-                    {
-                        toAdd = new Pump();
-                        toAdd.PictureBox.Width = 32;
-                        toAdd.PictureBox.Height = 32;
-                    }
-                    else if (ActiveTool == ActiveToolType.Sink)
-                    {
-                        toAdd = new Sink();
-                        toAdd.PictureBox.Width = 50;
-                        toAdd.PictureBox.Height = 50;
-                    }
-                    else if (ActiveTool == ActiveToolType.Splitter)
-                    {
-                        toAdd = new Splitter();
-                        toAdd.PictureBox.Width = 100;
-                        toAdd.PictureBox.Height = 100;
-                    }
-                    else if (ActiveTool == ActiveToolType.AdjustableSplitter)
-                    {
-                        toAdd = new AdjustableSplitter();
-                    }
-                    else if (ActiveTool == ActiveToolType.Merger)
-                    {
-                        toAdd = new Merger();
-                    }
-                    if(toAdd != null)
-                    {
-                        toAdd.PictureBox.Enabled = false;
-
-                        toAdd.X = mousePosition.X; // x,y = mouse position
-                        toAdd.Y = mousePosition.Y;
-
-                        this.plDraw.Controls.Add(toAdd.PictureBox);
-                        AllElements.Add(toAdd);
-                        iconBelowCursor.BackColor = Color.Red;
-                    }
-
-                };
-                
+            plDraw.Click += plDraw_HandleClick;
         }
 
+        protected void pboxToolClick(object sender, EventArgs e)
+        {
+            PictureBox clickedPbox = (PictureBox)sender;
+            if (clickedPbox == null)
+                return;
+            if (currentActiveToolPbox != null)
+            {
+                currentActiveToolPbox.BackColor = Color.AliceBlue;
+            }
+            currentActiveToolPbox = clickedPbox;
+            if (currentActiveToolPbox == pictureBox1)
+                ActiveTool = ActiveToolType.Select;
+            else if (currentActiveToolPbox == pictureBox2)
+                ActiveTool = ActiveToolType.Pump;
+            else if (currentActiveToolPbox == pictureBox3)
+                ActiveTool = ActiveToolType.Sink;
+            else if (currentActiveToolPbox == pictureBox4)
+                ActiveTool = ActiveToolType.Splitter;
+            else if (currentActiveToolPbox == pictureBox5)
+                ActiveTool = ActiveToolType.AdjustableSplitter;
+            else if (currentActiveToolPbox == pictureBox6)
+                ActiveTool = ActiveToolType.Merger;
+            else if (currentActiveToolPbox == pictureBox7)
+                ActiveTool = ActiveToolType.Pipe;
+            else if (currentActiveToolPbox == pictureBox8)
+                ActiveTool = ActiveToolType.Delete;
+            else
+                ActiveTool = ActiveToolType.None;
+            clickedPbox.BackColor = Color.Gold;
+        }
+
+        void plDraw_HandleClick(object sender, EventArgs e)
+        {
+            if (((MouseEventArgs)e).Button == MouseButtons.Right)
+            {
+                HandleRightClick();
+                return;
+            }
+
+            switch (ActiveTool)
+            {
+                case ActiveToolType.Pump:
+                case ActiveToolType.Sink:
+                case ActiveToolType.Splitter:
+                case ActiveToolType.AdjustableSplitter:
+                case ActiveToolType.Merger:
+                    HandleCreateElementToolClick(); return;
+                case ActiveToolType.Pipe: HandleConnectionToolClick(); return;
+                case ActiveToolType.Delete: HandleDeleteToolClick(); return;
+                case ActiveToolType.Select: HandleSelectToolClick(); return;
+                case ActiveToolType.None: return;
+                default: throw new ArgumentException("Unknown tool " + ActiveTool);
+            }
+        }
+        #region tools
+        void HandleSelectToolClick()
+        {
+
+        }
+
+        void HandleDeleteToolClick()
+        {
+
+        }
+
+        void HandleCreateElementToolClick()
+        {
+            if (HasCollision(mousePosition))
+            {
+                return;
+            }
+
+            Element toAdd = null;
+
+            if (ActiveTool == ActiveToolType.Pump)
+            {
+                toAdd = new Pump();
+                toAdd.PictureBox.Width = 32;
+                toAdd.PictureBox.Height = 32;
+            }
+            else if (ActiveTool == ActiveToolType.Sink)
+            {
+                toAdd = new Sink();
+                toAdd.PictureBox.Width = 50;
+                toAdd.PictureBox.Height = 50;
+            }
+            else if (ActiveTool == ActiveToolType.Splitter)
+            {
+                toAdd = new Splitter();
+                toAdd.PictureBox.Width = 100;
+                toAdd.PictureBox.Height = 100;
+            }
+            else if (ActiveTool == ActiveToolType.AdjustableSplitter)
+            {
+                toAdd = new AdjustableSplitter();
+            }
+            else if (ActiveTool == ActiveToolType.Merger)
+            {
+                toAdd = new Merger();
+            }
+            if (toAdd != null)
+            {
+                toAdd.PictureBox.Enabled = false;
+
+                toAdd.X = mousePosition.X;
+                toAdd.Y = mousePosition.Y;
+
+                this.plDraw.Controls.Add(toAdd.PictureBox);
+                AllElements.Add(toAdd);
+                iconBelowCursor.BackColor = Color.Red;
+            }
+            else
+                throw new ArgumentException("Unknown element " + ActiveTool);
+        }
+
+        void HandleConnectionToolClick()
+        {
+            Element hovered = FindCollisionUnder(mousePosition);
+            if (hovered == null) return;
+
+            if (PathStart == null) PathStart = hovered;
+            else PathEnd = hovered;
+
+            if (PathStart != null && PathEnd != null)
+            {
+                ConnectionZone.Path result = new ConnectionZone.Path(new ConnectionZone(new Point(), PathStart),
+                    new ConnectionZone(new Point(), PathEnd));
+
+                result.OnAdjusted += () =>
+                {
+                    AllPaths.Add(result);
+                    plDraw.Invalidate();
+                };
+
+                result.Adjust();
+
+                PathStart = null;
+                PathEnd = null;
+            }
+
+        }
+        #endregion
+        #region drag
+        void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
+        {
+            if (HasCollision(mousePosition)) return;
+            if (dragElement != null)
+            {
+                dragElement = null;
+                plDraw.Cursor = Cursors.Arrow;
+            }
+        }
+
+        void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
+        {
+            if (ActiveTool == ActiveToolType.Select)
+            {
+                if (dragElement == null)
+                {
+                    dragElement = FindCollisionUnder(mousePosition);
+                    if (dragElement != null)
+                        dragStart = dragElement.PictureBox.Location;
+                }
+                else
+                {
+                    dragElement.PictureBox.Location = mousePosition;
+                }
+            }
+        }
+
+        void plDraw_MoveDragElement(object sender, MouseEventArgs e)
+        {
+            if (dragElement == null) return;
+            dragElement.PictureBox.Location = e.Location;
+        }
+        #endregion
+        void plDraw_HandleDynamicIcon(object sender, MouseEventArgs evnt)
+        {
+            if (ActiveTool == ActiveToolType.Select)
+            {
+                Element e = FindCollisionUnder(mousePosition);
+                if (e != null || dragElement != null)
+                {
+                    this.Cursor = Cursors.SizeAll;
+                }
+                else
+                    this.Cursor = Cursors.Arrow;
+            }
+
+            mousePosition = evnt.Location;
+            if (ActiveTool == ActiveToolType.None)
+            {
+                iconBelowCursor.Visible = false;
+                iconBelowCursor.BackColor = Color.Bisque;
+            }
+            else
+            {
+                iconBelowCursor.Visible = true;
+                Point point = evnt.Location;
+                point.Offset(plDraw.Location);
+                point.Offset(16, 16);
+                this.iconBelowCursor.Location = point;
+                if (HasCollision(mousePosition))
+                {
+                    iconBelowCursor.BackColor = Color.Red;
+                }
+                else iconBelowCursor.BackColor = Color.Green;
+                iconBelowCursor.BringToFront();
+            }
+        }
+
+        void plDraw_DrawPaths(object sender, PaintEventArgs e)
+        {
+            foreach (ConnectionZone.Path path in AllPaths)
+            {
+                Point previous = path.From;
+                foreach (Point point in path.PathPoints)
+                {
+                    e.Graphics.DrawLine(Pens.Black, previous, point);
+                    previous = point;
+                }
+            }
+        }
+        #region rightClick
         [Flags]
         enum RightClickOptions
         {
@@ -344,7 +387,8 @@ namespace Flow_Network
             rightClickPanel.BringToFront();
             rightClickPanel.BackColor = Color.FromArgb(255, 157, 157, 157);
         }
-
+        #endregion
+        #region collision,element detection
         private Element FindCollisionUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
@@ -376,63 +420,7 @@ namespace Flow_Network
         {
             return FindCollisionElement(mousePosition) != null;
         }
-
-        //private Point MouseDownLocation;
-
-        //private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
-        //{
-        //    if (e.Button == System.Windows.Forms.MouseButtons.Left)
-        //    {
-        //        MouseDownLocation = e.Location;
-        //    }
-        //}
-
-        //private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
-        //{
-
-        //    if (e.Button == System.Windows.Forms.MouseButtons.Left)
-        //    {
-        //        pictureBox1.Left = e.X + pictureBox1.Left - MouseDownLocation.X;
-        //        pictureBox1.Top = e.Y + pictureBox1.Top - MouseDownLocation.Y;
-        //    }
-        //}
-        
-        
-        PictureBox currentActive;
-        protected void onClickHandler(object sender, EventArgs e)
-        {
-            PictureBox s = (PictureBox)sender;
-            if (s == null)
-                return;
-            if (currentActive != null)
-            {
-                currentActive.BackColor = Color.AliceBlue;
-                
-            } 
-            currentActive = s;
-            if (currentActive == pictureBox1)
-                ActiveTool = ActiveToolType.Select;
-            else if (currentActive == pictureBox2)
-                ActiveTool = ActiveToolType.Pump;
-            else if (currentActive == pictureBox3)
-                ActiveTool = ActiveToolType.Sink;
-            else if (currentActive == pictureBox4)
-                ActiveTool = ActiveToolType.Splitter;
-            else if (currentActive == pictureBox5)
-                ActiveTool = ActiveToolType.AdjustableSplitter;
-            else if (currentActive == pictureBox6)
-                ActiveTool = ActiveToolType.Merger;
-            else if (currentActive == pictureBox7)
-                ActiveTool = ActiveToolType.Pipe;
-            else if (currentActive == pictureBox8)
-                ActiveTool = ActiveToolType.Delete;
-            else
-                ActiveTool = ActiveToolType.None;
-            s.BackColor = Color.Gold;
-        }
-
-
-
+        #endregion
     }
 }
 

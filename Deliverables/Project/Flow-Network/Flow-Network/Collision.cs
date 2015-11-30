@@ -102,7 +102,7 @@ namespace Flow_Network
             return collision != null;
         }
 
-        public static Collision FindBetween(Point from, Point to, Connection fromEl, Connection toEl,ref Collision lastCollision, List<Element> elements = null)
+        public static Collision FindBetween(Point from, Point to, ConnectionZone fromEl, ConnectionZone toEl,ref Collision lastCollision, List<Element> elements = null)
         {
             if (elements == null) elements = Element.AllElements;
 
