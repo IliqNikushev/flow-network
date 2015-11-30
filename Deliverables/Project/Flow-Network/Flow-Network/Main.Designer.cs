@@ -45,21 +45,21 @@
             this.plDraw = new System.Windows.Forms.Panel();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.pictureBox6 = new System.Windows.Forms.PictureBox();
-            this.pictureBox5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pbMerger = new System.Windows.Forms.PictureBox();
+            this.pbAdjSplitter = new System.Windows.Forms.PictureBox();
+            this.pbSplitter = new System.Windows.Forms.PictureBox();
             this.pictureBox7 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
-            this.pictureBox2 = new System.Windows.Forms.PictureBox();
+            this.pbSink = new System.Windows.Forms.PictureBox();
+            this.pbPump = new System.Windows.Forms.PictureBox();
             this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.plDraw.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbAdjSplitter)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSplitter)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSink)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPump)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -211,39 +211,39 @@
             // 
             // pictureBox6
             // 
-            this.pictureBox6.BackColor = System.Drawing.Color.AliceBlue;
-            this.pictureBox6.Image = global::Flow_Network.Properties.Resources.merger;
-            this.pictureBox6.Location = new System.Drawing.Point(17, 343);
-            this.pictureBox6.Name = "pictureBox6";
-            this.pictureBox6.Size = new System.Drawing.Size(59, 54);
-            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox6.TabIndex = 9;
-            this.pictureBox6.TabStop = false;
-            this.pictureBox6.Click += new System.EventHandler(this.onClickHandler);
+            this.pbMerger.BackColor = System.Drawing.Color.AliceBlue;
+            this.pbMerger.Image = global::Flow_Network.Properties.Resources.merger;
+            this.pbMerger.Location = new System.Drawing.Point(17, 343);
+            this.pbMerger.Name = "pictureBox6";
+            this.pbMerger.Size = new System.Drawing.Size(59, 54);
+            this.pbMerger.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbMerger.TabIndex = 9;
+            this.pbMerger.TabStop = false;
+            this.pbMerger.Click += new System.EventHandler(this.onClickHandler);
             // 
             // pictureBox5
             // 
-            this.pictureBox5.BackColor = System.Drawing.Color.AliceBlue;
-            this.pictureBox5.Image = global::Flow_Network.Properties.Resources.A_splitter;
-            this.pictureBox5.Location = new System.Drawing.Point(17, 283);
-            this.pictureBox5.Name = "pictureBox5";
-            this.pictureBox5.Size = new System.Drawing.Size(59, 54);
-            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox5.TabIndex = 8;
-            this.pictureBox5.TabStop = false;
-            this.pictureBox5.Click += new System.EventHandler(this.onClickHandler);
+            this.pbAdjSplitter.BackColor = System.Drawing.Color.AliceBlue;
+            this.pbAdjSplitter.Image = global::Flow_Network.Properties.Resources.A_splitter;
+            this.pbAdjSplitter.Location = new System.Drawing.Point(17, 283);
+            this.pbAdjSplitter.Name = "pictureBox5";
+            this.pbAdjSplitter.Size = new System.Drawing.Size(59, 54);
+            this.pbAdjSplitter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbAdjSplitter.TabIndex = 8;
+            this.pbAdjSplitter.TabStop = false;
+            this.pbAdjSplitter.Click += new System.EventHandler(this.onClickHandler);
             // 
             // pictureBox4
             // 
-            this.pictureBox4.BackColor = System.Drawing.Color.AliceBlue;
-            this.pictureBox4.Image = global::Flow_Network.Properties.Resources.splitter1;
-            this.pictureBox4.Location = new System.Drawing.Point(17, 223);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(59, 54);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox4.TabIndex = 7;
-            this.pictureBox4.TabStop = false;
-            this.pictureBox4.Click += new System.EventHandler(this.onClickHandler);
+            this.pbSplitter.BackColor = System.Drawing.Color.AliceBlue;
+            this.pbSplitter.Image = global::Flow_Network.Properties.Resources.splitter1;
+            this.pbSplitter.Location = new System.Drawing.Point(17, 223);
+            this.pbSplitter.Name = "pictureBox4";
+            this.pbSplitter.Size = new System.Drawing.Size(59, 54);
+            this.pbSplitter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pbSplitter.TabIndex = 7;
+            this.pbSplitter.TabStop = false;
+            this.pbSplitter.Click += new System.EventHandler(this.onClickHandler);
             // 
             // pictureBox7
             // 
@@ -259,27 +259,27 @@
             // 
             // pictureBox3
             // 
-            this.pictureBox3.BackColor = System.Drawing.Color.AliceBlue;
-            this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pictureBox3.Location = new System.Drawing.Point(17, 163);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(59, 54);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox3.TabIndex = 6;
-            this.pictureBox3.TabStop = false;
-            this.pictureBox3.Click += new System.EventHandler(this.onClickHandler);
+            this.pbSink.BackColor = System.Drawing.Color.AliceBlue;
+            this.pbSink.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
+            this.pbSink.Location = new System.Drawing.Point(17, 163);
+            this.pbSink.Name = "pictureBox3";
+            this.pbSink.Size = new System.Drawing.Size(59, 54);
+            this.pbSink.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pbSink.TabIndex = 6;
+            this.pbSink.TabStop = false;
+            this.pbSink.Click += new System.EventHandler(this.onClickHandler);
             // 
             // pictureBox2
             // 
-            this.pictureBox2.BackColor = System.Drawing.Color.AliceBlue;
-            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pictureBox2.Location = new System.Drawing.Point(17, 103);
-            this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(59, 54);
-            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox2.TabIndex = 5;
-            this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.onClickHandler);
+            this.pbPump.BackColor = System.Drawing.Color.AliceBlue;
+            this.pbPump.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pbPump.Location = new System.Drawing.Point(17, 103);
+            this.pbPump.Name = "pictureBox2";
+            this.pbPump.Size = new System.Drawing.Size(59, 54);
+            this.pbPump.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pbPump.TabIndex = 5;
+            this.pbPump.TabStop = false;
+            this.pbPump.Click += new System.EventHandler(this.onClickHandler);
             // 
             // pictureBox8
             // 
@@ -315,14 +315,14 @@
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.pictureBox6);
-            this.Controls.Add(this.pictureBox5);
+            this.Controls.Add(this.pbMerger);
+            this.Controls.Add(this.pbAdjSplitter);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.pictureBox4);
+            this.Controls.Add(this.pbSplitter);
             this.Controls.Add(this.pictureBox7);
-            this.Controls.Add(this.pictureBox3);
+            this.Controls.Add(this.pbSink);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.pictureBox2);
+            this.Controls.Add(this.pbPump);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox8);
             this.Controls.Add(this.label6);
@@ -337,12 +337,12 @@
             this.Name = "Main";
             this.Text = "Form1";
             this.plDraw.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbAdjSplitter)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSplitter)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbSink)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pbPump)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
@@ -358,11 +358,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.PictureBox pictureBox7;
-        private System.Windows.Forms.PictureBox pictureBox6;
-        private System.Windows.Forms.PictureBox pictureBox5;
-        private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.PictureBox pictureBox3;
-        private System.Windows.Forms.PictureBox pictureBox2;
+        private System.Windows.Forms.PictureBox pbMerger;
+        private System.Windows.Forms.PictureBox pbAdjSplitter;
+        private System.Windows.Forms.PictureBox pbSplitter;
+        private System.Windows.Forms.PictureBox pbSink;
+        private System.Windows.Forms.PictureBox pbPump;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;

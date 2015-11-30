@@ -59,11 +59,11 @@ namespace Flow_Network
                 }
             };
 
-            Resources.PumpIcon = this.pictureBox2.Image;
-            Resources.SinkIcon = this.pictureBox3.Image;
-            Resources.MergerIcon = this.pictureBox6.Image;
-            Resources.SplitterIcon = this.pictureBox4.Image;
-            Resources.AdjSplitterIcon = this.pictureBox5.Image;
+            Resources.PumpIcon = this.pbPump.Image;
+            Resources.SinkIcon = this.pbSink.Image;
+            Resources.MergerIcon = this.pbMerger.Image;
+            Resources.SplitterIcon = this.pbSplitter.Image;
+            Resources.AdjSplitterIcon = this.pbAdjSplitter.Image;
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
             iconBelowCursor.Height = 16;
@@ -412,15 +412,15 @@ namespace Flow_Network
             currentActive = s;
             if (currentActive == pictureBox1)
                 ActiveTool = ActiveToolType.Select;
-            else if (currentActive == pictureBox2)
+            else if (currentActive == pbPump)
                 ActiveTool = ActiveToolType.Pump;
-            else if (currentActive == pictureBox3)
+            else if (currentActive == pbSink)
                 ActiveTool = ActiveToolType.Sink;
-            else if (currentActive == pictureBox4)
+            else if (currentActive == pbSplitter)
                 ActiveTool = ActiveToolType.Splitter;
-            else if (currentActive == pictureBox5)
+            else if (currentActive == pbAdjSplitter)
                 ActiveTool = ActiveToolType.AdjustableSplitter;
-            else if (currentActive == pictureBox6)
+            else if (currentActive == pbMerger)
                 ActiveTool = ActiveToolType.Merger;
             else if (currentActive == pictureBox7)
                 ActiveTool = ActiveToolType.Pipe;
