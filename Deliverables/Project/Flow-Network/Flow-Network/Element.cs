@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace Flow_Network
 {
-    public class Element
+    public abstract class Element
     {
         public static List<Element> AllElements { get { return Main.AllElements; } }
 
@@ -31,12 +31,13 @@ namespace Flow_Network
             this.PictureBox.Image = this.Icon;
             this.PictureBox.Width = 32;
             this.PictureBox.Height = 32;
+            this.PictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
         }
         public int X
         {
             get
             {
-                return this.PictureBox.Left; // total left
+                return this.PictureBox.Left;
             }
             set
             {
@@ -55,16 +56,5 @@ namespace Flow_Network
                 this.PictureBox.Top = value;
             }
         }
-
-        //public @delegate OnFlowAltered
-        //{
-        //    get
-        //    {
-        //        throw new System.NotImplementedException();
-        //    }
-        //    set
-        //    {
-        //    }
-        //}
     }
 }

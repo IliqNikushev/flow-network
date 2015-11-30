@@ -19,16 +19,30 @@ namespace Flow_Network
         {
             if (IsUndone) return;
             OnUndo();
+            IsUndone = true;
+            IsDone = false;
         }
 
         public void Redo()
         {
             if (IsDone) return;
-            Redo();
+            OnRedo();
+            IsDone = true;
+            IsUndone = false;
         }
 
         protected abstract void OnUndo();
 
         protected abstract void OnRedo();
+
+        protected abstract string AsString { get; }
+
+        public override string ToString()
+        {
+            return
+                (this.IsDone ? "Perform " : "Undo ")
+                +
+                this.AsString;
+        }
     }
 }

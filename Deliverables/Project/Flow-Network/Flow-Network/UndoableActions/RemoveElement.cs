@@ -22,5 +22,13 @@ namespace Flow_Network.UndoableActions
         {
             base.OnUndo();
         }
+
+        protected override string AsString
+        {
+            get
+            {
+                return "Remove Element";
+            }
+        }
     }
 }

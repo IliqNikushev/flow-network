@@ -7,6 +7,9 @@ namespace Flow_Network
 {
     public static class UndoStack
     {
+        public static event Action<int, UndoableAction> OnUndoAltered = (x, y) => { };
+        public static event Action<int, UndoableAction> OnRedoAltered = (x, y) => { };
+
         public static bool CanUndo
         {
             get
@@ -28,9 +31,12 @@ namespace Flow_Network
 
         public static void AddAction(UndoableAction action, bool isNew = true)
         {
-            if(redoStack.Count > 0) redoStack.Clear();
+            if (redoStack.Count > 0) redoStack.Clear();
 
             activitiesStack.Push(action);
+
+            OnUndoAltered(activitiesStack.Count, action);
+            OnRedoAltered(redoStack.Count, null);
         }
 
         public static void Undo()
@@ -39,6 +45,12 @@ namespace Flow_Network
             UndoableAction action = activitiesStack.Pop();
             action.Undo();
             redoStack.Push(action);
+
+            OnRedoAltered(redoStack.Count, action);
+            if (activitiesStack.Count == 0)
+                OnUndoAltered(activitiesStack.Count, null);
+            else
+                OnUndoAltered(activitiesStack.Count, activitiesStack.Peek());
         }
 
         public static void Redo()
@@ -48,6 +60,12 @@ namespace Flow_Network
             UndoableAction action = redoStack.Pop();
             action.Redo();
             activitiesStack.Push(action);
+
+            OnUndoAltered(activitiesStack.Count, action);
+            if (redoStack.Count == 0)
+                OnRedoAltered(redoStack.Count, null);
+            else
+                OnRedoAltered(redoStack.Count, redoStack.Peek());
         }
     }
 }

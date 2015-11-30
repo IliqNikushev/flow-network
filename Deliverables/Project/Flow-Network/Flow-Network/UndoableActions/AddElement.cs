@@ -28,5 +28,10 @@ namespace Flow_Network.UndoableActions
             Element.PictureBox.Parent = pboxParent;
             Element.AllElements.Add(this.Element);
         }
+
+        protected override string AsString
+        {
+            get { return "Add Element"; }
+        }
     }
 }

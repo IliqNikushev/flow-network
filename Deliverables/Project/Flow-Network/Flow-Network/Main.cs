@@ -66,6 +66,24 @@ namespace Flow_Network
             plDraw.MouseUp += plDraw_HandleStopDrag;
 
             plDraw.Click += plDraw_HandleClick;
+
+            UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
+            {
+                numberActionsToUndoLbl.Text = numberLeft.ToString();
+                if (lastAction == null)
+                    lastActionToUndoLbl.Text = "";
+                else
+                lastActionToUndoLbl.Text = lastAction.ToString();
+            };
+
+            UndoStack.OnRedoAltered += (numberLeft, lastAction) =>
+            {
+                numberActionsRedone.Text = numberLeft.ToString();
+                if (lastAction == null)
+                    lastActionUndone.Text = "";
+                else
+                    lastActionUndone.Text = lastAction.ToString();
+            };
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -140,44 +158,31 @@ namespace Flow_Network
                 return;
             }
 
-            Element toAdd = null;
+            Element elementToAdd = null;
 
             if (ActiveTool == ActiveToolType.Pump)
             {
-                toAdd = new Pump();
-                toAdd.PictureBox.Width = 32;
-                toAdd.PictureBox.Height = 32;
+                elementToAdd = new Pump();
             }
             else if (ActiveTool == ActiveToolType.Sink)
             {
-                toAdd = new Sink();
-                toAdd.PictureBox.Width = 50;
-                toAdd.PictureBox.Height = 50;
+                elementToAdd = new Sink();
             }
             else if (ActiveTool == ActiveToolType.Splitter)
             {
-                toAdd = new Splitter();
-                toAdd.PictureBox.Width = 100;
-                toAdd.PictureBox.Height = 100;
+                elementToAdd = new Splitter();
             }
             else if (ActiveTool == ActiveToolType.AdjustableSplitter)
             {
-                toAdd = new AdjustableSplitter();
+                elementToAdd = new AdjustableSplitter();
             }
             else if (ActiveTool == ActiveToolType.Merger)
             {
-                toAdd = new Merger();
+                elementToAdd = new Merger();
             }
-            if (toAdd != null)
+            if (elementToAdd != null)
             {
-                toAdd.PictureBox.Enabled = false;
-
-                toAdd.X = mousePosition.X;
-                toAdd.Y = mousePosition.Y;
-
-                this.plDraw.Controls.Add(toAdd.PictureBox);
-                AllElements.Add(toAdd);
-                iconBelowCursor.BackColor = Color.Red;
+                AddElement(elementToAdd, mousePosition);
             }
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
@@ -291,6 +296,36 @@ namespace Flow_Network
                 }
             }
         }
+
+        #region AddElement Remove
+
+        void RemoveElement(Element e)
+        {
+            AllElements.Remove(e);
+            plDraw.Controls.Remove(e.PictureBox);
+            UndoStack.AddAction(new UndoableActions.RemoveElement(e, plDraw));
+        }
+
+        void AddElement(Element e, Point position)
+        {
+            e.PictureBox.Enabled = false;
+
+            e.X = position.X;
+            e.Y = position.Y;
+
+            this.plDraw.Controls.Add(e.PictureBox);
+            AllElements.Add(e);
+
+            UndoStack.AddAction(new UndoableActions.AddElement(e));
+        }
+
+        void AddElement<T>(Point position) where T : Element
+        {
+            Element e = Activator.CreateInstance<T>();
+            AddElement(e, position);
+        }
+        #endregion
+
         #region rightClick
         [Flags]
         enum RightClickOptions
@@ -342,15 +377,14 @@ namespace Flow_Network
                     if (e == null) return;
                     else
                     {
-                        AllElements.Remove(e);
-                        plDraw.Controls.Remove(e.PictureBox);
+                        RemoveElement(e);
                     }
                 }).Name = "remove";
-                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { });
-                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { });
-                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { });
-                rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { });
-                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { });
+                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<Pump>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<Sink>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<Splitter>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<Merger>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Cancel", 120);
 
                 foreach (var item in rightClickPanel.Controls)
@@ -421,6 +455,26 @@ namespace Flow_Network
             return FindCollisionElement(mousePosition) != null;
         }
         #endregion
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void undoButton_Click(object sender, EventArgs e)
+        {
+            UndoStack.Undo();
+        }
+
+        private void redoButton_Click(object sender, EventArgs e)
+        {
+            UndoStack.Redo();
+        }
     }
 }
 

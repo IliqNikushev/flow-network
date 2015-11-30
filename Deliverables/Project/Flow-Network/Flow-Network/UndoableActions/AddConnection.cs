@@ -24,5 +24,10 @@ namespace Flow_Network.UndoableActions
         {
             ConnectionZone.Path.All.Add(this.Connection);
         }
+
+        protected override string AsString
+        {
+            get { return "Add Connection"; }
+        }
     }
 }
