@@ -7,7 +7,7 @@ namespace Flow_Network
 {
     public class Sink : Element
     {
-        public Connection In
+        public ConnectionZone In
         {
             get
             {

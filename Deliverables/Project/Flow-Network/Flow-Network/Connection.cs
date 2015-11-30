@@ -6,82 +6,13 @@ using System.Drawing;
 
 namespace Flow_Network
 {
-    public class Connection
+    public class ConnectionZone
     {
-        #region old
-        /*
-        public Connection()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public int X
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public int Y
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            set
-            {
-            }
-        }
-
-        public Element Owner
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            private set
-            {
-            }
-        }
-
-        public Element To
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-            private set
-            {
-            }
-        }
-
-        public int Flow
-        {
-            get
-            {
-                throw new System.NotImplementedException();
-            }
-        }
-
-        public bool CanConnectTo(Element e)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void ConnectTo(Element e)
-        {
-            throw new System.NotImplementedException();
-        }
-        */
-        #endregion
         public class Path
         {
-            public Connection From{get; private set;}
-            public Connection To{get; private set;}
+            public static List<Path> All { get { return Main.AllPaths; } }
+            public ConnectionZone From{get; private set;}
+            public ConnectionZone To{get; private set;}
 
             public List<Point> PathPoints
             {
@@ -96,7 +27,7 @@ namespace Flow_Network
             }
             public List<Point> MidPoints = new List<Point>();
 
-            public Path(Connection from, Connection to)
+            public Path(ConnectionZone from, ConnectionZone to)
             {
                 this.From = from;
                 this.To = to;
@@ -266,30 +197,23 @@ namespace Flow_Network
             }
         }
 
-        public Path PathWay { get; private set; }
-
-        public Connection(Point margin, Element parent)
+        public ConnectionZone(Point margin, Element parent)
         {
             this.Margin = margin;
             this.Parent = parent;
         }
 
-        public void ConnectTo(Connection connection)
-        {
-            this.PathWay = new Path(this, connection);
-        }
-
-        public static Path PathFromTo(Connection from, Connection to)
+        public static Path PathFromTo(ConnectionZone from, ConnectionZone to)
         {
             return new Path(from, to);
         }
 
-        public Path GetPathTo(Connection to)
+        public Path GetPathTo(ConnectionZone to)
         {
             return PathFromTo(this, to);
         }
 
-        public static implicit operator Point(Connection connection)
+        public static implicit operator Point(ConnectionZone connection)
         {
             return connection.Parent.Center;
         }

@@ -43,29 +43,39 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.plDraw = new System.Windows.Forms.Panel();
+            this.pictureBox10 = new System.Windows.Forms.PictureBox();
+            this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.pbMerger = new System.Windows.Forms.PictureBox();
-            this.pbAdjSplitter = new System.Windows.Forms.PictureBox();
-            this.pbSplitter = new System.Windows.Forms.PictureBox();
+            this.pictureBox6 = new System.Windows.Forms.PictureBox();
+            this.pictureBox5 = new System.Windows.Forms.PictureBox();
+            this.pictureBox4 = new System.Windows.Forms.PictureBox();
             this.pictureBox7 = new System.Windows.Forms.PictureBox();
-            this.pbSink = new System.Windows.Forms.PictureBox();
-            this.pbPump = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox8 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox9 = new System.Windows.Forms.PictureBox();
-            this.pictureBox10 = new System.Windows.Forms.PictureBox();
+            this.undoButton = new System.Windows.Forms.Button();
+            this.redoButton = new System.Windows.Forms.Button();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.numberActionsToUndoLbl = new System.Windows.Forms.Label();
+            this.lastActionToUndoLbl = new System.Windows.Forms.Label();
+            this.lastActionUndone = new System.Windows.Forms.Label();
+            this.numberActionsRedone = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
             this.plDraw.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbAdjSplitter)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSplitter)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSink)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPump)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -192,16 +202,38 @@
             this.plDraw.Controls.Add(this.pictureBox9);
             this.plDraw.Controls.Add(this.btnLoad);
             this.plDraw.Controls.Add(this.btnSave);
-            this.plDraw.Location = new System.Drawing.Point(223, 24);
+            this.plDraw.Location = new System.Drawing.Point(223, 43);
             this.plDraw.Name = "plDraw";
-            this.plDraw.Size = new System.Drawing.Size(815, 575);
+            this.plDraw.Size = new System.Drawing.Size(815, 556);
             this.plDraw.TabIndex = 2;
+            // 
+            // pictureBox10
+            // 
+            this.pictureBox10.Enabled = false;
+            this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
+            this.pictureBox10.Location = new System.Drawing.Point(3, 522);
+            this.pictureBox10.Name = "pictureBox10";
+            this.pictureBox10.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox10.TabIndex = 3;
+            this.pictureBox10.TabStop = false;
+            // 
+            // pictureBox9
+            // 
+            this.pictureBox9.Enabled = false;
+            this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
+            this.pictureBox9.Location = new System.Drawing.Point(82, 522);
+            this.pictureBox9.Name = "pictureBox9";
+            this.pictureBox9.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox9.TabIndex = 2;
+            this.pictureBox9.TabStop = false;
             // 
             // btnLoad
             // 
             this.btnLoad.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.btnLoad.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.btnLoad.Location = new System.Drawing.Point(75, 541);
+            this.btnLoad.Location = new System.Drawing.Point(78, 519);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(76, 31);
             this.btnLoad.TabIndex = 1;
@@ -209,10 +241,11 @@
             this.btnLoad.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnLoad.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnLoad.UseVisualStyleBackColor = true;
+            this.btnLoad.Click += new System.EventHandler(this.btnLoad_Click);
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(3, 541);
+            this.btnSave.Location = new System.Drawing.Point(3, 519);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(72, 31);
             this.btnSave.TabIndex = 0;
@@ -220,42 +253,43 @@
             this.btnSave.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.btnSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnSave.UseVisualStyleBackColor = true;
+            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // pictureBox6
             // 
-            this.pbMerger.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbMerger.Image = global::Flow_Network.Properties.Resources.merger;
-            this.pbMerger.Location = new System.Drawing.Point(17, 343);
-            this.pbMerger.Name = "pictureBox6";
-            this.pbMerger.Size = new System.Drawing.Size(59, 54);
-            this.pbMerger.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbMerger.TabIndex = 9;
-            this.pbMerger.TabStop = false;
-            this.pbMerger.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox6.BackColor = System.Drawing.Color.AliceBlue;
+            this.pictureBox6.Image = global::Flow_Network.Properties.Resources.merger;
+            this.pictureBox6.Location = new System.Drawing.Point(17, 343);
+            this.pictureBox6.Name = "pictureBox6";
+            this.pictureBox6.Size = new System.Drawing.Size(59, 54);
+            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox6.TabIndex = 9;
+            this.pictureBox6.TabStop = false;
+            this.pictureBox6.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox5
             // 
-            this.pbAdjSplitter.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbAdjSplitter.Image = global::Flow_Network.Properties.Resources.A_splitter;
-            this.pbAdjSplitter.Location = new System.Drawing.Point(17, 283);
-            this.pbAdjSplitter.Name = "pictureBox5";
-            this.pbAdjSplitter.Size = new System.Drawing.Size(59, 54);
-            this.pbAdjSplitter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbAdjSplitter.TabIndex = 8;
-            this.pbAdjSplitter.TabStop = false;
-            this.pbAdjSplitter.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox5.BackColor = System.Drawing.Color.AliceBlue;
+            this.pictureBox5.Image = global::Flow_Network.Properties.Resources.A_splitter;
+            this.pictureBox5.Location = new System.Drawing.Point(17, 283);
+            this.pictureBox5.Name = "pictureBox5";
+            this.pictureBox5.Size = new System.Drawing.Size(59, 54);
+            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox5.TabIndex = 8;
+            this.pictureBox5.TabStop = false;
+            this.pictureBox5.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox4
             // 
-            this.pbSplitter.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbSplitter.Image = global::Flow_Network.Properties.Resources.splitter1;
-            this.pbSplitter.Location = new System.Drawing.Point(17, 223);
-            this.pbSplitter.Name = "pictureBox4";
-            this.pbSplitter.Size = new System.Drawing.Size(59, 54);
-            this.pbSplitter.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pbSplitter.TabIndex = 7;
-            this.pbSplitter.TabStop = false;
-            this.pbSplitter.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox4.BackColor = System.Drawing.Color.AliceBlue;
+            this.pictureBox4.Image = global::Flow_Network.Properties.Resources.splitter1;
+            this.pictureBox4.Location = new System.Drawing.Point(17, 223);
+            this.pictureBox4.Name = "pictureBox4";
+            this.pictureBox4.Size = new System.Drawing.Size(59, 54);
+            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox4.TabIndex = 7;
+            this.pictureBox4.TabStop = false;
+            this.pictureBox4.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox7
             // 
@@ -267,31 +301,31 @@
             this.pictureBox7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox7.TabIndex = 10;
             this.pictureBox7.TabStop = false;
-            this.pictureBox7.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox7.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox3
             // 
-            this.pbSink.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbSink.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
-            this.pbSink.Location = new System.Drawing.Point(17, 163);
-            this.pbSink.Name = "pictureBox3";
-            this.pbSink.Size = new System.Drawing.Size(59, 54);
-            this.pbSink.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pbSink.TabIndex = 6;
-            this.pbSink.TabStop = false;
-            this.pbSink.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox3.BackColor = System.Drawing.Color.AliceBlue;
+            this.pictureBox3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox3.Image")));
+            this.pictureBox3.Location = new System.Drawing.Point(17, 163);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(59, 54);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox3.TabIndex = 6;
+            this.pictureBox3.TabStop = false;
+            this.pictureBox3.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox2
             // 
-            this.pbPump.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbPump.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
-            this.pbPump.Location = new System.Drawing.Point(17, 103);
-            this.pbPump.Name = "pictureBox2";
-            this.pbPump.Size = new System.Drawing.Size(59, 54);
-            this.pbPump.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pbPump.TabIndex = 5;
-            this.pbPump.TabStop = false;
-            this.pbPump.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox2.BackColor = System.Drawing.Color.AliceBlue;
+            this.pictureBox2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox2.Image")));
+            this.pictureBox2.Location = new System.Drawing.Point(17, 103);
+            this.pictureBox2.Name = "pictureBox2";
+            this.pictureBox2.Size = new System.Drawing.Size(59, 54);
+            this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox2.TabIndex = 5;
+            this.pictureBox2.TabStop = false;
+            this.pictureBox2.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox8
             // 
@@ -303,7 +337,7 @@
             this.pictureBox8.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBox8.TabIndex = 11;
             this.pictureBox8.TabStop = false;
-            this.pictureBox8.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox8.Click += new System.EventHandler(this.pboxToolClick);
             // 
             // pictureBox1
             // 
@@ -315,29 +349,99 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 4;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.onClickHandler);
+            this.pictureBox1.Click += new System.EventHandler(this.pboxToolClick);
             // 
-            // pictureBox9
+            // undoButton
             // 
-            this.pictureBox9.Enabled = false;
-            this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
-            this.pictureBox9.Location = new System.Drawing.Point(79, 544);
-            this.pictureBox9.Name = "pictureBox9";
-            this.pictureBox9.Size = new System.Drawing.Size(33, 24);
-            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox9.TabIndex = 2;
-            this.pictureBox9.TabStop = false;
+            this.undoButton.Location = new System.Drawing.Point(304, 1);
+            this.undoButton.Name = "undoButton";
+            this.undoButton.Size = new System.Drawing.Size(75, 23);
+            this.undoButton.TabIndex = 4;
+            this.undoButton.Text = "Undo";
+            this.undoButton.UseVisualStyleBackColor = true;
+            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
             // 
-            // pictureBox10
+            // redoButton
             // 
-            this.pictureBox10.Enabled = false;
-            this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
-            this.pictureBox10.Location = new System.Drawing.Point(3, 544);
-            this.pictureBox10.Name = "pictureBox10";
-            this.pictureBox10.Size = new System.Drawing.Size(33, 24);
-            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox10.TabIndex = 3;
-            this.pictureBox10.TabStop = false;
+            this.redoButton.Location = new System.Drawing.Point(304, 21);
+            this.redoButton.Name = "redoButton";
+            this.redoButton.Size = new System.Drawing.Size(75, 23);
+            this.redoButton.TabIndex = 20;
+            this.redoButton.Text = "Redo";
+            this.redoButton.UseVisualStyleBackColor = true;
+            this.redoButton.Click += new System.EventHandler(this.redoButton_Click);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(382, 5);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(71, 14);
+            this.label12.TabIndex = 21;
+            this.label12.Text = "items to undo";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(486, 5);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(84, 14);
+            this.label13.TabIndex = 22;
+            this.label13.Text = "Last thing done:";
+            // 
+            // numberActionsToUndoLbl
+            // 
+            this.numberActionsToUndoLbl.AutoSize = true;
+            this.numberActionsToUndoLbl.Location = new System.Drawing.Point(451, 5);
+            this.numberActionsToUndoLbl.Name = "numberActionsToUndoLbl";
+            this.numberActionsToUndoLbl.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsToUndoLbl.TabIndex = 23;
+            this.numberActionsToUndoLbl.Text = "####";
+            // 
+            // lastActionToUndoLbl
+            // 
+            this.lastActionToUndoLbl.AutoSize = true;
+            this.lastActionToUndoLbl.Location = new System.Drawing.Point(576, 5);
+            this.lastActionToUndoLbl.Name = "lastActionToUndoLbl";
+            this.lastActionToUndoLbl.Size = new System.Drawing.Size(43, 14);
+            this.lastActionToUndoLbl.TabIndex = 24;
+            this.lastActionToUndoLbl.Text = "............";
+            // 
+            // lastActionUndone
+            // 
+            this.lastActionUndone.AutoSize = true;
+            this.lastActionUndone.Location = new System.Drawing.Point(576, 24);
+            this.lastActionUndone.Name = "lastActionUndone";
+            this.lastActionUndone.Size = new System.Drawing.Size(43, 14);
+            this.lastActionUndone.TabIndex = 28;
+            this.lastActionUndone.Text = "............";
+            // 
+            // numberActionsRedone
+            // 
+            this.numberActionsRedone.AutoSize = true;
+            this.numberActionsRedone.Location = new System.Drawing.Point(451, 24);
+            this.numberActionsRedone.Name = "numberActionsRedone";
+            this.numberActionsRedone.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsRedone.TabIndex = 27;
+            this.numberActionsRedone.Text = "####";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(486, 24);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(84, 14);
+            this.label16.TabIndex = 26;
+            this.label16.Text = "Last thing done:";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(382, 24);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(69, 14);
+            this.label17.TabIndex = 25;
+            this.label17.Text = "items to redo";
             // 
             // Main
             // 
@@ -345,18 +449,28 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
+            this.Controls.Add(this.lastActionUndone);
+            this.Controls.Add(this.numberActionsRedone);
+            this.Controls.Add(this.label16);
+            this.Controls.Add(this.label17);
+            this.Controls.Add(this.lastActionToUndoLbl);
+            this.Controls.Add(this.numberActionsToUndoLbl);
+            this.Controls.Add(this.label13);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.redoButton);
+            this.Controls.Add(this.undoButton);
             this.Controls.Add(this.plDraw);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.label9);
-            this.Controls.Add(this.pbMerger);
-            this.Controls.Add(this.pbAdjSplitter);
+            this.Controls.Add(this.pictureBox6);
+            this.Controls.Add(this.pictureBox5);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.pbSplitter);
+            this.Controls.Add(this.pictureBox4);
             this.Controls.Add(this.pictureBox7);
-            this.Controls.Add(this.pbSink);
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.label7);
-            this.Controls.Add(this.pbPump);
+            this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox8);
             this.Controls.Add(this.label6);
@@ -371,16 +485,16 @@
             this.Name = "Main";
             this.Text = "Form1";
             this.plDraw.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbAdjSplitter)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSplitter)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbSink)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pbPump)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -394,11 +508,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox8;
         private System.Windows.Forms.PictureBox pictureBox7;
-        private System.Windows.Forms.PictureBox pbMerger;
-        private System.Windows.Forms.PictureBox pbAdjSplitter;
-        private System.Windows.Forms.PictureBox pbSplitter;
-        private System.Windows.Forms.PictureBox pbSink;
-        private System.Windows.Forms.PictureBox pbPump;
+        private System.Windows.Forms.PictureBox pictureBox6;
+        private System.Windows.Forms.PictureBox pictureBox5;
+        private System.Windows.Forms.PictureBox pictureBox4;
+        private System.Windows.Forms.PictureBox pictureBox3;
+        private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label label9;
@@ -414,6 +528,16 @@
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.PictureBox pictureBox10;
         private System.Windows.Forms.PictureBox pictureBox9;
+        private System.Windows.Forms.Button undoButton;
+        private System.Windows.Forms.Button redoButton;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label numberActionsToUndoLbl;
+        private System.Windows.Forms.Label lastActionToUndoLbl;
+        private System.Windows.Forms.Label lastActionUndone;
+        private System.Windows.Forms.Label numberActionsRedone;
+        private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Label label17;
     }
 }
 

@@ -5,38 +5,67 @@ using System.Text;
 
 namespace Flow_Network
 {
-    public class UndoStack
+    public static class UndoStack
     {
-        public bool CanUndo
+        public static event Action<int, UndoableAction> OnUndoAltered = (x, y) => { };
+        public static event Action<int, UndoableAction> OnRedoAltered = (x, y) => { };
+
+        public static bool CanUndo
         {
             get
             {
-                throw new System.NotImplementedException();
+                return activitiesStack.Count != 0;
             }
         }
-        Stack<Action> stack = new Stack<Action>();
 
-        public bool CanRedo
+        public static bool CanRedo
         {
             get
             {
-                throw new System.NotImplementedException();
+                return redoStack.Count != 0;
             }
         }
-    
-        public void AddAction(Action action)
+
+        private static Stack<UndoableAction> activitiesStack = new Stack<UndoableAction>();
+        private static Stack<UndoableAction> redoStack = new Stack<UndoableAction>();
+
+        public static void AddAction(UndoableAction action, bool isNew = true)
         {
-            throw new System.NotImplementedException();
+            if (redoStack.Count > 0) redoStack.Clear();
+
+            activitiesStack.Push(action);
+
+            OnUndoAltered(activitiesStack.Count, action);
+            OnRedoAltered(redoStack.Count, null);
         }
 
-        public void Undo()
+        public static void Undo()
         {
-            throw new System.NotImplementedException();
+            if (!CanUndo) return;
+            UndoableAction action = activitiesStack.Pop();
+            action.Undo();
+            redoStack.Push(action);
+
+            OnRedoAltered(redoStack.Count, action);
+            if (activitiesStack.Count == 0)
+                OnUndoAltered(activitiesStack.Count, null);
+            else
+                OnUndoAltered(activitiesStack.Count, activitiesStack.Peek());
         }
 
-        public void Redo()
+        public static void Redo()
         {
-            throw new System.NotImplementedException();
+            if (!CanRedo) return;
+
+            UndoableAction action = redoStack.Pop();
+            action.Redo();
+            activitiesStack.Push(action);
+
+            OnUndoAltered(activitiesStack.Count, action);
+            if (redoStack.Count == 0)
+                OnRedoAltered(redoStack.Count, null);
+            else
+                OnRedoAltered(redoStack.Count, redoStack.Peek());
         }
     }
 }
