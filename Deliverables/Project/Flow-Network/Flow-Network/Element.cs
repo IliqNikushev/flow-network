@@ -11,6 +11,12 @@ namespace Flow_Network
     {
         public static List<Element> AllElements { get { return Main.AllElements; } }
 
+        public bool Contains(Point point)
+        {
+            return this.X <= point.X && this.X >= point.X + this.Width &&
+                    this.Y <= point.Y && this.Y >= point.Y + this.Height;
+        }
+
         public void RefreshConnections(bool refresh = false)
         {
             foreach (ConnectionZone.Path connection in this.Connections)
@@ -19,7 +25,7 @@ namespace Flow_Network
             }
         }
 
-        public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this || x.To.Parent == this); } }
+        public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this); } }
 
         public Point Center { get { return new Point(this.X + this.Width / 2, this.Y + this.Height / 2); } }
         public Point A { get { return new Point(this.X-1, this.Y + this.Height+2); } }

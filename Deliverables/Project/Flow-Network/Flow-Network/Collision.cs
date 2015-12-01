@@ -102,36 +102,80 @@ namespace Flow_Network
             return collision != null;
         }
 
-        public static Collision FindBetween(Point from, Point to, ConnectionZone fromEl, ConnectionZone toEl,ref Collision lastCollision, List<Element> elements = null)
+        public static Collision FindBetween(Point from, Point to, ConnectionZone fromEl, ConnectionZone toEl,ref HashSet<Collision> lastCollision, List<Element> elements = null)
         {
             if (elements == null) elements = Element.AllElements;
+
+            double deltaMin = double.MaxValue;
+            Collision minimum = null;
 
             foreach (Element element in elements)
             {
                 if (element == fromEl.Parent) continue;
                 if (element == toEl.Parent) continue;
 
-                Point intersection;
+                Point intersection = new Point();
                 bool interects = Intersects(element.A, element.B, from, to, out intersection);
                 if(!interects)
                     interects = Intersects(element.A, element.D, from, to, out intersection);
                 if (!interects)
                     interects = Intersects(element.C, element.D, from, to, out intersection);
                 if (!interects)
-                    interects = Intersects(element.C, element.B, from, to, out intersection);
+                   interects = Intersects(element.C, element.B, from, to, out intersection);
+                if (interects)
+                //bool interects = Intersects(from, to, element);
                 if (interects)
                 {
+                    double deltaX = element.Center.X - fromEl.Parent.Center.X;
+                    double deltaY = element.Center.Y - fromEl.Parent.Center.Y;
+                    double delta = deltaX * deltaX + deltaY * deltaY;
+                    delta = Math.Sqrt(delta);
                     Collision collision = new Collision(intersection, element, from, to);
-                    if (lastCollision != null)
-                        if (collision.Element == lastCollision.Element) continue;
-                    lastCollision = collision;
-                    return collision;
+                    if (lastCollision.FirstOrDefault(x => x.Element == element) != null) continue;
+                    
+                    if (deltaMin > delta)
+                    {
+                        deltaMin = delta;
+                        minimum = collision;
+                    }
                 }
             }
-
-            return null;
+            if(minimum != null)
+                lastCollision.Add(minimum);
+            return minimum;
         }
 
+        static bool Intersects(Point p1, Point p2, Element r)
+        {
+            return LineIntersectsLine(p1, p2, new Point(r.X, r.Y), new Point(r.X + r.Width, r.Y)) ||
+                   LineIntersectsLine(p1, p2, new Point(r.X + r.Width, r.Y), new Point(r.X + r.Width, r.Y + r.Height)) ||
+                   LineIntersectsLine(p1, p2, new Point(r.X + r.Width, r.Y + r.Height), new Point(r.X, r.Y + r.Height)) ||
+                   LineIntersectsLine(p1, p2, new Point(r.X, r.Y + r.Height), new Point(r.X, r.Y)) ||
+                   (r.Contains(p1) && r.Contains(p2));
+        }
+
+        private static bool LineIntersectsLine(Point l1p1, Point l1p2, Point l2p1, Point l2p2)
+        {
+            float q = (l1p1.Y - l2p1.Y) * (l2p2.X - l2p1.X) - (l1p1.X - l2p1.X) * (l2p2.Y - l2p1.Y);
+            float d = (l1p2.X - l1p1.X) * (l2p2.Y - l2p1.Y) - (l1p2.Y - l1p1.Y) * (l2p2.X - l2p1.X);
+
+            if (d == 0)
+            {
+                return false;
+            }
+
+            float r = q / d;
+
+            q = (l1p1.Y - l2p1.Y) * (l1p2.X - l1p1.X) - (l1p1.X - l2p1.X) * (l1p2.Y - l1p1.Y);
+            float s = q / d;
+
+            if (r < 0 || r > 1 || s < 0 || s > 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection)
         {

@@ -45,24 +45,21 @@ namespace Flow_Network
             {
                 if (IsAdjusting) activeAdjuster.Abort();
 
-                Point start = this.From;
-                Point end = this.To;
-
-                this.MidPoints.Clear();
-
                 activeAdjuster = new System.Threading.Thread(() =>
                {
                    try
                    {
-                       Collision lastCollision = null;
+                       Point start = this.From;
+                       Point end = this.To;
+
+                       this.MidPoints.Clear();
+                       HashSet<Collision> lastCollisions = new HashSet<Collision>();
                        while (true)
                        {
-                           Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref lastCollision, Element.AllElements);
+                           Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref lastCollisions, Element.AllElements);
                            if (!collision) break;
                            else
                            {
-                               Point margin = collision.CloserMargin;
-
                                //1 3;2 4
                                if (collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
                                {
