@@ -65,7 +65,8 @@
             this.numberActionsRedone = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
-            this.plDraw.SuspendLayout();
+            this.pictureBox11 = new System.Windows.Forms.PictureBox();
+            this.btnNew = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
@@ -76,6 +77,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -198,10 +200,6 @@
             // 
             this.plDraw.BackColor = System.Drawing.Color.Bisque;
             this.plDraw.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.plDraw.Controls.Add(this.pictureBox10);
-            this.plDraw.Controls.Add(this.pictureBox9);
-            this.plDraw.Controls.Add(this.btnLoad);
-            this.plDraw.Controls.Add(this.btnSave);
             this.plDraw.Location = new System.Drawing.Point(223, 43);
             this.plDraw.Name = "plDraw";
             this.plDraw.Size = new System.Drawing.Size(815, 556);
@@ -211,7 +209,7 @@
             // 
             this.pictureBox10.Enabled = false;
             this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
-            this.pictureBox10.Location = new System.Drawing.Point(3, 522);
+            this.pictureBox10.Location = new System.Drawing.Point(301, 8);
             this.pictureBox10.Name = "pictureBox10";
             this.pictureBox10.Size = new System.Drawing.Size(33, 24);
             this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -222,7 +220,7 @@
             // 
             this.pictureBox9.Enabled = false;
             this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
-            this.pictureBox9.Location = new System.Drawing.Point(82, 522);
+            this.pictureBox9.Location = new System.Drawing.Point(380, 8);
             this.pictureBox9.Name = "pictureBox9";
             this.pictureBox9.Size = new System.Drawing.Size(33, 24);
             this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -233,7 +231,7 @@
             // 
             this.btnLoad.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.btnLoad.ImageAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.btnLoad.Location = new System.Drawing.Point(78, 519);
+            this.btnLoad.Location = new System.Drawing.Point(376, 5);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(76, 31);
             this.btnLoad.TabIndex = 1;
@@ -245,7 +243,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(3, 519);
+            this.btnSave.Location = new System.Drawing.Point(301, 5);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(72, 31);
             this.btnSave.TabIndex = 0;
@@ -353,7 +351,7 @@
             // 
             // undoButton
             // 
-            this.undoButton.Location = new System.Drawing.Point(304, 1);
+            this.undoButton.Location = new System.Drawing.Point(480, 1);
             this.undoButton.Name = "undoButton";
             this.undoButton.Size = new System.Drawing.Size(75, 23);
             this.undoButton.TabIndex = 4;
@@ -363,7 +361,7 @@
             // 
             // redoButton
             // 
-            this.redoButton.Location = new System.Drawing.Point(304, 21);
+            this.redoButton.Location = new System.Drawing.Point(480, 21);
             this.redoButton.Name = "redoButton";
             this.redoButton.Size = new System.Drawing.Size(75, 23);
             this.redoButton.TabIndex = 20;
@@ -374,7 +372,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(382, 5);
+            this.label12.Location = new System.Drawing.Point(558, 5);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(71, 14);
             this.label12.TabIndex = 21;
@@ -383,7 +381,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(486, 5);
+            this.label13.Location = new System.Drawing.Point(662, 5);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(84, 14);
             this.label13.TabIndex = 22;
@@ -392,7 +390,7 @@
             // numberActionsToUndoLbl
             // 
             this.numberActionsToUndoLbl.AutoSize = true;
-            this.numberActionsToUndoLbl.Location = new System.Drawing.Point(451, 5);
+            this.numberActionsToUndoLbl.Location = new System.Drawing.Point(627, 5);
             this.numberActionsToUndoLbl.Name = "numberActionsToUndoLbl";
             this.numberActionsToUndoLbl.Size = new System.Drawing.Size(31, 14);
             this.numberActionsToUndoLbl.TabIndex = 23;
@@ -401,7 +399,7 @@
             // lastActionToUndoLbl
             // 
             this.lastActionToUndoLbl.AutoSize = true;
-            this.lastActionToUndoLbl.Location = new System.Drawing.Point(576, 5);
+            this.lastActionToUndoLbl.Location = new System.Drawing.Point(752, 5);
             this.lastActionToUndoLbl.Name = "lastActionToUndoLbl";
             this.lastActionToUndoLbl.Size = new System.Drawing.Size(43, 14);
             this.lastActionToUndoLbl.TabIndex = 24;
@@ -410,7 +408,7 @@
             // lastActionUndone
             // 
             this.lastActionUndone.AutoSize = true;
-            this.lastActionUndone.Location = new System.Drawing.Point(576, 24);
+            this.lastActionUndone.Location = new System.Drawing.Point(752, 24);
             this.lastActionUndone.Name = "lastActionUndone";
             this.lastActionUndone.Size = new System.Drawing.Size(43, 14);
             this.lastActionUndone.TabIndex = 28;
@@ -419,7 +417,7 @@
             // numberActionsRedone
             // 
             this.numberActionsRedone.AutoSize = true;
-            this.numberActionsRedone.Location = new System.Drawing.Point(451, 24);
+            this.numberActionsRedone.Location = new System.Drawing.Point(627, 24);
             this.numberActionsRedone.Name = "numberActionsRedone";
             this.numberActionsRedone.Size = new System.Drawing.Size(31, 14);
             this.numberActionsRedone.TabIndex = 27;
@@ -428,7 +426,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(486, 24);
+            this.label16.Location = new System.Drawing.Point(662, 24);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(84, 14);
             this.label16.TabIndex = 26;
@@ -437,11 +435,34 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(382, 24);
+            this.label17.Location = new System.Drawing.Point(558, 24);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(69, 14);
             this.label17.TabIndex = 25;
             this.label17.Text = "items to redo";
+            // 
+            // pictureBox11
+            // 
+            this.pictureBox11.Enabled = false;
+            this.pictureBox11.Image = global::Flow_Network.Properties.Resources.save;
+            this.pictureBox11.Location = new System.Drawing.Point(227, 8);
+            this.pictureBox11.Name = "pictureBox11";
+            this.pictureBox11.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox11.TabIndex = 30;
+            this.pictureBox11.TabStop = false;
+            // 
+            // btnNew
+            // 
+            this.btnNew.Location = new System.Drawing.Point(223, 5);
+            this.btnNew.Name = "btnNew";
+            this.btnNew.Size = new System.Drawing.Size(72, 31);
+            this.btnNew.TabIndex = 29;
+            this.btnNew.Text = "NEW";
+            this.btnNew.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnNew.UseVisualStyleBackColor = true;
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
             // Main
             // 
@@ -449,8 +470,14 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
+            this.Controls.Add(this.pictureBox11);
+            this.Controls.Add(this.btnNew);
+            this.Controls.Add(this.pictureBox10);
             this.Controls.Add(this.lastActionUndone);
+            this.Controls.Add(this.pictureBox9);
             this.Controls.Add(this.numberActionsRedone);
+            this.Controls.Add(this.btnLoad);
+            this.Controls.Add(this.btnSave);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.label17);
             this.Controls.Add(this.lastActionToUndoLbl);
@@ -484,7 +511,6 @@
             this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "Main";
             this.Text = "Form1";
-            this.plDraw.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
@@ -495,6 +521,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -538,6 +565,8 @@
         private System.Windows.Forms.Label numberActionsRedone;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.PictureBox pictureBox11;
+        private System.Windows.Forms.Button btnNew;
     }
 }
 

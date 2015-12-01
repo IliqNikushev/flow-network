@@ -36,6 +36,7 @@ namespace Flow_Network
         private Element PathEnd;
 
         private Element dragElement;
+        private PictureBox oldDragElementPosition;
         private Point dragStart;
 
         private Point mousePosition = new Point(0, 0);
@@ -45,6 +46,15 @@ namespace Flow_Network
         public Main()
         {
             InitializeComponent();
+
+            oldDragElementPosition = new PictureBox();
+            oldDragElementPosition.Height = 32;
+            oldDragElementPosition.SizeMode = PictureBoxSizeMode.StretchImage;
+            oldDragElementPosition.Width = 32;
+            oldDragElementPosition.BorderStyle = BorderStyle.FixedSingle;
+            oldDragElementPosition.Visible = false;
+
+            plDraw.Controls.Add(oldDragElementPosition);
 
             plDraw.Paint += plDraw_DrawPaths;
 
@@ -233,12 +243,13 @@ namespace Flow_Network
         #region drag
         void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
         {
-            if (HasCollision(mousePosition)) return;
-            if (dragElement != null)
+            if (HasCollision(mousePosition))
             {
-                dragElement = null;
-                plDraw.Cursor = Cursors.Arrow;
+                RevertDrag();
             }
+            oldDragElementPosition.Visible = false;
+            dragElement = null;
+            plDraw.Cursor = Cursors.Arrow;
         }
 
         void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
@@ -249,7 +260,12 @@ namespace Flow_Network
                 {
                     dragElement = FindCollisionUnder(mousePosition);
                     if (dragElement != null)
+                    {
                         dragStart = dragElement.PictureBox.Location;
+                        oldDragElementPosition.Visible = true;
+                        oldDragElementPosition.Location = dragStart;
+                        oldDragElementPosition.Image = dragElement.PictureBox.Image;
+                    }
                 }
                 else
                 {
@@ -264,15 +280,22 @@ namespace Flow_Network
             if (dragElement.PictureBox.Location != e.Location)
             {
                 dragElement.PictureBox.Location = e.Location;
-                foreach (Element ex in AllElements)
-                {
-                    if (ex == dragElement) continue;
-                    ex.RefreshConnections();
-                }
-                dragElement.RefreshConnections();
-                plDraw.Invalidate();
+                RefreshConnections();
             }
         }
+
+        private void RevertDrag()
+        {
+            if (dragElement == null) return;
+
+            dragElement.PictureBox.Location = dragStart;
+            oldDragElementPosition.Visible = false;
+            dragElement = null;
+
+            RefreshConnections();
+
+        }
+
         #endregion
         void plDraw_HandleDynamicIcon(object sender, MouseEventArgs evnt)
         {
@@ -330,13 +353,7 @@ namespace Flow_Network
             plDraw.Controls.Remove(e.PictureBox);
             UndoStack.AddAction(new UndoableActions.RemoveElement(e, plDraw));
 
-            foreach (Element item in AllElements)
-            {
-                if (item == e) continue;
-                item.RefreshConnections();
-            }
-
-            plDraw.Invalidate();
+            RefreshConnections(e);
         }
 
         void AddElement(Element e, Point position)
@@ -351,11 +368,20 @@ namespace Flow_Network
 
             UndoStack.AddAction(new UndoableActions.AddElement(e));
 
-            foreach (Element item in AllElements)
-            {
-                if (item == e) continue;
+            RefreshConnections(e);
+        }
+
+        private void RefreshConnections(Element e = null)
+        {
+            if (e == null)
+                foreach (Element item in AllElements)
                     item.RefreshConnections();
-            }
+            else
+                foreach (Element item in AllElements)
+                    if (item == e)
+                        continue;
+                    else
+                        item.RefreshConnections();
 
             plDraw.Invalidate();
         }
@@ -386,13 +412,10 @@ namespace Flow_Network
         private void HandleRightClick()
         {
             if (ActiveTool == ActiveToolType.Select)
-                if (dragElement != null)
-                {
-                    dragElement.PictureBox.Location = dragStart;
-                    dragElement = null;
-
-                    return;
-                }
+            {
+                RevertDrag();
+                return;
+            }
 
             RightClickOptions options = ~RightClickOptions.Remove;
             rightClickMousePosition = mousePosition;
@@ -499,16 +522,6 @@ namespace Flow_Network
         }
         #endregion
 
-        private void btnLoad_Click(object sender, EventArgs e)
-        {
-            
-        }
-
-        private void btnSave_Click(object sender, EventArgs e)
-        {
-            
-        }
-
         private void undoButton_Click(object sender, EventArgs e)
         {
             UndoStack.Undo();
@@ -517,6 +530,21 @@ namespace Flow_Network
         private void redoButton_Click(object sender, EventArgs e)
         {
             UndoStack.Redo();
+        }
+
+        private void btnNew_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
