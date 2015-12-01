@@ -218,7 +218,6 @@ namespace Flow_Network
                 result.OnAdjusted += () =>
                 {
                     plDraw.Invalidate();
-                    plDraw.BackColor = Color.Bisque;
                 };
 
                 result.Adjust();
@@ -267,8 +266,10 @@ namespace Flow_Network
                 dragElement.PictureBox.Location = e.Location;
                 foreach (Element ex in AllElements)
                 {
-                    ex.RefreshConnections(dragElement);
+                    if (ex == dragElement) continue;
+                    ex.RefreshConnections();
                 }
+                dragElement.RefreshConnections();
                 plDraw.Invalidate();
             }
         }
@@ -310,7 +311,7 @@ namespace Flow_Network
 
         void plDraw_DrawPaths(object sender, PaintEventArgs e)
         {
-            foreach (ConnectionZone.Path path in AllPaths)
+            foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
             {
                 Point previous = path.From;
                 foreach (Point point in path.PathPoints)
@@ -332,8 +333,10 @@ namespace Flow_Network
             foreach (Element item in AllElements)
             {
                 if (item == e) continue;
-                item.RefreshConnections(e);
+                item.RefreshConnections();
             }
+
+            plDraw.Invalidate();
         }
 
         void AddElement(Element e, Point position)
@@ -351,8 +354,10 @@ namespace Flow_Network
             foreach (Element item in AllElements)
             {
                 if (item == e) continue;
-                    item.RefreshConnections(e);
+                    item.RefreshConnections();
             }
+
+            plDraw.Invalidate();
         }
 
         void AddElement<T>(Point position) where T : Element

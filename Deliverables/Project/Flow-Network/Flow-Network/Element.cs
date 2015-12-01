@@ -11,11 +11,11 @@ namespace Flow_Network
     {
         public static List<Element> AllElements { get { return Main.AllElements; } }
 
-        public void RefreshConnections(Element e = null)
+        public void RefreshConnections(bool refresh = false)
         {
             foreach (ConnectionZone.Path connection in this.Connections)
             {
-                connection.Adjust(e);
+                connection.Adjust(refresh);
             }
         }
 

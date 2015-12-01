@@ -41,22 +41,15 @@ namespace Flow_Network
 
             bool isNew = true;
 
-            public void Adjust(Element e = null)
+            public void Adjust(bool refresh = false)
             {
                 if (IsAdjusting) activeAdjuster.Abort();
 
-                this.MidPoints.Clear();
-
                 Point start = this.From;
                 Point end = this.To;
-                if (e != null)
-                {
-                    Collision lastCollision = null;
-                    if (Collision.FindBetween(start, end, this.From, this.To, ref lastCollision, new Element[] { e }.ToList()) == null)
-                    {
-                        return;
-                    }
-                }
+
+                this.MidPoints.Clear();
+
                 activeAdjuster = new System.Threading.Thread(() =>
                {
                    try
@@ -64,7 +57,6 @@ namespace Flow_Network
                        Collision lastCollision = null;
                        while (true)
                        {
-
                            Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref lastCollision, Element.AllElements);
                            if (!collision) break;
                            else
@@ -194,7 +186,8 @@ namespace Flow_Network
                            isNew = false;
                        }
                        else
-                           OnAdjusted();
+                           if (refresh)
+                               OnAdjusted();
                    }
                    catch (System.Threading.ThreadAbortException)
                    {
