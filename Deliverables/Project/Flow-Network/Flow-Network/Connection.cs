@@ -20,7 +20,10 @@ namespace Flow_Network
                 {
                     List<Point> result = new List<Point>();
                     result.Add(From.Parent.Center);
-                    result.AddRange(MidPoints);
+                    lock (threadLock)
+                    {
+                        result.AddRange(MidPoints);
+                    }
                     result.Add(To.Parent.Center);
                     return result;
                 }
@@ -41,9 +44,14 @@ namespace Flow_Network
 
             bool isNew = true;
 
+            object threadLock = new object();
+
             public void Adjust(bool refresh = false)
             {
-                if (IsAdjusting) activeAdjuster.Abort();
+                lock (threadLock)
+                {
+                    if (IsAdjusting) activeAdjuster.Abort();
+                }
 
                 activeAdjuster = new System.Threading.Thread(() =>
                {
@@ -52,7 +60,10 @@ namespace Flow_Network
                        Point start = this.From;
                        Point end = this.To;
 
-                       this.MidPoints.Clear();
+                       lock (threadLock)
+                       {
+                           this.MidPoints.Clear();
+                       }
                        HashSet<Collision> lastCollisions = new HashSet<Collision>();
                        while (true)
                        {
@@ -60,118 +71,121 @@ namespace Flow_Network
                            if (!collision) break;
                            else
                            {
-                               //1 3;2 4
-                               if (collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
+                               lock (threadLock)
                                {
-                                   // 1;2
-                                   if (collision.SenderIsUp && collision.TargetIsUp)
+                                   //1 3;2 4
+                                   if (collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
                                    {
-                                       this.MidPoints.Add(collision.Element.D);
-                                       this.MidPoints.Add(collision.Element.C);
-                                       start = collision.Element.C;
-                                   }//1; 4
-                                   else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       // 1;2
+                                       if (collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.D);
+                                           this.MidPoints.Add(collision.Element.C);
+                                           start = collision.Element.C;
+                                       }//1; 4
+                                       else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.D);
+                                           this.MidPoints.Add(collision.Element.C);
+                                           this.MidPoints.Add(collision.Element.B);
+                                           start = collision.Element.B;
+                                       }//3;2
+                                       if (!collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.A);
+                                           this.MidPoints.Add(collision.Element.B);
+                                           this.MidPoints.Add(collision.Element.C);
+                                           start = collision.Element.C;
+                                       }//3;4
+                                       else if (!collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.A);
+                                           this.MidPoints.Add(collision.Element.B);
+                                           start = collision.Element.B;
+                                       }
+                                   }//1 3;1 3
+                                   else if (collision.SenderIsOnLeft && collision.TargetIsOnLeft)
                                    {
-                                       this.MidPoints.Add(collision.Element.D);
-                                       this.MidPoints.Add(collision.Element.C);
-                                       this.MidPoints.Add(collision.Element.B);
-                                       start = collision.Element.B;
-                                   }//3;2
-                                   if (!collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.A);
-                                       this.MidPoints.Add(collision.Element.B);
-                                       this.MidPoints.Add(collision.Element.C);
-                                       start = collision.Element.C;
-                                   }//3;4
-                                   else if (!collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.A);
-                                       this.MidPoints.Add(collision.Element.B);
-                                       start = collision.Element.B;
+                                       //1;1
+                                       if (collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.D);
+                                           start = collision.Element.D;
+                                       }//1;3
+                                       else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.D);
+                                           this.MidPoints.Add(collision.Element.A);
+                                           start = collision.Element.A;
+                                       }//3;1
+                                       else if (!collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.A);
+                                           this.MidPoints.Add(collision.Element.D);
+                                           start = collision.Element.D;
+                                       }//3;3
+                                       else if (!collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.A);
+                                           start = collision.Element.A;
+                                       }
                                    }
-                               }//1 3;1 3
-                               else if (collision.SenderIsOnLeft && collision.TargetIsOnLeft)
-                               {
-                                   //1;1
-                                   if (collision.SenderIsUp && collision.TargetIsUp)
+                                   //2 4; 2 4
+                                   else if (!collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
                                    {
-                                       this.MidPoints.Add(collision.Element.D);
-                                       start = collision.Element.D;
-                                   }//1;3
-                                   else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       //2;2
+                                       if (collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.C);
+                                           start = collision.Element.C;
+                                       }//2;4
+                                       else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.C);
+                                           this.MidPoints.Add(collision.Element.B);
+                                           start = collision.Element.B;
+                                       }//4;2
+                                       else if (!collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.B);
+                                           this.MidPoints.Add(collision.Element.C);
+                                           start = collision.Element.C;
+                                       }//4;4
+                                       else if (!collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.B);
+                                           start = collision.Element.B;
+                                       }
+                                   }//2 4; 1 3
+                                   else if (!collision.SenderIsOnLeft && collision.TargetIsOnLeft)
                                    {
-                                       this.MidPoints.Add(collision.Element.D);
-                                       this.MidPoints.Add(collision.Element.A);
-                                       start = collision.Element.A;
-                                   }//3;1
-                                   else if (!collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.A);
-                                       this.MidPoints.Add(collision.Element.D);
-                                       start = collision.Element.D;
-                                   }//3;3
-                                   else if (!collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.A);
-                                       start = collision.Element.A;
-                                   }
-                               }
-                               //2 4; 2 4
-                               else if (!collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
-                               {
-                                   //2;2
-                                   if (collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.C);
-                                       start = collision.Element.C;
-                                   }//2;4
-                                   else if (collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.C);
-                                       this.MidPoints.Add(collision.Element.B);
-                                       start = collision.Element.B;
-                                   }//4;2
-                                   else if (!collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.B);
-                                       this.MidPoints.Add(collision.Element.C);
-                                       start = collision.Element.C;
-                                   }//4;4
-                                   else if (!collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.B);
-                                       start = collision.Element.B;
-                                   }
-                               }//2 4; 1 3
-                               else if (!collision.SenderIsOnLeft && collision.TargetIsOnLeft)
-                               {
-                                   // 2;1
-                                   if (collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.C);
-                                       this.MidPoints.Add(collision.Element.D);
-                                       start = collision.Element.D;
-                                   }//2; 3
-                                   else if (collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.C);
-                                       this.MidPoints.Add(collision.Element.B);
-                                       this.MidPoints.Add(collision.Element.A);
-                                       start = collision.Element.A;
-                                   }//4;1
-                                   if (!collision.SenderIsUp && collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.B);
-                                       this.MidPoints.Add(collision.Element.C);
-                                       this.MidPoints.Add(collision.Element.D);
-                                       start = collision.Element.D;
-                                   }//4;3
-                                   else if (!collision.SenderIsUp && !collision.TargetIsUp)
-                                   {
-                                       this.MidPoints.Add(collision.Element.B);
-                                       this.MidPoints.Add(collision.Element.A);
-                                       start = collision.Element.A;
+                                       // 2;1
+                                       if (collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.C);
+                                           this.MidPoints.Add(collision.Element.D);
+                                           start = collision.Element.D;
+                                       }//2; 3
+                                       else if (collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.C);
+                                           this.MidPoints.Add(collision.Element.B);
+                                           this.MidPoints.Add(collision.Element.A);
+                                           start = collision.Element.A;
+                                       }//4;1
+                                       if (!collision.SenderIsUp && collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.B);
+                                           this.MidPoints.Add(collision.Element.C);
+                                           this.MidPoints.Add(collision.Element.D);
+                                           start = collision.Element.D;
+                                       }//4;3
+                                       else if (!collision.SenderIsUp && !collision.TargetIsUp)
+                                       {
+                                           this.MidPoints.Add(collision.Element.B);
+                                           this.MidPoints.Add(collision.Element.A);
+                                           start = collision.Element.A;
+                                       }
                                    }
                                }
                            }
