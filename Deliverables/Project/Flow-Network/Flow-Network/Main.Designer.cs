@@ -198,7 +198,7 @@
             // 
             // plDraw
             // 
-            this.plDraw.BackColor = System.Drawing.Color.Bisque;
+            this.plDraw.BackColor = System.Drawing.Color.OldLace;
             this.plDraw.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.plDraw.Location = new System.Drawing.Point(223, 43);
             this.plDraw.Name = "plDraw";

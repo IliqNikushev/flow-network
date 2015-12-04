@@ -47,7 +47,7 @@
     <Compile Include="UndoableAction.cs" />
     <Compile Include="AdjustableSplitter.cs" />
     <Compile Include="Collision.cs" />
-    <Compile Include="Connection.cs" />
+    <Compile Include="ConnectionZone.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -134,6 +134,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\save.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\sinkResclaed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mergerRescaled.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toggled_converted.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toggled.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

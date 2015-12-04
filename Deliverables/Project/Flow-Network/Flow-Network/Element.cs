@@ -24,7 +24,19 @@ namespace Flow_Network
                 connection.Adjust(refresh);
             }
         }
-
+        public IEnumerable<ConnectionZone> ConnectionZones
+        {
+            get
+            {
+                var prop =
+                this.GetType().GetProperties(
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Instance).
+                Where(x => x.PropertyType == typeof(ConnectionZone) && x.CanRead && x.CanWrite);
+                return prop.Select(x => x.GetValue(this) as ConnectionZone);
+                
+            }
+        }
         public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this); } }
 
         public Point Center { get { return new Point(this.X + this.Width / 2, this.Y + this.Height / 2); } }
@@ -38,7 +50,6 @@ namespace Flow_Network
 
         public System.Drawing.Image Icon { get { return Resources.Icon(this); } }
         public System.Windows.Forms.PictureBox PictureBox { get; private set; }
-
         public Element()
         {
             this.PictureBox = new System.Windows.Forms.PictureBox();
@@ -46,7 +57,6 @@ namespace Flow_Network
             this.PictureBox.Width = 32;
             this.PictureBox.Height = 32;
             this.PictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            
         }
         public int X
         {

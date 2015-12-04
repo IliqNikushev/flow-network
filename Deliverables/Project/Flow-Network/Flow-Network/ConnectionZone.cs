@@ -19,12 +19,12 @@ namespace Flow_Network
                 get
                 {
                     List<Point> result = new List<Point>();
-                    result.Add(From.Parent.Center);
+                    result.Add(From);
                     lock (threadLock)
                     {
                         result.AddRange(MidPoints);
                     }
-                    result.Add(To.Parent.Center);
+                    result.Add(To);
                     return result;
                 }
             }
@@ -238,7 +238,7 @@ namespace Flow_Network
 
         public static implicit operator Point(ConnectionZone connection)
         {
-            return connection.Parent.Center;
+            return new Point(connection.Position.X + connection.Margin.X/2, connection.Position.Y + connection.Margin.Y/2);
         }
     }
 }

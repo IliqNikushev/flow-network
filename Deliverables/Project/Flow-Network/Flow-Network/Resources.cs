@@ -13,7 +13,6 @@ namespace Flow_Network
         public static System.Drawing.Image MergerIcon;
         public static System.Drawing.Image SplitterIcon;
         public static System.Drawing.Image AdjSplitterIcon;
-
         public static System.Drawing.Image Icon(Element e)
         {
             if (e is Pump) return PumpIcon;
