@@ -46,7 +46,6 @@ namespace Flow_Network
         private Point mousePosition = new Point(0, 0);
         private Pen linePen = new Pen(Color.Black);
         PictureBox currentActiveToolPbox;
-        private PictureBox ClickBox;
         ConnectionZone.Path pathToDelete;
         private Point toggle = new Point(0, 0);
         public Main()
@@ -54,9 +53,9 @@ namespace Flow_Network
             InitializeComponent();
             
             oldDragElementPosition = new PictureBox();
-            oldDragElementPosition.Height = 32;
+            oldDragElementPosition.Height = 42;
             oldDragElementPosition.SizeMode = PictureBoxSizeMode.StretchImage;
-            oldDragElementPosition.Width = 32;
+            oldDragElementPosition.Width = 42;
             oldDragElementPosition.BorderStyle = BorderStyle.FixedSingle;
             oldDragElementPosition.Visible = false;
 
@@ -136,6 +135,7 @@ namespace Flow_Network
             else
                 ActiveTool = ActiveToolType.None;
             clickedPbox.BackColor = Color.Gold;
+            plDraw.Invalidate();
         }
 
         void plDraw_HandleClick(object sender, EventArgs e)
@@ -209,7 +209,6 @@ namespace Flow_Network
             {
                 AddElement(elementToAdd, mousePosition);
                 ////toggle = new Point(mousePosition.X + 22, mousePosition.Y + 26);
-                AttachToggle(elementToAdd, ClickBox,toggle);
             }
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
@@ -229,7 +228,7 @@ namespace Flow_Network
 
                 result.OnCreated += () =>
                 {
-                    AllPaths.Add(result);
+                    result.Add();
                     plDraw.Invalidate();
                 };
 
@@ -269,15 +268,15 @@ namespace Flow_Network
                     dragElement = FindCollisionUnder(mousePosition);
                     if (dragElement != null)
                     {
-                        dragStart = dragElement.PictureBox.Location;
+                        dragStart = dragElement.Location;
                         oldDragElementPosition.Visible = true;
                         oldDragElementPosition.Location = dragStart;
-                        oldDragElementPosition.Image = dragElement.PictureBox.Image;
+                        oldDragElementPosition.Image = dragElement.Icon;
                     }
                 }
                 else
                 {
-                    dragElement.PictureBox.Location = mousePosition;
+                    dragElement.Location = mousePosition;
                 }
             }
         }
@@ -285,9 +284,9 @@ namespace Flow_Network
         void plDraw_MoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (dragElement.PictureBox.Location != e.Location)
+            if (dragElement.Location != e.Location)
             {
-                dragElement.PictureBox.Location = e.Location;
+                dragElement.Location = e.Location;
                 RefreshConnections();
             }
         }
@@ -296,7 +295,7 @@ namespace Flow_Network
         {
             if (dragElement == null) return;
 
-            dragElement.PictureBox.Location = dragStart;
+            dragElement.Location = dragStart;
             oldDragElementPosition.Visible = false;
             dragElement = null;
 
@@ -377,19 +376,16 @@ namespace Flow_Network
         //before u draw with black, check if prev and current point are from the collision line if true draw red
         void plDraw_DrawPaths(object sender, PaintEventArgs e)
         {
-            foreach (Control i in plDraw.Controls)
-            {
-                i.Visible = false;
-            }
             foreach (var item in AllElements)
             {
-                e.Graphics.DrawImage(item.PictureBox.Image,item.PictureBox.Location);
-                foreach (var con in item.ConnectionZones)
-                {
-                    //if tool if pipe,,,,
-                    //if connection is taken make red, if connection is empty green, if connection is in use yellow
-                    e.Graphics.DrawImage(Properties.Resources.toggled, con.Position);
-                }
+                e.Graphics.DrawImage(item.Icon,item.Location.X, item.Location.Y,item.Width,item.Height);
+                if(ActiveTool == ActiveToolType.Pipe)
+                    foreach (var con in item.ConnectionZones)
+                    {
+                        //if tool if pipe,,,,
+                        //if connection is taken make red, if connection is empty green, if connection is in use yellow
+                        e.Graphics.DrawImage(Properties.Resources.toggled, con.Position.X, con.Position.Y, con.Width, con.Height);
+                    }
             }
 
             foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
@@ -419,7 +415,7 @@ namespace Flow_Network
             Point crossV2 = new Point(mouse.X+1, mouse.Y);
 
             return (Intersects(a, b, crossH1, crossH2, out intersection) || Intersects(a, b, crossV1, crossV2,out intersection));
-            return onCollision(a.X, b.X, a.Y, b.Y, mouse.X, mouse.Y);
+            //return onCollision(a.X, b.X, a.Y, b.Y, mouse.X, mouse.Y);
         }
 
         static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection)
@@ -463,46 +459,21 @@ namespace Flow_Network
         void RemoveElement(Element e)
         {
             AllElements.Remove(e);
-            plDraw.Controls.Remove(e.PictureBox);
-            UndoStack.AddAction(new UndoableActions.RemoveElement(e, plDraw));
+            UndoStack.AddAction(new UndoableActions.RemoveElement(e));
 
             RefreshConnections(e);
         }
 
         void AddElement(Element e, Point position)
         {
-            e.PictureBox.Enabled = false;
-
             e.X = position.X;
             e.Y = position.Y;
             
-            this.plDraw.Controls.Add(e.PictureBox);
             AllElements.Add(e);
             
             UndoStack.AddAction(new UndoableActions.AddElement(e));
 
             RefreshConnections(e);
-        }
-        private void AttachToggle(Element e, PictureBox pic,Point p)
-        {
-            pic = new PictureBox();
-            pic.Height = 15;
-            pic.Width = 15;
-            pic.Image = Properties.Resources.toggled;
-            pic.SizeMode = PictureBoxSizeMode.Zoom;
-            pic.Parent = e.PictureBox;
-            if(ActiveTool==ActiveToolType.Pump)
-            {
-                //pic.Location = new Point(17, 18);
-                pic.Location = new Point(mousePosition.X + 22, mousePosition.Y + 26);
-            }
-            
-            
-            //e.PictureBox.Controls.Add(pic);
-            this.plDraw.Controls.Add(pic);
-            pic.BackColor = Color.Transparent;
-            //pic.Parent = e.PictureBox;
-            pic.BringToFront();
         }
 
         private void RefreshConnections(Element e = null)
@@ -641,8 +612,8 @@ namespace Flow_Network
             {
                 foreach (var q in item.ConnectionZones)
                 {
-                    if (q.Position.X <= mousePosition.X && q.Position.X + q.Margin.X >= mousePosition.X)
-                        if (q.Position.Y <= mousePosition.Y && q.Position.Y + q.Margin.Y >= mousePosition.Y)
+                    if (q.Position.X <= mousePosition.X && q.Position.X + q.Width >= mousePosition.X)
+                        if (q.Position.Y <= mousePosition.Y && q.Position.Y + q.Height >= mousePosition.Y)
                             return q;
                 }
             }
@@ -656,8 +627,8 @@ namespace Flow_Network
                 if (q == dragElement) return false;
                 Point position = mousePosition;
 
-                if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
-                    if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
+                if (q.X - q.Width <= position.X && q.X + q.Width >= position.X)
+                    if (q.Y - q.Height <= position.Y && q.Y + q.Height >= position.Y)
                         return true;
                 return false;
             });

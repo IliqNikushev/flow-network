@@ -17,12 +17,12 @@ namespace Flow_Network.UndoableActions
 
         protected override void OnUndo()
         {
-            ConnectionZone.Path.All.Remove(this.Connection);
+            this.Connection.Remove();
         }
 
         protected override void OnRedo()
         {
-            ConnectionZone.Path.All.Add(this.Connection);
+            this.Connection.Add();
         }
 
         protected override string AsString

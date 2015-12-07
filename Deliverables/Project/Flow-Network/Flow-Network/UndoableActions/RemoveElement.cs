@@ -8,9 +8,8 @@ namespace Flow_Network.UndoableActions
 {
     class RemoveElement : AddElement
     {
-        public RemoveElement(Element element, System.Windows.Forms.Control elementPboxParent) : base(element)
+        public RemoveElement(Element element) : base(element)
         {
-            base.pboxParent = elementPboxParent;
         }
 
         protected override void OnUndo()

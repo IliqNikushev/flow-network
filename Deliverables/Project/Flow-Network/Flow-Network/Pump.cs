@@ -9,9 +9,11 @@ namespace Flow_Network
     {
         public Pump ()
         {
-            this.Out = new ConnectionZone(new System.Drawing.Point(32,32),this);
+            this.Out = new ConnectionZone(new System.Drawing.Point(32,32),this, false);
         }
         public ConnectionZone Out { get; private set; }
+
+        public float Flow { get; set; }
         
     }
 }
