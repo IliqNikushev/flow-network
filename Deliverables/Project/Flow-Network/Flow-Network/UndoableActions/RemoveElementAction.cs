@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 
 namespace Flow_Network.UndoableActions
 {
-    class AddElement : UndoableAction
+    class RemoveElementAction : AddElementAction
     {
-        public Element Element{get; private set;}
-
-        public AddElement(Element element)
+        public RemoveElementAction(Element element) : base(element)
         {
-            this.Element = element;
         }
 
         protected override void OnUndo()
         {
-            Element.AllElements.Remove(this.Element);
+            base.OnRedo();
         }
 
         protected override void OnRedo()
         {
-            Element.AllElements.Add(this.Element);
+            base.OnUndo();
         }
 
         protected override string AsString
         {
-            get { return "Add Element"; }
+            get
+            {
+                return "Remove Element";
+            }
         }
     }
 }

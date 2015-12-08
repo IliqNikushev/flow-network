@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 
 namespace Flow_Network.UndoableActions
 {
-    class AddConnection : UndoableAction
+    class AddElementAction : UndoableAction
     {
-        public ConnectionZone.Path Connection { get; private set; }
+        public Element Element{get; private set;}
 
-        public AddConnection(ConnectionZone.Path connection)
+        public AddElementAction(Element element)
         {
-            this.Connection = connection;
+            this.Element = element;
         }
 
         protected override void OnUndo()
         {
-            this.Connection.Remove();
+            Element.AllElements.Remove(this.Element);
         }
 
         protected override void OnRedo()
         {
-            this.Connection.Add();
+            Element.AllElements.Add(this.Element);
         }
 
         protected override string AsString
         {
-            get { return "Add Connection"; }
+            get { return "Add Element"; }
         }
     }
 }

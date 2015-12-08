@@ -67,11 +67,11 @@
     <Compile Include="Resources.cs" />
     <Compile Include="Sink.cs" />
     <Compile Include="Splitter.cs" />
-    <Compile Include="UndoableActions\AddConnection.cs" />
-    <Compile Include="UndoableActions\AddElement.cs" />
-    <Compile Include="UndoableActions\MoveElement.cs" />
-    <Compile Include="UndoableActions\RemoveConnection.cs" />
-    <Compile Include="UndoableActions\RemoveElement.cs" />
+    <Compile Include="UndoableActions\AddConnectionAction.cs" />
+    <Compile Include="UndoableActions\AddElementAction.cs" />
+    <Compile Include="UndoableActions\MoveElementAction.cs" />
+    <Compile Include="UndoableActions\RemoveConnectionAction.cs" />
+    <Compile Include="UndoableActions\RemoveElementAction.cs" />
     <Compile Include="UndoStack.cs" />
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

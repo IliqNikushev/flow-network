@@ -89,7 +89,7 @@ namespace Flow_Network
                 else
                     lastActionToUndoLbl.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
                     plDraw.Invalidate();
             };
 
@@ -101,7 +101,7 @@ namespace Flow_Network
                 else
                     lastActionUndone.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
                     plDraw.Invalidate();
             };
         }
@@ -239,7 +239,7 @@ namespace Flow_Network
 
                 result.Adjust();
 
-                UndoStack.AddAction(new UndoableActions.AddConnection(result));
+                UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
 
                 PathStart = null;
                 PathEnd = null;
@@ -459,7 +459,7 @@ namespace Flow_Network
         void RemoveElement(Element e)
         {
             AllElements.Remove(e);
-            UndoStack.AddAction(new UndoableActions.RemoveElement(e));
+            UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
 
             RefreshConnections(e);
         }
@@ -471,7 +471,7 @@ namespace Flow_Network
             
             AllElements.Add(e);
             
-            UndoStack.AddAction(new UndoableActions.AddElement(e));
+            UndoStack.AddAction(new UndoableActions.AddElementAction(e));
 
             RefreshConnections(e);
         }

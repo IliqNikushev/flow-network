@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Flow_Network.UndoableActions
 {
-    class RemoveElement : AddElement
+    class RemoveConnectionAction : AddConnectionAction
     {
-        public RemoveElement(Element element) : base(element)
+        public RemoveConnectionAction(ConnectionZone.Path connection) : base(connection)
         {
+
         }
 
         protected override void OnUndo()
@@ -26,7 +27,7 @@ namespace Flow_Network.UndoableActions
         {
             get
             {
-                return "Remove Element";
+                return "Remove Connection";
             }
         }
     }
