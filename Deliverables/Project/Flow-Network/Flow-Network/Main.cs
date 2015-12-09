@@ -15,6 +15,9 @@ using System.Windows.Forms;
 
 namespace Flow_Network
 {
+    /// <summary>
+    /// Flow network main form
+    /// </summary>
     public partial class Main : Form
     {
         enum ActiveToolType
@@ -53,9 +56,9 @@ namespace Flow_Network
             InitializeComponent();
             
             oldDragElementPosition = new PictureBox();
-            oldDragElementPosition.Height = 42;
+            oldDragElementPosition.Height = Element.DefaultSize.Y;
             oldDragElementPosition.SizeMode = PictureBoxSizeMode.StretchImage;
-            oldDragElementPosition.Width = 42;
+            oldDragElementPosition.Width = Element.DefaultSize.X;
             oldDragElementPosition.BorderStyle = BorderStyle.FixedSingle;
             oldDragElementPosition.Visible = false;
 
@@ -186,16 +189,16 @@ namespace Flow_Network
             
             if (ActiveTool == ActiveToolType.Pump)
             {
-                elementToAdd = new Pump();
+                elementToAdd = new PumpElement();
                 
             }
             else if (ActiveTool == ActiveToolType.Sink)
             {
-                elementToAdd = new Sink();
+                elementToAdd = new SinkElement();
             }
             else if (ActiveTool == ActiveToolType.Splitter)
             {
-                elementToAdd = new Splitter();
+                elementToAdd = new SplitterElement();
             }
             else if (ActiveTool == ActiveToolType.AdjustableSplitter)
             {
@@ -203,7 +206,7 @@ namespace Flow_Network
             }
             else if (ActiveTool == ActiveToolType.Merger)
             {
-                elementToAdd = new Merger();
+                elementToAdd = new MergerElement();
             }
             if (elementToAdd != null)
             {
@@ -384,7 +387,7 @@ namespace Flow_Network
                     {
                         //if tool if pipe,,,,
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
-                        e.Graphics.DrawImage(Properties.Resources.toggled, con.Position.X, con.Position.Y, con.Width, con.Height);
+                        e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
                     }
             }
 
@@ -549,11 +552,11 @@ namespace Flow_Network
                         RemoveElement(e);
                     }
                 }).Name = "remove";
-                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<Pump>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<Sink>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<Splitter>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<PumpElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<SinkElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<SplitterElement>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<Merger>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<MergerElement>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Cancel", 120).Name = "cancel";
 
                 foreach (var item in rightClickPanel.Controls)
@@ -612,8 +615,8 @@ namespace Flow_Network
             {
                 foreach (var q in item.ConnectionZones)
                 {
-                    if (q.Position.X <= mousePosition.X && q.Position.X + q.Width >= mousePosition.X)
-                        if (q.Position.Y <= mousePosition.Y && q.Position.Y + q.Height >= mousePosition.Y)
+                    if (q.Location.X <= mousePosition.X && q.Location.X + q.Width >= mousePosition.X)
+                        if (q.Location.Y <= mousePosition.Y && q.Location.Y + q.Height >= mousePosition.Y)
                             return q;
                 }
             }

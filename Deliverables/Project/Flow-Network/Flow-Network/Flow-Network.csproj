@@ -55,7 +55,7 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
-    <Compile Include="Merger.cs" />
+    <Compile Include="MergerElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -63,10 +63,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Pump.cs" />
+    <Compile Include="PumpElement.cs" />
     <Compile Include="Resources.cs" />
-    <Compile Include="Sink.cs" />
-    <Compile Include="Splitter.cs" />
+    <Compile Include="SinkElement.cs" />
+    <Compile Include="SplitterElement.cs" />
     <Compile Include="UndoableActions\AddConnectionAction.cs" />
     <Compile Include="UndoableActions\AddElementAction.cs" />
     <Compile Include="UndoableActions\MoveElementAction.cs" />

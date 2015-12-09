@@ -5,30 +5,31 @@ using System.Text;
 
 namespace Flow_Network
 {
+    /// <summary>An action performed in the network that can be undone</summary>
     public abstract class UndoableAction
     {
-        public bool IsUndone { get; private set; }
-        public bool IsDone { get; private set; }
+        /// <summary>True = Is done, False = is not done / undone</summary>
+        private bool isApplied = true;
+        public bool IsUndone { get { return !isApplied; } }
+        public bool IsDone { get { return isApplied; } }
 
         public UndoableAction()
         {
-            IsDone = true;
         }
 
+        /// <summary></summary>
         public void Undo()
         {
             if (IsUndone) return;
             OnUndo();
-            IsUndone = true;
-            IsDone = false;
+            this.isApplied = false;
         }
 
         public void Redo()
         {
             if (IsDone) return;
             OnRedo();
-            IsDone = true;
-            IsUndone = false;
+            this.isApplied = true;
         }
 
         protected abstract void OnUndo();
