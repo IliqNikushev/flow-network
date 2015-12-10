@@ -108,7 +108,7 @@ namespace Flow_Network
             return new Point(connection.Location.X + connection.Width / 2, connection.Location.Y + connection.Height / 2);
         }
 
-        /// <summary>Path from 2 connection zones. Refered to also as Connection</summary>
+        /// <summary>Path from 2 connection zones.</summary>
         public class Path
         {
             public delegate void FlowAlteredEvent(Path path, float previous, float current);
