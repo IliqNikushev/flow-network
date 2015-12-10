@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Flow_Network.AdjustableSplitter">
+    <Position X="4" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAA=</HashCode>
+      <FileName>AdjustableSplitter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.Collision">
+    <Position X="7.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAAAAAgAAAAAAAAAQgAAAAAAAIACAIA=</HashCode>
+      <FileName>Collision.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.ConnectionZone">
+    <Position X="9.5" Y="7.75" Width="1.5" />
+    <NestedTypes>
+      <Class Name="Flow_Network.ConnectionZone.Path" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>ConnectionZone.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAABAAAABAAABgAgAAIAwEAAAABAAAEACAAAAAABAQA=</HashCode>
+      <FileName>ConnectionZone.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.Element">
+    <Position X="4.25" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAIAAgAAhAAAAAAAAAIAAEAAAAAAAAAACAAApiEYYAA=</HashCode>
+      <FileName>Element.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="AllElements" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="Flow_Network.Main" Collapsed="true">
+    <Position X="5.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>/CMJIhA5kLIBARAAAEGYSBAKRggOgBgAUIQ9AitAUYI=</HashCode>
+      <FileName>Main.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.MergerElement">
+    <Position X="1.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI=</HashCode>
+      <FileName>MergerElement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.PumpElement">
+    <Position X="8" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>PumpElement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.Resources">
+    <Position X="5.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAABAAAAAAAAAAoAAABAAEAAAA=</HashCode>
+      <FileName>Resources.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.SinkElement">
+    <Position X="8" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>SinkElement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.SplitterElement">
+    <Position X="2" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAAAAAIAAAACAAAAAgAACI=</HashCode>
+      <FileName>SplitterElement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableAction">
+    <Position X="12.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAABAABAgEAAAAgEABAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UndoableAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoStack">
+    <Position X="11.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAABAABgAAAAAADAAAAAAAQAAAAAAEgAAA=</HashCode>
+      <FileName>UndoStack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="E">
+    <Position X="11.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Main.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.Properties.Resources" Collapsed="true">
+    <Position X="5.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAICAEAEAgAABEoAAAQAAAAAAFIGABAAIAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableActions.AddConnectionAction">
+    <Position X="10.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAkAAAAAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UndoableActions\AddConnectionAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableActions.AddElementAction">
+    <Position X="12.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAgAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UndoableActions\AddElementAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableActions.MoveElementAction">
+    <Position X="14.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAgAAAAAAEAIAgAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>UndoableActions\MoveElementAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableActions.RemoveConnectionAction">
+    <Position X="10.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UndoableActions\RemoveConnectionAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Flow_Network.UndoableActions.RemoveElementAction">
+    <Position X="14.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>UndoableActions\RemoveElementAction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

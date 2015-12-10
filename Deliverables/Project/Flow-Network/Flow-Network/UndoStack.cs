@@ -5,9 +5,12 @@ using System.Text;
 
 namespace Flow_Network
 {
+    /// <summary>Wrapper for Flow Network's collection of actions that can be undone/redone</summary>
     public static class UndoStack
     {
+        /// <summary>Triggered when the Undo stack has been changed</summary>
         public static event Action<int, UndoableAction> OnUndoAltered = (x, y) => { };
+        /// <summary>Triggered when the Redo stack has been changed</summary>
         public static event Action<int, UndoableAction> OnRedoAltered = (x, y) => { };
 
         public static bool CanUndo
@@ -29,7 +32,8 @@ namespace Flow_Network
         private static Stack<UndoableAction> activitiesStack = new Stack<UndoableAction>();
         private static Stack<UndoableAction> redoStack = new Stack<UndoableAction>();
 
-        public static void AddAction(UndoableAction action, bool isNew = true)
+        /// <summary>Adds the specified action to be listed as an action that can be undone</summary>
+        public static void AddAction(UndoableAction action)
         {
             if (redoStack.Count > 0) redoStack.Clear();
 
@@ -39,6 +43,7 @@ namespace Flow_Network
             OnRedoAltered(redoStack.Count, null);
         }
 
+        /// <summary>Undoes the last action performed, if any</summary>
         public static void Undo()
         {
             if (!CanUndo) return;
@@ -53,6 +58,7 @@ namespace Flow_Network
                 OnUndoAltered(activitiesStack.Count, activitiesStack.Peek());
         }
 
+        /// <summary>Redoes the last action undone, if any</summary>
         public static void Redo()
         {
             if (!CanRedo) return;

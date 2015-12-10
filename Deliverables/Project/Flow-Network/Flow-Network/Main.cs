@@ -15,6 +15,9 @@ using System.Windows.Forms;
 
 namespace Flow_Network
 {
+    /// <summary>
+    /// Flow network main form
+    /// </summary>
     public partial class Main : Form
     {
         enum ActiveToolType
@@ -37,37 +40,34 @@ namespace Flow_Network
        
         private PictureBox iconBelowCursor;
 
-        private Element PathStart;
-        private Element PathEnd;
+        private ConnectionZone PathStart;
+        private ConnectionZone PathEnd;
 
         private Element dragElement;
         private PictureBox oldDragElementPosition;
         private Point dragStart;
-
         private Point mousePosition = new Point(0, 0);
         private Pen linePen = new Pen(Color.Black);
         PictureBox currentActiveToolPbox;
-
         ConnectionZone.Path pathToDelete;
-
+        private Point toggle = new Point(0, 0);
         public Main()
         {
             InitializeComponent();
-
+            
             oldDragElementPosition = new PictureBox();
-            oldDragElementPosition.Height = 32;
+            oldDragElementPosition.Height = Element.DefaultSize.Y;
             oldDragElementPosition.SizeMode = PictureBoxSizeMode.StretchImage;
-            oldDragElementPosition.Width = 32;
+            oldDragElementPosition.Width = Element.DefaultSize.X;
             oldDragElementPosition.BorderStyle = BorderStyle.FixedSingle;
             oldDragElementPosition.Visible = false;
 
             plDraw.Controls.Add(oldDragElementPosition);
 
             plDraw.Paint += plDraw_DrawPaths;
-
             Resources.PumpIcon = this.pictureBox2.Image;
-            Resources.SinkIcon = this.pictureBox3.Image;
-            Resources.MergerIcon = this.pictureBox6.Image;
+            Resources.SinkIcon = Properties.Resources.sinkRescaled;
+            Resources.MergerIcon = Properties.Resources.mergerRescaled;
             Resources.SplitterIcon = this.pictureBox4.Image;
             Resources.AdjSplitterIcon = this.pictureBox5.Image;
             iconBelowCursor = new PictureBox();
@@ -92,7 +92,7 @@ namespace Flow_Network
                 else
                     lastActionToUndoLbl.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
                     plDraw.Invalidate();
             };
 
@@ -104,7 +104,7 @@ namespace Flow_Network
                 else
                     lastActionUndone.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnection || lastAction is UndoableActions.AddConnection)
+                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
                     plDraw.Invalidate();
             };
         }
@@ -138,6 +138,7 @@ namespace Flow_Network
             else
                 ActiveTool = ActiveToolType.None;
             clickedPbox.BackColor = Color.Gold;
+            plDraw.Invalidate();
         }
 
         void plDraw_HandleClick(object sender, EventArgs e)
@@ -175,27 +176,29 @@ namespace Flow_Network
             if(e!=null)
                 RemoveElement(e);
         }
-
+        
         void HandleCreateElementToolClick()
         {
+            Point toggle = new Point(mousePosition.X, mousePosition.Y);
             if (HasCollision(mousePosition))
             {
                 return;
             }
 
             Element elementToAdd = null;
-
+            
             if (ActiveTool == ActiveToolType.Pump)
             {
-                elementToAdd = new Pump();
+                elementToAdd = new PumpElement();
+                
             }
             else if (ActiveTool == ActiveToolType.Sink)
             {
-                elementToAdd = new Sink();
+                elementToAdd = new SinkElement();
             }
             else if (ActiveTool == ActiveToolType.Splitter)
             {
-                elementToAdd = new Splitter();
+                elementToAdd = new SplitterElement();
             }
             else if (ActiveTool == ActiveToolType.AdjustableSplitter)
             {
@@ -203,11 +206,12 @@ namespace Flow_Network
             }
             else if (ActiveTool == ActiveToolType.Merger)
             {
-                elementToAdd = new Merger();
+                elementToAdd = new MergerElement();
             }
             if (elementToAdd != null)
             {
                 AddElement(elementToAdd, mousePosition);
+                ////toggle = new Point(mousePosition.X + 22, mousePosition.Y + 26);
             }
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
@@ -215,7 +219,7 @@ namespace Flow_Network
 
         void HandleConnectionToolClick()
         {
-            Element hovered = FindCollisionUnder(mousePosition);
+            ConnectionZone hovered = FindConnectionUnder(mousePosition);
             if (hovered == null) return;
 
             if (PathStart == null) PathStart = hovered;
@@ -223,12 +227,11 @@ namespace Flow_Network
 
             if (PathStart != null && PathEnd != null)
             {
-                ConnectionZone.Path result = new ConnectionZone.Path(new ConnectionZone(new Point(), PathStart),
-                    new ConnectionZone(new Point(), PathEnd));
+                ConnectionZone.Path result = new ConnectionZone.Path(PathStart,PathEnd);
 
                 result.OnCreated += () =>
                 {
-                    AllPaths.Add(result);
+                    result.Add();
                     plDraw.Invalidate();
                 };
 
@@ -239,7 +242,7 @@ namespace Flow_Network
 
                 result.Adjust();
 
-                UndoStack.AddAction(new UndoableActions.AddConnection(result));
+                UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
 
                 PathStart = null;
                 PathEnd = null;
@@ -268,15 +271,15 @@ namespace Flow_Network
                     dragElement = FindCollisionUnder(mousePosition);
                     if (dragElement != null)
                     {
-                        dragStart = dragElement.PictureBox.Location;
+                        dragStart = dragElement.Location;
                         oldDragElementPosition.Visible = true;
                         oldDragElementPosition.Location = dragStart;
-                        oldDragElementPosition.Image = dragElement.PictureBox.Image;
+                        oldDragElementPosition.Image = dragElement.Icon;
                     }
                 }
                 else
                 {
-                    dragElement.PictureBox.Location = mousePosition;
+                    dragElement.Location = mousePosition;
                 }
             }
         }
@@ -284,9 +287,9 @@ namespace Flow_Network
         void plDraw_MoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (dragElement.PictureBox.Location != e.Location)
+            if (dragElement.Location != e.Location)
             {
-                dragElement.PictureBox.Location = e.Location;
+                dragElement.Location = e.Location;
                 RefreshConnections();
             }
         }
@@ -295,7 +298,7 @@ namespace Flow_Network
         {
             if (dragElement == null) return;
 
-            dragElement.PictureBox.Location = dragStart;
+            dragElement.Location = dragStart;
             oldDragElementPosition.Visible = false;
             dragElement = null;
 
@@ -376,7 +379,18 @@ namespace Flow_Network
         //before u draw with black, check if prev and current point are from the collision line if true draw red
         void plDraw_DrawPaths(object sender, PaintEventArgs e)
         {
-            
+            foreach (var item in AllElements)
+            {
+                e.Graphics.DrawImage(item.Icon,item.Location.X, item.Location.Y,item.Width,item.Height);
+                if(ActiveTool == ActiveToolType.Pipe)
+                    foreach (var con in item.ConnectionZones)
+                    {
+                        //if tool if pipe,,,,
+                        //if connection is taken make red, if connection is empty green, if connection is in use yellow
+                        e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
+                    }
+            }
+
             foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
             {
                 Pen pen = Pens.Black;
@@ -403,8 +417,8 @@ namespace Flow_Network
             Point crossV1 = new Point(mouse.X-1, mouse.Y);
             Point crossV2 = new Point(mouse.X+1, mouse.Y);
 
-            return (Intersects(a, b, crossH1, crossH2, out intersection) && Intersects(a, b, crossV1, crossV2,out intersection));
-            return onCollision(a.X, b.X, a.Y, b.Y, mouse.X, mouse.Y);
+            return (Intersects(a, b, crossH1, crossH2, out intersection) || Intersects(a, b, crossV1, crossV2,out intersection));
+            //return onCollision(a.X, b.X, a.Y, b.Y, mouse.X, mouse.Y);
         }
 
         static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection)
@@ -448,23 +462,19 @@ namespace Flow_Network
         void RemoveElement(Element e)
         {
             AllElements.Remove(e);
-            plDraw.Controls.Remove(e.PictureBox);
-            UndoStack.AddAction(new UndoableActions.RemoveElement(e, plDraw));
+            UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
 
             RefreshConnections(e);
         }
 
         void AddElement(Element e, Point position)
         {
-            e.PictureBox.Enabled = false;
-
             e.X = position.X;
             e.Y = position.Y;
-
-            this.plDraw.Controls.Add(e.PictureBox);
+            
             AllElements.Add(e);
-
-            UndoStack.AddAction(new UndoableActions.AddElement(e));
+            
+            UndoStack.AddAction(new UndoableActions.AddElementAction(e));
 
             RefreshConnections(e);
         }
@@ -542,11 +552,11 @@ namespace Flow_Network
                         RemoveElement(e);
                     }
                 }).Name = "remove";
-                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<Pump>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<Sink>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<Splitter>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<PumpElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<SinkElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<SplitterElement>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<Merger>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<MergerElement>(rightClickMousePosition); });
                 rightClickPanel.AddButton("Cancel", 120).Name = "cancel";
 
                 foreach (var item in rightClickPanel.Controls)
@@ -599,6 +609,19 @@ namespace Flow_Network
                     return false;
                 });
         }
+        private ConnectionZone FindConnectionUnder(Point mousePosition)
+        {
+            foreach (var item in AllElements)
+            {
+                foreach (var q in item.ConnectionZones)
+                {
+                    if (q.Location.X <= mousePosition.X && q.Location.X + q.Width >= mousePosition.X)
+                        if (q.Location.Y <= mousePosition.Y && q.Location.Y + q.Height >= mousePosition.Y)
+                            return q;
+                }
+            }
+            return null;
+        }
 
         private Element FindCollisionElement(Point mousePosition)
         {
@@ -607,8 +630,8 @@ namespace Flow_Network
                 if (q == dragElement) return false;
                 Point position = mousePosition;
 
-                if (q.X - q.PictureBox.Width <= position.X && q.X + q.PictureBox.Width >= position.X)
-                    if (q.Y - q.PictureBox.Height <= position.Y && q.Y + q.PictureBox.Height >= position.Y)
+                if (q.X - q.Width <= position.X && q.X + q.Width >= position.X)
+                    if (q.Y - q.Height <= position.Y && q.Y + q.Height >= position.Y)
                         return true;
                 return false;
             });
