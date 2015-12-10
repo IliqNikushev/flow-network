@@ -1,0 +1,289 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Flow-Network</name>
+    </assembly>
+    <members>
+        <member name="T:Flow_Network.UndoableAction">
+            <summary>An action performed in the network that can be undone</summary>
+        </member>
+        <member name="F:Flow_Network.UndoableAction.isApplied">
+            <summary>True = Is done, False = is not done / undone</summary>
+        </member>
+        <member name="M:Flow_Network.UndoableAction.Undo">
+            <summary></summary>
+        </member>
+        <member name="T:Flow_Network.AdjustableSplitter">
+            <summary>
+            Splitter that can have the out flow adjusted in percentage
+            </summary>
+        </member>
+        <member name="T:Flow_Network.SplitterElement">
+            <summary>
+            Element that has an 2 OUT 1 IN flow points. The flow is 50%
+            </summary>
+        </member>
+        <member name="M:Flow_Network.Element.Contains(System.Drawing.Point)">
+            <summary>Checks if a specific point is within the element's boundries</summary>
+        </member>
+        <member name="M:Flow_Network.Element.RefreshConnections(System.Boolean)">
+            <summary>Recalculates all connections of this element</summary>
+            <param name="refresh">If set to true, invokes the OnAdjust event once completed for each connection</param>
+        </member>
+        <member name="P:Flow_Network.Element.AllElements">
+            <summary>Returns all elements used in the Main form</summary>
+        </member>
+        <member name="P:Flow_Network.Element.ConnectionZones">
+            <summary>Gets all Properties that are a connection zone within the class</summary>
+        </member>
+        <member name="P:Flow_Network.Element.Connections">
+            <summary>Gets all connections that are defined in Path.All and are from this element to any other</summary>
+        </member>
+        <member name="P:Flow_Network.Element.Center">
+            <summary>Center of the bounding box of the element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.A">
+            <summary>Bottom left point of the bounding box of the element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.B">
+            <summary>Bottom right point of the bounding box of the element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.C">
+            <summary>Top right point of the bounding box of the element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.D">
+            <summary>Top left point of the bounding box of the element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.Icon">
+            <summary>Gets the icon found in the Resources assosiacted to the current element</summary>
+        </member>
+        <member name="P:Flow_Network.Element.X">
+            <summary>X coordinate in the 4-th sector of the coordinate system</summary>
+        </member>
+        <member name="P:Flow_Network.Element.Y">
+            <summary>Y coordinate in the 4-th sector of the coordinate system, where 4-th sector is positive, 2-nd is negative</summary>
+        </member>
+        <member name="P:Flow_Network.Element.Location">
+            <summary>Location based on the X and Y</summary>
+        </member>
+        <member name="P:Flow_Network.AdjustableSplitter.UpFlowPercent">
+            <summary>range : 0-100</summary>
+        </member>
+        <member name="P:Flow_Network.AdjustableSplitter.DownFlowPercent">
+            <summary>range : 0-100</summary>
+        </member>
+        <member name="E:Flow_Network.AdjustableSplitter.OnAdjusted">
+            <summary>Called when the up flow percent has been changed, left value is previous, right value is current and Adjustable splitter is the current splitter</summary>
+        </member>
+        <member name="T:Flow_Network.Collision">
+            <summary>Helper class for ConnectionZone.Path to find a collision with an element</summary>
+        </member>
+        <member name="T:Flow_Network.ConnectionZone">
+            <summary>Zone in which an element can be connected with a path</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Parent">
+            <summary>Element that the zone belongs to</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Margin">
+            <summary>Distance from the parent's X,Y</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Location">
+            <summary>Returns the parent's location + current (X,Y)</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Previous">
+            <summary>If connected, returns the element prior to the current on the path they are connected</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Flow">
+            <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
+        </member>
+        <member name="T:Flow_Network.ConnectionZone.Path">
+            <summary>Path from 2 connection zones. ALSO KNOWN AS : Connection</summary>
+        </member>
+        <member name="F:Flow_Network.ConnectionZone.Path.UserDefinedMidPoints">
+            <summary>Points the path HAS to go to before reaching the TO zone</summary>
+        </member>
+        <member name="F:Flow_Network.ConnectionZone.Path.MidPoints">
+            <summary>Points the path will go through before reaching the TO zone</summary>
+        </member>
+        <member name="M:Flow_Network.ConnectionZone.Path.Add">
+            <summary>Adds to the All collection of paths if not added</summary>
+        </member>
+        <member name="M:Flow_Network.ConnectionZone.Path.Remove">
+            <summary>Removes from the All collection of paths if present</summary>
+        </member>
+        <member name="M:Flow_Network.ConnectionZone.Path.Adjust(System.Boolean)">
+            <summary>Calculates the new midpoints based on the position of the Elements.All and the user defined mid points
+            The process is executed on a different thread to not hold up the program</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Path.All">
+            <summary>Returns all paths defineed in the Main form</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Path.PathPoints">
+            <summary>Returns a path starting at the FROM zone to the TO zone, with all midpoints inbetween</summary>
+        </member>
+        <member name="E:Flow_Network.ConnectionZone.Path.OnCreated">
+            <summary>Called when the path is adjusted for the first time</summary>
+        </member>
+        <member name="E:Flow_Network.ConnectionZone.Path.OnAdjusted">
+            <summary>Called when the path has been adjusted</summary>
+        </member>
+        <member name="T:Flow_Network.Main">
+            <summary>
+            Flow network main form
+            </summary>
+        </member>
+        <member name="F:Flow_Network.Main.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Flow_Network.Main.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Flow_Network.Main.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="T:Flow_Network.MergerElement">
+            <summary>
+            Element that has 2 IN and 1 OUT flow points. The out flow is the sum of the two in going flows
+            </summary>
+        </member>
+        <member name="M:Flow_Network.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:Flow_Network.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.A_splitter">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.close">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.connect">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.cursor">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.load">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.merger">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.merger1">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.mergerRescaled">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.pump">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.save">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.sink">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.sinkRescaled">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.splitter">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.splitter1">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.toggled">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.toggled_converted">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="T:Flow_Network.PumpElement">
+            <summary>Element that has 1 OUT flow point and can specify the out flow's amount </summary>
+        </member>
+        <member name="P:Flow_Network.PumpElement.Flow">
+            <summary>Flow of the pump </summary>
+        </member>
+        <member name="T:Flow_Network.Resources">
+            <summary>Static class for resources</summary>
+        </member>
+        <member name="T:Flow_Network.SinkElement">
+            <summary>Element that has 1 IN flow point</summary>
+        </member>
+        <member name="T:Flow_Network.UndoStack">
+            <summary>Wrapper for Flow Network's collection of actions that can be undone/redone</summary>
+        </member>
+        <member name="M:Flow_Network.UndoStack.AddAction(Flow_Network.UndoableAction)">
+            <summary>Adds the specified action to be listed as an action that can be undone</summary>
+        </member>
+        <member name="M:Flow_Network.UndoStack.Undo">
+            <summary>Undoes the last action performed, if any</summary>
+        </member>
+        <member name="M:Flow_Network.UndoStack.Redo">
+            <summary>Redoes the last action undone, if any</summary>
+        </member>
+        <member name="E:Flow_Network.UndoStack.OnUndoAltered">
+            <summary>Triggered when the Undo stack has been changed</summary>
+        </member>
+        <member name="E:Flow_Network.UndoStack.OnRedoAltered">
+            <summary>Triggered when the Redo stack has been changed</summary>
+        </member>
+    </members>
+</doc>
