@@ -97,9 +97,6 @@
         <member name="P:Flow_Network.Element.Location">
             <summary>Location based on the X and Y</summary>
         </member>
-        <member name="F:Flow_Network.AdjustableSplitter.upPercent">
-            <summary>Current up percent</summary>
-        </member>
         <member name="P:Flow_Network.AdjustableSplitter.UpFlowPercent">
             <summary>
             Value of the % flow of the up stream

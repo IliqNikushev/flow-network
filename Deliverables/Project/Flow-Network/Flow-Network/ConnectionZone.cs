@@ -119,7 +119,7 @@ namespace Flow_Network
             public ConnectionZone From { get; private set; }
             public ConnectionZone To { get; private set; }
 
-            public float maxFlow;
+            private float maxFlow;
             /// <summary>
             /// Maximum flow that can go through this path
             /// Minimum : 0
