@@ -19,7 +19,9 @@ namespace Flow_Network
         /// <summary>Distance from the parent's X,Y</summary>
         public Point Margin { get; private set; }
 
+        /// <summary>returns DefaultSize.X</summary>
         public int Width { get { return DefaultSize.X; } }
+        /// <summary>returns DefaultSize.Y</summary>
         public int Height { get { return DefaultSize.Y; } }
 
         /// <summary>Returns the parent's location + current (X,Y)</summary>

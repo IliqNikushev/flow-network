@@ -130,6 +130,12 @@
         <member name="P:Flow_Network.ConnectionZone.Margin">
             <summary>Distance from the parent's X,Y</summary>
         </member>
+        <member name="P:Flow_Network.ConnectionZone.Width">
+            <summary>returns DefaultSize.X</summary>
+        </member>
+        <member name="P:Flow_Network.ConnectionZone.Height">
+            <summary>returns DefaultSize.Y</summary>
+        </member>
         <member name="P:Flow_Network.ConnectionZone.Location">
             <summary>Returns the parent's location + current (X,Y)</summary>
         </member>
@@ -140,7 +146,7 @@
             <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
         </member>
         <member name="T:Flow_Network.ConnectionZone.Path">
-            <summary>Path from 2 connection zones. Refered to also as Connection</summary>
+            <summary>Path from 2 connection zones.</summary>
         </member>
         <member name="F:Flow_Network.ConnectionZone.Path.UserDefinedMidPoints">
             <summary>Points the path HAS to go to before reaching the TO zone</summary>
@@ -337,7 +343,7 @@
             <summary>Invokes ConnectionZone.Path.Add of this.Connection</summary>
         </member>
         <member name="P:Flow_Network.UndoableActions.AddConnectionAction.Connection">
-            <param name="connection">The connection that was added</param>
+            <summary>The connection that was added</summary>
         </member>
         <member name="M:Flow_Network.UndoableActions.AddElementAction.OnUndo">
             <summary>Removes this.Element from the Element.AllElements collection</summary>

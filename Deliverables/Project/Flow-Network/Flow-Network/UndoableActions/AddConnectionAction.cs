@@ -8,7 +8,7 @@ namespace Flow_Network.UndoableActions
 {
     class AddConnectionAction : UndoableAction
     {
-        /// <param name="connection">The connection that was added</param>
+        /// <summary>The connection that was added</summary>
         public ConnectionZone.Path Connection { get; private set; }
 
         public AddConnectionAction(ConnectionZone.Path connection)
