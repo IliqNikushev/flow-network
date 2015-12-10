@@ -14,5 +14,13 @@ var hierarchy =
       [ "Flow_Network.Main", "class_flow___network_1_1_main.html", null ]
     ] ],
     [ "Flow_Network.ConnectionZone.Path", "class_flow___network_1_1_connection_zone_1_1_path.html", null ],
-    [ "Flow_Network.UndoableAction", "class_flow___network_1_1_undoable_action.html", null ]
+    [ "Flow_Network.UndoableAction", "class_flow___network_1_1_undoable_action.html", [
+      [ "Flow_Network.UndoableActions.AddConnectionAction", "class_flow___network_1_1_undoable_actions_1_1_add_connection_action.html", [
+        [ "Flow_Network.UndoableActions.RemoveConnectionAction", "class_flow___network_1_1_undoable_actions_1_1_remove_connection_action.html", null ]
+      ] ],
+      [ "Flow_Network.UndoableActions.AddElementAction", "class_flow___network_1_1_undoable_actions_1_1_add_element_action.html", [
+        [ "Flow_Network.UndoableActions.RemoveElementAction", "class_flow___network_1_1_undoable_actions_1_1_remove_element_action.html", null ]
+      ] ],
+      [ "Flow_Network.UndoableActions.MoveElementAction", "class_flow___network_1_1_undoable_actions_1_1_move_element_action.html", null ]
+    ] ]
 ];

@@ -1,5 +1,7 @@
 var files =
 [
+    [ "Properties", "dir_d051c76eebdc544d9c3d734575641c72.html", "dir_d051c76eebdc544d9c3d734575641c72" ],
+    [ "UndoableActions", "dir_e97cd5fe41c1990207e3a191fcb77ca5.html", "dir_e97cd5fe41c1990207e3a191fcb77ca5" ],
     [ "AdjustableSplitter.cs", "_adjustable_splitter_8cs.html", [
       [ "AdjustableSplitter", "class_flow___network_1_1_adjustable_splitter.html", "class_flow___network_1_1_adjustable_splitter" ]
     ] ],
