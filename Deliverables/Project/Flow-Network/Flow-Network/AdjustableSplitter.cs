@@ -10,8 +10,13 @@ namespace Flow_Network
     /// </summary>
     public class AdjustableSplitter : SplitterElement
     {
+        public delegate void AdjustEventArgs(AdjustableSplitter splitter, int previous, int current);
+        /// <summary>Current up percent</summary>
         private int upPercent;
-        /// <summary>range : 0-100</summary>
+        /// <summary>
+        /// Value of the % flow of the up stream
+        /// range : 0-100
+        /// </summary>
         public int UpFlowPercent
         {
             get
@@ -22,14 +27,18 @@ namespace Flow_Network
             {
                 if (value < 0) value = 0;
                 else if (value > 100) value = 100;
-                float previous = upPercent;
+                int previous = upPercent;
                 upPercent = value;
 
-                if (upPercent != previous) OnAdjusted(this, previous, upPercent);
+                if (previous != value) 
+                    OnAdjusted(this, previous, value);
             }
         }
 
-        /// <summary>range : 0-100</summary>
+        /// <summary>
+        /// Value of the % flow of the down stream
+        /// range : 0-100
+        /// </summary>
         public int DownFlowPercent
         {
             get
@@ -44,7 +53,7 @@ namespace Flow_Network
             }
         }
 
-        /// <summary>Called when the up flow percent has been changed, left value is previous, right value is current and Adjustable splitter is the current splitter</summary>
-        public event Action<AdjustableSplitter, float, float> OnAdjusted = (e, x, y) => { };
+        /// <summary>Called when the up flow percent has been changed</summary>
+        public event AdjustEventArgs OnAdjusted = (e, x, y) => { };
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Flow_Network.UndoableActions
 {
+    /// <summary>Uses the inverse of AddElementAction's redo, undo methods</summary>
     class RemoveElementAction : AddElementAction
     {
         public RemoveElementAction(Element element) : base(element)

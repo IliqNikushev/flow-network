@@ -9,6 +9,7 @@ namespace Flow_Network
     /// <summary>Zone in which an element can be connected with a path</summary>
     public class ConnectionZone
     {
+        /// <summary>Constant Default size for width and height when drawn</summary>
         public static readonly Point DefaultSize = new Point(20, 20);
         private bool isInFlow;
         
@@ -92,14 +93,14 @@ namespace Flow_Network
             this.isInFlow = isInflow;
         }
 
-        public static Path PathFromTo(ConnectionZone from, ConnectionZone to)
+        public static Path GetPathFromTo(ConnectionZone from, ConnectionZone to)
         {
             return new Path(from, to);
         }
 
         public Path GetPathTo(ConnectionZone to)
         {
-            return PathFromTo(this, to);
+            return GetPathFromTo(this, to);
         }
 
         public static implicit operator Point(ConnectionZone connection)
@@ -107,16 +108,37 @@ namespace Flow_Network
             return new Point(connection.Location.X + connection.Width / 2, connection.Location.Y + connection.Height / 2);
         }
 
-        /// <summary>Path from 2 connection zones. ALSO KNOWN AS : Connection</summary>
+        /// <summary>Path from 2 connection zones. Refered to also as Connection</summary>
         public class Path
         {
+            public delegate void FlowAlteredEvent(Path path, float previous, float current);
             /// <summary>Returns all paths defineed in the Main form</summary>
             public static List<Path> All { get { return Main.AllPaths; } }
             public ConnectionZone From { get; private set; }
             public ConnectionZone To { get; private set; }
-            public float MaxFlow { get; set; }
 
-            public event Action<float> OnMaxFlowChanged = (x) => { };
+            public float maxFlow;
+            /// <summary>
+            /// Maximum flow that can go through this path
+            /// Minimum : 0
+            /// </summary>
+            public float MaxFlow
+            {
+                get { return maxFlow; }
+                set
+                {
+                    if (value < 0) value = 0;
+
+                    float previous = this.maxFlow;
+                    this.maxFlow = value;
+
+                    if (previous != value)
+                        OnMaxFlowChanged(this, previous, value);
+                }
+            }
+
+            /// <summary>Called when the max flow has been altered</summary>
+            public event FlowAlteredEvent OnMaxFlowChanged = (x,y,z) => { };
 
             /// <summary>Returns a path starting at the FROM zone to the TO zone, with all midpoints inbetween</summary>
             public List<Point> PathPoints
@@ -179,6 +201,7 @@ namespace Flow_Network
 
             /// <summary>Calculates the new midpoints based on the position of the Elements.All and the user defined mid points
             /// The process is executed on a different thread to not hold up the program</summary>
+            /// <param name="refresh">If set to true, will call OnAdjusted</param>
             public void Adjust(bool refresh = false)
             {
                 lock (threadLock)

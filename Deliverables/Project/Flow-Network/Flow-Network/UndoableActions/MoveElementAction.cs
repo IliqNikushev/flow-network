@@ -19,14 +19,16 @@ namespace Flow_Network.UndoableActions
             this.NewCoordinates = newCoordinates;
         }
 
+        /// <summary>Changes the coordinates of the element to the old ones</summary>
         protected override void OnUndo()
         {
-            throw new NotImplementedException();
+            this.element.Location = this.OldCoordinates;
         }
 
+        /// <summary>Changes the coordinates of the element to the new ones</summary>
         protected override void OnRedo()
         {
-            throw new NotImplementedException();
+            this.element.Location = this.NewCoordinates;
         }
 
         protected override string AsString

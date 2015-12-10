@@ -5,7 +5,7 @@ var searchData=
   ['main_2ecs',['Main.cs',['../_main_8cs.html',1,'']]],
   ['main_2edesigner_2ecs',['Main.Designer.cs',['../_main_8_designer_8cs.html',1,'']]],
   ['margin',['Margin',['../class_flow___network_1_1_connection_zone.html#a2a78b8231339a1b80dc014ba725e4eac',1,'Flow_Network::ConnectionZone']]],
-  ['maxflow',['MaxFlow',['../class_flow___network_1_1_connection_zone_1_1_path.html#ac3c20891b2872a2e447fb6f4bcfd40e9',1,'Flow_Network::ConnectionZone::Path']]],
+  ['maxflow',['maxFlow',['../class_flow___network_1_1_connection_zone_1_1_path.html#a2596ba20ef665499d9e64506936dee41',1,'Flow_Network.ConnectionZone.Path.maxFlow()'],['../class_flow___network_1_1_connection_zone_1_1_path.html#ac3c20891b2872a2e447fb6f4bcfd40e9',1,'Flow_Network.ConnectionZone.Path.MaxFlow()']]],
   ['merger',['Merger',['../class_flow___network_1_1_main.html#a37eea98bf4048d5fe4edbefa360d5737aef85b1cef547fa05ada048c96cfe3a71',1,'Flow_Network.Main.Merger()'],['../class_flow___network_1_1_main.html#a01ae270e5949fef50e60fec455fb4332aef85b1cef547fa05ada048c96cfe3a71',1,'Flow_Network.Main.Merger()']]],
   ['mergerelement',['MergerElement',['../class_flow___network_1_1_merger_element.html',1,'Flow_Network']]],
   ['mergerelement',['MergerElement',['../class_flow___network_1_1_merger_element.html#aa5bba416edcad6a56ab6f5653b4c8553',1,'Flow_Network::MergerElement']]],

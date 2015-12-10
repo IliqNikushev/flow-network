@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Flow_Network
 {
-    /// <summary>Wrapper for Flow Network's collection of actions that can be undone/redone</summary>
+    /// <summary>Wrapper for Flow Network's collection of actions that can be undone/redone defined in an activity stack and a redo stack</summary>
     public static class UndoStack
     {
         /// <summary>Triggered when the Undo stack has been changed</summary>
@@ -13,6 +13,7 @@ namespace Flow_Network
         /// <summary>Triggered when the Redo stack has been changed</summary>
         public static event Action<int, UndoableAction> OnRedoAltered = (x, y) => { };
 
+        /// <summary>True if any changes remain in the activity stack</summary>
         public static bool CanUndo
         {
             get
@@ -21,6 +22,7 @@ namespace Flow_Network
             }
         }
 
+        /// <summary>True if any changes remain in the redo stack</summary>
         public static bool CanRedo
         {
             get

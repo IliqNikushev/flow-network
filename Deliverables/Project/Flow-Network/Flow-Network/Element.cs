@@ -9,6 +9,7 @@ namespace Flow_Network
 {
     public abstract class Element
     {
+        /// <summary>Constant Default size for width and height when drawn</summary>
         public static readonly Point DefaultSize = new Point(42, 42);
         /// <summary>Returns all elements used in the Main form</summary>
         public static List<Element> AllElements { get { return Main.AllElements; } }
@@ -21,7 +22,7 @@ namespace Flow_Network
         }
 
         /// <summary>Recalculates all connections of this element</summary>
-        /// <param name="refresh">If set to true, invokes the OnAdjust event once completed for each connection</param>
+        /// <param name="refresh">Passed to the ConnectionZone.Path.Adjust method</param>
         public void RefreshConnections(bool refresh = false)
         {
             foreach (ConnectionZone.Path connection in this.Connections)
@@ -30,22 +31,25 @@ namespace Flow_Network
             }
         }
 
-        private IEnumerable<System.Reflection.PropertyInfo> connectionZoneProperties;
+        private IEnumerable<ConnectionZone> connectionZones;
 
         /// <summary>Gets all Properties that are a connection zone within the class</summary>
         public IEnumerable<ConnectionZone> ConnectionZones
         {
             get
             {
-                if (connectionZoneProperties == null)
+                if (connectionZones == null)
                 {
-                    this.connectionZoneProperties =
+                    this.connectionZones =
                         this.GetType().GetProperties(
                             System.Reflection.BindingFlags.Public |
                             System.Reflection.BindingFlags.Instance).
-                        Where(x => x.PropertyType == typeof(ConnectionZone) && x.CanRead && x.CanWrite);
+                        Where(x => x.PropertyType == typeof(ConnectionZone) && x.CanRead && x.CanWrite).
+                        Select(x => x.GetValue(this) as ConnectionZone);
+                    if (this.connectionZones.Where(x => x == null).Any()) 
+                        throw new NotImplementedException("A connection zone is not implemented in " + this.GetType().Name);
                 }
-                return connectionZoneProperties.Select(x => x.GetValue(this) as ConnectionZone);
+                return connectionZones;
             }
         }
         /// <summary>Gets all connections that are defined in Path.All and are from this element to any other</summary>
@@ -62,7 +66,9 @@ namespace Flow_Network
         /// <summary>Top left point of the bounding box of the element</summary>
         public Point D { get { return new Point(this.X, this.Y - 2); } }
 
+        /// <summary>Returns DefaultSize.X</summary>
         public int Width { get { return DefaultSize.X; } }
+        /// <summary>Returns DefaultSize.Y</summary>
         public int Height { get { return DefaultSize.Y; } }
 
         /// <summary>Gets the icon found in the Resources assosiacted to the current element</summary>

@@ -1,6 +1,8 @@
 var class_flow___network_1_1_undoable_action =
 [
     [ "UndoableAction", "class_flow___network_1_1_undoable_action.html#a48ad0fa7e42a0a0adbc23c76892e4674", null ],
+    [ "Apply", "class_flow___network_1_1_undoable_action.html#a4ea97104519a96947936e91c7dcab52e", null ],
+    [ "Cancel", "class_flow___network_1_1_undoable_action.html#a1a9c64b36fb77cdcc4c826ad5ad78ead", null ],
     [ "OnRedo", "class_flow___network_1_1_undoable_action.html#a2686ced14c65ad30ce313481da706926", null ],
     [ "OnUndo", "class_flow___network_1_1_undoable_action.html#a9252cef9791538dd4a202215e66e9e99", null ],
     [ "Redo", "class_flow___network_1_1_undoable_action.html#a58a6a24aaffe1869625a8d07ff64de2c", null ],

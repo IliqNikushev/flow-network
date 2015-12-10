@@ -1,7 +1,7 @@
 var searchData=
 [
   ['c',['C',['../class_flow___network_1_1_element.html#a7e80a6e59c607a14c45623eb82369ffb',1,'Flow_Network::Element']]],
-  ['cancel',['Cancel',['../class_flow___network_1_1_main.html#a01ae270e5949fef50e60fec455fb4332aea4788705e6873b424c65e91c2846b19',1,'Flow_Network::Main']]],
+  ['cancel',['Cancel',['../class_flow___network_1_1_undoable_action.html#a1a9c64b36fb77cdcc4c826ad5ad78ead',1,'Flow_Network.UndoableAction.Cancel()'],['../class_flow___network_1_1_main.html#a01ae270e5949fef50e60fec455fb4332aea4788705e6873b424c65e91c2846b19',1,'Flow_Network.Main.Cancel()']]],
   ['center',['Center',['../class_flow___network_1_1_element.html#a8898f7fbabc28de85666543bd405d63f',1,'Flow_Network::Element']]],
   ['collision',['Collision',['../class_flow___network_1_1_collision.html',1,'Flow_Network']]],
   ['collision',['Collision',['../class_flow___network_1_1_collision.html#a6e0e31b6203d2bc6a757e1935b511547',1,'Flow_Network::Collision']]],

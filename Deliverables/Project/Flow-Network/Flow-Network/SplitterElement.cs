@@ -5,9 +5,7 @@ using System.Text;
 
 namespace Flow_Network
 {
-    /// <summary>
-    /// Element that has an 2 OUT 1 IN flow points. The flow is 50%
-    /// </summary>
+    /// <summary>Element that has an 2 OUT 1 IN flow points. The flow is 50%</summary>
     public class SplitterElement : Element
     {
         public ConnectionZone Up { get; private set; }

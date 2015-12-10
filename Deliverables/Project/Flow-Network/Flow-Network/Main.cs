@@ -8,11 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-//todo OPTIMIZATION
-/*
- * remove tool instead of redral ALL paths - redral only the red one
- * */
-
 namespace Flow_Network
 {
     /// <summary>
@@ -32,7 +27,6 @@ namespace Flow_Network
             Pipe,
             None
         }
-
         public static List<Element> AllElements = new List<Element>();
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
@@ -44,27 +38,32 @@ namespace Flow_Network
         private ConnectionZone PathEnd;
 
         private Element dragElement;
-        private PictureBox oldDragElementPosition;
+        private PictureBox oldDragElementPlaceholder;
         private Point dragStart;
         private Point mousePosition = new Point(0, 0);
-        private Pen linePen = new Pen(Color.Black);
         PictureBox currentActiveToolPbox;
         ConnectionZone.Path pathToDelete;
-        private Point toggle = new Point(0, 0);
+
+        /// <summary>
+        /// Initializes the resources based on the present images
+        /// Subscribes for the Undo and Redo events of the UndoStack
+        /// Subscribes the draw panel for the different events
+        /// </summary>
+
         public Main()
         {
             InitializeComponent();
             
-            oldDragElementPosition = new PictureBox();
-            oldDragElementPosition.Height = Element.DefaultSize.Y;
-            oldDragElementPosition.SizeMode = PictureBoxSizeMode.StretchImage;
-            oldDragElementPosition.Width = Element.DefaultSize.X;
-            oldDragElementPosition.BorderStyle = BorderStyle.FixedSingle;
-            oldDragElementPosition.Visible = false;
+            oldDragElementPlaceholder = new PictureBox();
+            oldDragElementPlaceholder.Height = Element.DefaultSize.Y;
+            oldDragElementPlaceholder.SizeMode = PictureBoxSizeMode.StretchImage;
+            oldDragElementPlaceholder.Width = Element.DefaultSize.X;
+            oldDragElementPlaceholder.BorderStyle = BorderStyle.FixedSingle;
+            oldDragElementPlaceholder.Visible = false;
 
-            plDraw.Controls.Add(oldDragElementPosition);
+            plDraw.Controls.Add(oldDragElementPlaceholder);
 
-            plDraw.Paint += plDraw_DrawPaths;
+            plDraw.Paint += plDraw_Redraw;
             Resources.PumpIcon = this.pictureBox2.Image;
             Resources.SinkIcon = Properties.Resources.sinkRescaled;
             Resources.MergerIcon = Properties.Resources.mergerRescaled;
@@ -172,14 +171,13 @@ namespace Flow_Network
 
         void HandleDeleteToolClick()
         {
-            Element e = FindCollisionUnder(mousePosition);
+            Element e = FindElementUnder(mousePosition);
             if(e!=null)
                 RemoveElement(e);
         }
         
         void HandleCreateElementToolClick()
         {
-            Point toggle = new Point(mousePosition.X, mousePosition.Y);
             if (HasCollision(mousePosition))
             {
                 return;
@@ -211,7 +209,6 @@ namespace Flow_Network
             if (elementToAdd != null)
             {
                 AddElement(elementToAdd, mousePosition);
-                ////toggle = new Point(mousePosition.X + 22, mousePosition.Y + 26);
             }
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
@@ -219,7 +216,7 @@ namespace Flow_Network
 
         void HandleConnectionToolClick()
         {
-            ConnectionZone hovered = FindConnectionUnder(mousePosition);
+            ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
             if (hovered == null) return;
 
             if (PathStart == null) PathStart = hovered;
@@ -257,7 +254,7 @@ namespace Flow_Network
             {
                 RevertDrag();
             }
-            oldDragElementPosition.Visible = false;
+            oldDragElementPlaceholder.Visible = false;
             dragElement = null;
             plDraw.Cursor = Cursors.Arrow;
         }
@@ -268,13 +265,13 @@ namespace Flow_Network
             {
                 if (dragElement == null)
                 {
-                    dragElement = FindCollisionUnder(mousePosition);
+                    dragElement = FindElementUnder(mousePosition);
                     if (dragElement != null)
                     {
                         dragStart = dragElement.Location;
-                        oldDragElementPosition.Visible = true;
-                        oldDragElementPosition.Location = dragStart;
-                        oldDragElementPosition.Image = dragElement.Icon;
+                        oldDragElementPlaceholder.Visible = true;
+                        oldDragElementPlaceholder.Location = dragStart;
+                        oldDragElementPlaceholder.Image = dragElement.Icon;
                     }
                 }
                 else
@@ -299,7 +296,7 @@ namespace Flow_Network
             if (dragElement == null) return;
 
             dragElement.Location = dragStart;
-            oldDragElementPosition.Visible = false;
+            oldDragElementPlaceholder.Visible = false;
             dragElement = null;
 
             RefreshConnections();
@@ -312,7 +309,7 @@ namespace Flow_Network
         {
             if (ActiveTool == ActiveToolType.Select)
             {
-                Element e = FindCollisionUnder(mousePosition);
+                Element e = FindElementUnder(mousePosition);
                 if (e != null || dragElement != null)
                 {
                     this.Cursor = Cursors.SizeAll;
@@ -337,27 +334,10 @@ namespace Flow_Network
                 else
                     this.Cursor = Cursors.Arrow;
 
-                bool hadCollision = pathToDelete != null;
-                pathToDelete = null;
-
-                foreach(ConnectionZone.Path path in AllPaths)
-                {
-                    for (int i = 0; i < path.PathPoints.Count-1; i++)
-                    {
-                        Point lineStart = path.PathPoints[i];
-                        Point lineEnd = path.PathPoints[i+1];
-                        if (onCollision(lineStart, lineEnd, mousePosition))
-                        {
-                            pathToDelete = path;
-                            plDraw.Invalidate();
-                            break;
-                        }
-                    }
-
-                    if (pathToDelete != null) break;
-                }
-
-                if (hadCollision && pathToDelete == null)
+                ConnectionZone.Path previousCollisionPath = pathToDelete;
+                //todo check if works
+                pathToDelete = FindPathUnder(mousePosition);
+                if (previousCollisionPath != pathToDelete)
                     plDraw.Invalidate();
             }
             else
@@ -375,9 +355,8 @@ namespace Flow_Network
                 iconBelowCursor.BringToFront();
             }
         }
-        //save left point,right point on the collision line 
-        //before u draw with black, check if prev and current point are from the collision line if true draw red
-        void plDraw_DrawPaths(object sender, PaintEventArgs e)
+
+        void plDraw_Redraw(object sender, PaintEventArgs e)
         {
             foreach (var item in AllElements)
             {
@@ -385,8 +364,8 @@ namespace Flow_Network
                 if(ActiveTool == ActiveToolType.Pipe)
                     foreach (var con in item.ConnectionZones)
                     {
-                        //if tool if pipe,,,,
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
+                        //if mouse is on top - mark active
                         e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
                     }
             }
@@ -408,53 +387,15 @@ namespace Flow_Network
                 }
             }
         }
-        private bool onCollision(Point a, Point b, Point mouse)
+        private bool LineIntersectsAt(Point a, Point b, Point mouse)
         {
-            Point intersection;
             Point crossH1 = new Point(mouse.X, mouse.Y-1);
             Point crossH2 = new Point(mouse.X, mouse.Y+1);
 
             Point crossV1 = new Point(mouse.X-1, mouse.Y);
             Point crossV2 = new Point(mouse.X+1, mouse.Y);
 
-            return (Intersects(a, b, crossH1, crossH2, out intersection) || Intersects(a, b, crossV1, crossV2,out intersection));
-            //return onCollision(a.X, b.X, a.Y, b.Y, mouse.X, mouse.Y);
-        }
-
-        static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection)
-        {
-            intersection = Point.Empty;
-
-            Point b = new Point(a2.X - a1.X, a2.Y - a1.Y);
-            Point d = new Point(b2.X - b1.X, b2.Y - b1.Y);
-            float bDotDPerp = b.X * d.Y - b.Y * d.X;
-
-            // if b dot d == 0, it means the lines are parallel so have infinite intersection points
-            if (bDotDPerp == 0)
-                return false;
-
-            Point c = new Point(b1.X - a1.X, b1.Y - a1.Y);
-            float t = (c.X * d.Y - c.Y * d.X) / bDotDPerp;
-            if (t < 0 || t > 1)
-                return false;
-
-            float u = (c.X * b.Y - c.Y * b.X) / bDotDPerp;
-            if (u < 0 || u > 1)
-                return false;
-
-            intersection = new Point((int)(a1.X + t * b.X), (int)(a1.Y + t * b.Y));
-
-            return true;
-        }
-    
-
-        private bool onCollision(int x1, int x2, int y1, int y2, int x, int y)
-        {
-                if ((x - x1) / (x2 - x1) == (y - y1) / (y2 - y1))
-                {
-                    return true;
-                }
-                else return false;
+            return (Collision.Intersects(a, b, crossH1, crossH2) || Collision.Intersects(a, b, crossV1, crossV2));
         }
 
         #region AddElement Remove
@@ -530,7 +471,7 @@ namespace Flow_Network
 
             if (HasCollision(rightClickMousePosition))
             {
-                Element e = FindCollisionUnder(rightClickMousePosition);
+                Element e = FindElementUnder(rightClickMousePosition);
                 if (e != null)
                     options = RightClickOptions.Remove;
             }
@@ -545,7 +486,7 @@ namespace Flow_Network
 
                 rightClickPanel.AddButton("Remove", 0, (x, y) =>
                 {
-                    Element e = FindCollisionUnder(rightClickMousePosition);
+                    Element e = FindElementUnder(rightClickMousePosition);
                     if (e == null) return;
                     else
                     {
@@ -597,7 +538,7 @@ namespace Flow_Network
         }
         #endregion
         #region collision,element detection
-        private Element FindCollisionUnder(Point mousePosition)
+        private Element FindElementUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
                 {
@@ -609,7 +550,22 @@ namespace Flow_Network
                     return false;
                 });
         }
-        private ConnectionZone FindConnectionUnder(Point mousePosition)
+        private ConnectionZone.Path FindPathUnder(Point mousePosition)
+        {
+            foreach (ConnectionZone.Path path in AllPaths)
+            {
+                for (int i = 0; i < path.PathPoints.Count - 1; i++)
+                {
+                    Point lineStart = path.PathPoints[i];
+                    Point lineEnd = path.PathPoints[i + 1];
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition))
+                        return path;
+                }
+            }
+            return null;
+        }
+
+        private ConnectionZone FindConnectionZoneUnder(Point mousePosition)
         {
             foreach (var item in AllElements)
             {
@@ -623,7 +579,7 @@ namespace Flow_Network
             return null;
         }
 
-        private Element FindCollisionElement(Point mousePosition)
+        private Element FindCollisionForPlacementOfElementUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
             {
@@ -639,7 +595,7 @@ namespace Flow_Network
 
         private bool HasCollision(Point mousePosition)
         {
-            return FindCollisionElement(mousePosition) != null;
+            return FindCollisionForPlacementOfElementUnder(mousePosition) != null;
         }
         #endregion
 

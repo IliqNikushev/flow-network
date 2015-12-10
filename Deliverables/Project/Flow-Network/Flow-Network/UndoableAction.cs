@@ -17,7 +17,7 @@ namespace Flow_Network
         {
         }
 
-        /// <summary></summary>
+        /// <summary>Removes changes defined by the action</summary>
         public void Undo()
         {
             if (IsUndone) return;
@@ -25,6 +25,7 @@ namespace Flow_Network
             this.isApplied = false;
         }
 
+        /// <summary>Applies changes defined by the action</summary>
         public void Redo()
         {
             if (IsDone) return;
@@ -32,12 +33,28 @@ namespace Flow_Network
             this.isApplied = true;
         }
 
+        /// <summary>Calls Redo</summary>
+        public void Apply()
+        {
+            Redo();
+        }
+
+        /// <summary>Calls Undo</summary>
+        public void Cancel()
+        {
+            Undo();
+        }
+
+        /// <summary>Defines changes to remove</summary>
         protected abstract void OnUndo();
-
+        /// <summary>Defines changes to apply</summary>
         protected abstract void OnRedo();
-
+        /// <summary>Defines how the action will be named in String format</summary>
         protected abstract string AsString { get; }
-
+        /// <summary>
+        /// Defines how the action will be in string format
+        /// </summary>
+        /// <returns>(IsDone?Perform:Undo)+AsString</returns>
         public override string ToString()
         {
             return

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Flow_Network.UndoableActions
 {
+    /// <summary>Uses the inverse of AddConnectionAction's redo, undo methods</summary>
     class RemoveConnectionAction : AddConnectionAction
     {
         public RemoveConnectionAction(ConnectionZone.Path connection) : base(connection)

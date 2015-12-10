@@ -19,7 +19,6 @@ namespace Flow_Network
 
         public Collision(Element element, Point from, Point to)
         {
-
             bool left = from.X < element.Center.X;
             bool up = from.Y < element.Center.Y;
 
@@ -81,7 +80,7 @@ namespace Flow_Network
             return minimum;
         }
 
-        static bool Intersects(Point a1, Point a2, Point b1, Point b2)
+        public static bool Intersects(Point a1, Point a2, Point b1, Point b2)
         {
             Point b = new Point(a2.X - a1.X, a2.Y - a1.Y);
             Point d = new Point(b2.X - b1.X, b2.Y - b1.Y);

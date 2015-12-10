@@ -15,14 +15,15 @@ namespace Flow_Network
         public static System.Drawing.Image SplitterIcon;
         public static System.Drawing.Image AdjSplitterIcon;
 
-        public static System.Drawing.Image Icon(Element e)
+        /// <summary>Iterates the resources to find the specified element's proper icon</summary>
+        public static System.Drawing.Image Icon(Element element)
         {
-            if (e is PumpElement) return PumpIcon;
-            else if (e is SinkElement) return SinkIcon;
-            else if (e is MergerElement) return MergerIcon;
-            else if (e is SplitterElement) return SplitterIcon;
-            else if (e is AdjustableSplitter) return AdjSplitterIcon;
-            throw new ArgumentException("Element not implemented, " + e.GetType().Name);
+            if (element is PumpElement) return PumpIcon;
+            else if (element is SinkElement) return SinkIcon;
+            else if (element is MergerElement) return MergerIcon;
+            else if (element is SplitterElement) return SplitterIcon;
+            else if (element is AdjustableSplitter) return AdjSplitterIcon;
+            throw new ArgumentException("Element not implemented, " + element.GetType().Name);
         }
     }
 }
