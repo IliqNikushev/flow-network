@@ -11,9 +11,6 @@
   </Comment>
   <Class Name="Flow_Network.AdjustableSplitter">
     <Position X="5.75" Y="6.25" Width="2.75" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
     <NestedTypes>
       <Delegate Name="Flow_Network.AdjustableSplitter.AdjustEventArgs" Collapsed="true">
         <TypeIdentifier>
@@ -37,6 +34,13 @@
     <Position X="9.5" Y="6" Width="4.25" />
     <NestedTypes>
       <Class Name="Flow_Network.ConnectionZone.Path" Collapsed="true">
+        <NestedTypes>
+          <Delegate Name="Flow_Network.ConnectionZone.Path.FlowAlteredEvent" Collapsed="true">
+            <TypeIdentifier>
+              <NewMemberFileName>ConnectionZone.cs</NewMemberFileName>
+            </TypeIdentifier>
+          </Delegate>
+        </NestedTypes>
         <TypeIdentifier>
           <NewMemberFileName>ConnectionZone.cs</NewMemberFileName>
         </TypeIdentifier>
