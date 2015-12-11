@@ -34,13 +34,6 @@
     <Position X="9.5" Y="6" Width="4.25" />
     <NestedTypes>
       <Class Name="Flow_Network.ConnectionZone.Path" Collapsed="true">
-        <NestedTypes>
-          <Delegate Name="Flow_Network.ConnectionZone.Path.FlowAlteredEvent" Collapsed="true">
-            <TypeIdentifier>
-              <NewMemberFileName>ConnectionZone.cs</NewMemberFileName>
-            </TypeIdentifier>
-          </Delegate>
-        </NestedTypes>
         <TypeIdentifier>
           <NewMemberFileName>ConnectionZone.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -106,7 +99,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>/CIJIhApgLKBERAAAAGYShIKRggOgBgAUaAtAotAUQI=</HashCode>
+      <HashCode>/CIJIAApgLKBERABAAGYChIKxggOgBwAUaAtAotAUQI=</HashCode>
       <FileName>Main.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -146,14 +139,14 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoableAction">
-    <Position X="12.75" Y="14.75" Width="2" />
+    <Position X="12.75" Y="15.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAACAAQBAABAgEAAAAgEABAgAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>UndoableAction.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoStack">
-    <Position X="11.75" Y="11.25" Width="3.25" />
+    <Position X="12" Y="12" Width="3.25" />
     <AssociationLine Name="activitiesStack" Type="Flow_Network.UndoableAction">
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.11" Y="0.418" />
@@ -201,21 +194,21 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoableActions.MoveElementAction">
-    <Position X="11" Y="20.25" Width="5.5" />
+    <Position X="11" Y="19.75" Width="5.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAAAAAAgAAAAAAEAIAgAAAAAAAAAAAAAABAA=</HashCode>
       <FileName>UndoableActions\MoveElementAction.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoableActions.RemoveConnectionAction">
-    <Position X="8.75" Y="18" Width="3" />
+    <Position X="8.75" Y="17.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAgAAAAAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>UndoableActions\RemoveConnectionAction.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoableActions.RemoveElementAction">
-    <Position X="15.75" Y="18" Width="3" />
+    <Position X="15.75" Y="17.5" Width="3" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAgAAAAAAEAAAgAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>UndoableActions\RemoveElementAction.cs</FileName>

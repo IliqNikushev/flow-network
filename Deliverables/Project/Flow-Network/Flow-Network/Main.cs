@@ -70,11 +70,11 @@ namespace Flow_Network
             plDraw.Controls.Add(oldDragElementPlaceholder);
 
             plDraw.Paint += plDraw_Redraw;
-            Resources.PumpIcon = this.pictureBox2.Image;
+            Resources.PumpIcon = this.pbPump.Image;
             Resources.SinkIcon = Properties.Resources.sinkRescaled;
             Resources.MergerIcon = Properties.Resources.mergerRescaled;
-            Resources.SplitterIcon = this.pictureBox4.Image;
-            Resources.AdjSplitterIcon = this.pictureBox5.Image;
+            Resources.SplitterIcon = this.pbSplitter.Image;
+            Resources.AdjSplitterIcon = this.pbAdjSplitter.Image;
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
             iconBelowCursor.Height = 16;
@@ -124,21 +124,21 @@ namespace Flow_Network
                 currentActiveToolPbox.BackColor = Color.AliceBlue;
             }
             currentActiveToolPbox = clickedPbox;
-            if (currentActiveToolPbox == pictureBox1)
+            if (currentActiveToolPbox == pbSelect)
                 ActiveTool = ActiveToolType.Select;
-            else if (currentActiveToolPbox == pictureBox2)
+            else if (currentActiveToolPbox == pbPump)
                 ActiveTool = ActiveToolType.Pump;
-            else if (currentActiveToolPbox == pictureBox3)
+            else if (currentActiveToolPbox == pbSink)
                 ActiveTool = ActiveToolType.Sink;
-            else if (currentActiveToolPbox == pictureBox4)
+            else if (currentActiveToolPbox == pbSplitter)
                 ActiveTool = ActiveToolType.Splitter;
-            else if (currentActiveToolPbox == pictureBox5)
+            else if (currentActiveToolPbox == pbAdjSplitter)
                 ActiveTool = ActiveToolType.AdjustableSplitter;
-            else if (currentActiveToolPbox == pictureBox6)
+            else if (currentActiveToolPbox == pbMerger)
                 ActiveTool = ActiveToolType.Merger;
-            else if (currentActiveToolPbox == pictureBox7)
+            else if (currentActiveToolPbox == pbPipe)
                 ActiveTool = ActiveToolType.Pipe;
-            else if (currentActiveToolPbox == pictureBox8)
+            else if (currentActiveToolPbox == pbDelete)
                 ActiveTool = ActiveToolType.Delete;
             else
                 ActiveTool = ActiveToolType.None;

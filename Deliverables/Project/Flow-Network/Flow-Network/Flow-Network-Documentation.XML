@@ -188,6 +188,16 @@
             Flow network main form
             </summary>
         </member>
+        <member name="F:Flow_Network.Main.AllElements">
+            <summary>
+            All elements within the network
+            </summary>
+        </member>
+        <member name="F:Flow_Network.Main.AllPaths">
+            <summary>
+            All paths within the network
+            </summary>
+        </member>
         <member name="M:Flow_Network.Main.#ctor">
             <summary>
             Initializes the resources based on the present images
