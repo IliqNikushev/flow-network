@@ -86,6 +86,53 @@
   </Class>
   <Class Name="Flow_Network.Main">
     <Position X="23.25" Y="3" Width="5" />
+    <Members>
+      <Field Name="btnLoad" Hidden="true" />
+      <Field Name="btnNew" Hidden="true" />
+      <Field Name="btnSave" Hidden="true" />
+      <Field Name="components" Hidden="true" />
+      <Field Name="currentActiveToolPbox" Hidden="true" />
+      <Field Name="iconBelowCursor" Hidden="true" />
+      <Field Name="label1" Hidden="true" />
+      <Field Name="label10" Hidden="true" />
+      <Field Name="label11" Hidden="true" />
+      <Field Name="label12" Hidden="true" />
+      <Field Name="label13" Hidden="true" />
+      <Field Name="label16" Hidden="true" />
+      <Field Name="label17" Hidden="true" />
+      <Field Name="label2" Hidden="true" />
+      <Field Name="label6" Hidden="true" />
+      <Field Name="label7" Hidden="true" />
+      <Field Name="label8" Hidden="true" />
+      <Field Name="label9" Hidden="true" />
+      <Field Name="lastActionToUndoLbl" Hidden="true" />
+      <Field Name="lastActionUndone" Hidden="true" />
+      <Field Name="lbPump" Hidden="true" />
+      <Field Name="lbSelect" Hidden="true" />
+      <Field Name="lbSink" Hidden="true" />
+      <Field Name="numberActionsRedone" Hidden="true" />
+      <Field Name="numberActionsToUndoLbl" Hidden="true" />
+      <Field Name="oldDragElementPlaceholder" Hidden="true" />
+      <Field Name="pbAdjSplitter" Hidden="true" />
+      <Field Name="pbDelete" Hidden="true" />
+      <Field Name="pbMerger" Hidden="true" />
+      <Field Name="pbPipe" Hidden="true" />
+      <Field Name="pbPump" Hidden="true" />
+      <Field Name="pbSelect" Hidden="true" />
+      <Field Name="pbSink" Hidden="true" />
+      <Field Name="pbSplitter" Hidden="true" />
+      <Field Name="pictureBox10" Hidden="true" />
+      <Field Name="pictureBox11" Hidden="true" />
+      <Field Name="pictureBox9" Hidden="true" />
+      <Field Name="plDraw" Hidden="true" />
+      <Field Name="redoButton" Hidden="true" />
+      <Field Name="tbCurrent" Hidden="true" />
+      <Field Name="tbMax" Hidden="true" />
+      <Field Name="undoButton" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
     <NestedTypes>
       <Enum Name="Flow_Network.Main.ActiveToolType" Collapsed="true">
         <TypeIdentifier>
@@ -99,7 +146,7 @@
       </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>/CIJIAApgLKBERABAAGYChIKxggOgBwAUaAtAotAUQI=</HashCode>
+      <HashCode>/AILAAAtiLKBURAAAAG4ChIKxggOgB0AQaENAotEUQM=</HashCode>
       <FileName>Main.cs</FileName>
     </TypeIdentifier>
   </Class>
