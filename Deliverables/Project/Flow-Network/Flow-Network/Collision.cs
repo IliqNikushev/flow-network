@@ -39,9 +39,10 @@ namespace Flow_Network
             return collision != null;
         }
 
-        public static Collision FindBetween(Point from, Point to, ConnectionZone fromEl, ConnectionZone toEl,ref HashSet<Collision> lastCollision, List<Element> elements = null)
+        public static Collision FindBetween(Point from, Point to, ConnectionZone fromEl, ConnectionZone toEl,ref HashSet<Element> elementsAlreadyCollided, List<Element> elements = null)
         {
-            if (elements == null) elements = Element.AllElements;
+            if (elements == null) 
+                elements = Element.AllElements;
 
             double deltaMin = double.MaxValue;
             Collision minimum = null;
@@ -65,7 +66,7 @@ namespace Flow_Network
                     double delta = deltaX * deltaX + deltaY * deltaY;
                     delta = Math.Sqrt(delta);
                     Collision collision = new Collision(element, from, to);
-                    if (lastCollision.FirstOrDefault(x => x.Element == element) != null) continue;
+                    if (elementsAlreadyCollided.Contains(element)) continue;
                     
                     //find closest collision
                     if (deltaMin > delta)
@@ -76,7 +77,7 @@ namespace Flow_Network
                 }
             }
             if(minimum != null)
-                lastCollision.Add(minimum);
+                elementsAlreadyCollided.Add(minimum.Element);
             return minimum;
         }
 

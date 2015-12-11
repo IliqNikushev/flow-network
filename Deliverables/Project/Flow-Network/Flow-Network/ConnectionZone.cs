@@ -225,8 +225,8 @@ namespace Flow_Network
                             this.MidPoints.Clear();
                         }
 
-                        
-                        HashSet<Collision> lastCollisions = new HashSet<Collision>();
+
+                        HashSet<Element> elementsAlreadyCollided = new HashSet<Element>();
 
                         int currentPointStartIndex = 0;
                         Point start = pointsToGoThrough[currentPointStartIndex];
@@ -234,7 +234,7 @@ namespace Flow_Network
 
                         while (true)
                         {
-                            Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref lastCollisions, Element.AllElements);
+                            Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref elementsAlreadyCollided, Element.AllElements);
                             if (!collision)
                             {
                                 currentPointStartIndex += 1;

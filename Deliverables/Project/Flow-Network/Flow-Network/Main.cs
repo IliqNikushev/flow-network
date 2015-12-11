@@ -27,7 +27,13 @@ namespace Flow_Network
             Pipe,
             None
         }
+        /// <summary>
+        /// All elements within the network
+        /// </summary>
         public static List<Element> AllElements = new List<Element>();
+        /// <summary>
+        /// All paths within the network
+        /// </summary>
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
         private ActiveToolType ActiveTool = ActiveToolType.None;
@@ -626,7 +632,7 @@ namespace Flow_Network
     }
 }
 
-static class E
+static class Extentions
 {
     public static Button AddButton(this Panel panel, string text, int top, EventHandler onClick = null)
     {
