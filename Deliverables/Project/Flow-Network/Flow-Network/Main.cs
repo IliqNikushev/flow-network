@@ -683,6 +683,8 @@ namespace Flow_Network
 
             }
         }
+    }
+}
 
         static class Extentions
         {
@@ -701,6 +703,4 @@ namespace Flow_Network
                 return button;
             }
         }
-    }
-}
 
