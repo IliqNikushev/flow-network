@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Flow_Network
 {
@@ -37,7 +38,7 @@ namespace Flow_Network
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
         private ActiveToolType ActiveTool = ActiveToolType.None;
-       
+
         private PictureBox iconBelowCursor;
 
         private ConnectionZone PathStart;
@@ -59,7 +60,7 @@ namespace Flow_Network
         public Main()
         {
             InitializeComponent();
-            
+
             oldDragElementPlaceholder = new PictureBox();
             oldDragElementPlaceholder.Height = Element.DefaultSize.Y;
             oldDragElementPlaceholder.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -178,10 +179,10 @@ namespace Flow_Network
         void HandleDeleteToolClick()
         {
             Element e = FindElementUnder(mousePosition);
-            if(e!=null)
+            if (e != null)
                 RemoveElement(e);
         }
-        
+
         void HandleCreateElementToolClick()
         {
             if (HasCollision(mousePosition))
@@ -190,11 +191,11 @@ namespace Flow_Network
             }
 
             Element elementToAdd = null;
-            
+
             if (ActiveTool == ActiveToolType.Pump)
             {
                 elementToAdd = new PumpElement();
-                
+
             }
             else if (ActiveTool == ActiveToolType.Sink)
             {
@@ -230,7 +231,7 @@ namespace Flow_Network
 
             if (PathStart != null && PathEnd != null)
             {
-                ConnectionZone.Path result = new ConnectionZone.Path(PathStart,PathEnd);
+                ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
 
                 result.OnCreated += () =>
                 {
@@ -333,7 +334,7 @@ namespace Flow_Network
             else if (ActiveTool == ActiveToolType.Delete)
             {
                 iconBelowCursor.Visible = false;
-                if(HasCollision(mousePosition))
+                if (HasCollision(mousePosition))
                 {
                     this.Cursor = System.Windows.Forms.Cursors.No;
                 }
@@ -366,8 +367,8 @@ namespace Flow_Network
         {
             foreach (var item in AllElements)
             {
-                e.Graphics.DrawImage(item.Icon,item.Location.X, item.Location.Y,item.Width,item.Height);
-                if(ActiveTool == ActiveToolType.Pipe)
+                e.Graphics.DrawImage(item.Icon, item.Location.X, item.Location.Y, item.Width, item.Height);
+                if (ActiveTool == ActiveToolType.Pipe)
                     foreach (var con in item.ConnectionZones)
                     {
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
@@ -395,11 +396,11 @@ namespace Flow_Network
         }
         private bool LineIntersectsAt(Point a, Point b, Point mouse)
         {
-            Point crossH1 = new Point(mouse.X, mouse.Y-1);
-            Point crossH2 = new Point(mouse.X, mouse.Y+1);
+            Point crossH1 = new Point(mouse.X, mouse.Y - 1);
+            Point crossH2 = new Point(mouse.X, mouse.Y + 1);
 
-            Point crossV1 = new Point(mouse.X-1, mouse.Y);
-            Point crossV2 = new Point(mouse.X+1, mouse.Y);
+            Point crossV1 = new Point(mouse.X - 1, mouse.Y);
+            Point crossV2 = new Point(mouse.X + 1, mouse.Y);
 
             return (Collision.Intersects(a, b, crossH1, crossH2) || Collision.Intersects(a, b, crossV1, crossV2));
         }
@@ -418,9 +419,9 @@ namespace Flow_Network
         {
             e.X = position.X;
             e.Y = position.Y;
-            
+
             AllElements.Add(e);
-            
+
             UndoStack.AddAction(new UndoableActions.AddElementAction(e));
 
             RefreshConnections(e);
@@ -622,31 +623,84 @@ namespace Flow_Network
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.InitialDirectory = "D:\\";
+            openFileDialog.Filter = "pipeline file(*.pipelane)|*.pipelane";
+            openFileDialog.RestoreDirectory = true;
+            openFileDialog.FilterIndex = 1;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+            }
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            Stream myStream;
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = "D:\\";
+            sfd.Filter = "pipeline file(*.pipelane)|*.pipelane";
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                if ((myStream = sfd.OpenFile()) != null)
+                {
+                    using (StreamWriter sw = new StreamWriter(myStream))
+                    {
+                        foreach (var item in AllElements)
+                        {
+                            string x = item.Location.X.ToString();
+                            string y = item.Location.Y.ToString();
+                            if (item is SinkElement)
+                            {
+                                sw.WriteLine("1", x, y);
+                            }
+                            else if (item is PumpElement)
+                            {
+                                sw.WriteLine("2", x, y);
+                            }
+                            else if (item is SplitterElement)
+                            {
+                                sw.WriteLine("3", x, y);
+                            }
+                            else if (item is MergerElement)
+                            {
+                                sw.WriteLine("4", x, y);
+                            }
+                            else if (item is AdjustableSplitter)
+                            {
+                                sw.WriteLine("5", x, y);
+                            }
+                            foreach (var con in item.ConnectionZones)
+                            {
+                                string a = con.Location.X.ToString();
+                                string b = con.Location.Y.ToString();
+                                sw.WriteLine("line", a, b);
+                            }
+                        }
+                        myStream.Close();
+                        MessageBox.Show("Saved");
+                    }
+                }
 
+            }
         }
-    }
-}
 
-static class Extentions
-{
-    public static Button AddButton(this Panel panel, string text, int top, EventHandler onClick = null)
-    {
-        Button button = new Button();
-        button.Text = text;
-        button.Width = panel.Width;
-        button.Height = 20;
-        button.Top = top;
-        if(onClick != null)
-            button.Click += onClick;
+        static class Extentions
+        {
+            public static Button AddButton(this Panel panel, string text, int top, EventHandler onClick = null)
+            {
+                Button button = new Button();
+                button.Text = text;
+                button.Width = panel.Width;
+                button.Height = 20;
+                button.Top = top;
+                if (onClick != null)
+                    button.Click += onClick;
 
-        panel.Controls.Add(button);
+                panel.Controls.Add(button);
 
-        return button;
+                return button;
+            }
+        }
     }
 }
 
