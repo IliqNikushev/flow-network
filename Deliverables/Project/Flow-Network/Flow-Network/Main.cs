@@ -636,10 +636,7 @@ namespace Flow_Network
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
-                    string[] a = nextLine.Split(',');
-                    int[] A;
-                    A = Array.ConvertAll<string, int>(a, s => int.Parse(s));
-                    if (A[0] == 1)
+                    
                     {
 
                     }
@@ -663,27 +660,7 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            if (item is SinkElement)
-                            {
-                                sw.WriteLine("1"+","+ x + ","+ y);
-                            }
-                            else if (item is PumpElement)
-                            {
-                                sw.WriteLine("2" + "," + x + "," + y);
-                            }
-                            else if (item is SplitterElement)
-                            {
-                                sw.WriteLine("3" + "," + x + "," + y);
-                            }
-                            else if (item is MergerElement)
-                            {
-                                sw.WriteLine("4" + "," + x + "," + y);
-                            }
-                            else if (item is AdjustableSplitter)
-                            {
-                                sw.WriteLine("5" + "," + x + "," + y);
-                            }
-
+                            sw.WriteLine(item + "," + x +","+ y);
                             // following is the connection need to be corrected
                             foreach (var con in item.Connections)
                             {
