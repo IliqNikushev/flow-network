@@ -630,6 +630,20 @@ namespace Flow_Network
             openFileDialog.FilterIndex = 1;
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+                FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open);
+                StreamReader sr = new StreamReader(fs);
+                string nextLine;
+                while ((nextLine = sr.ReadLine()) != null)
+                {
+                    Console.WriteLine(nextLine);
+                    string[] a = nextLine.Split(',');
+                    int[] A;
+                    A = Array.ConvertAll<string, int>(a, s => int.Parse(s));
+                    if (A[0] == 1)
+                    {
+
+                    }
+                } 
             }
         }
 
@@ -651,34 +665,35 @@ namespace Flow_Network
                             string y = item.Location.Y.ToString();
                             if (item is SinkElement)
                             {
-                                sw.WriteLine("1", x, y);
+                                sw.WriteLine("1"+","+ x + ","+ y);
                             }
                             else if (item is PumpElement)
                             {
-                                sw.WriteLine("2", x, y);
+                                sw.WriteLine("2" + "," + x + "," + y);
                             }
                             else if (item is SplitterElement)
                             {
-                                sw.WriteLine("3", x, y);
+                                sw.WriteLine("3" + "," + x + "," + y);
                             }
                             else if (item is MergerElement)
                             {
-                                sw.WriteLine("4", x, y);
+                                sw.WriteLine("4" + "," + x + "," + y);
                             }
                             else if (item is AdjustableSplitter)
                             {
-                                sw.WriteLine("5", x, y);
+                                sw.WriteLine("5" + "," + x + "," + y);
                             }
-                            foreach (var con in item.ConnectionZones)
+
+                            // following is the connection need to be corrected
+                            foreach (var con in item.Connections)
                             {
-                                string a = con.Location.X.ToString();
-                                string b = con.Location.Y.ToString();
-                                sw.WriteLine("line", a, b);
+                                sw.WriteLine("line" + "," + x + "," + y);
                             }
+                            // does not work the right way, dont know about how connection is working
                         }
-                        myStream.Close();
-                        MessageBox.Show("Saved");
                     }
+                    myStream.Close();
+                    MessageBox.Show("Saved");
                 }
 
             }
