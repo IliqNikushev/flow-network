@@ -82,6 +82,7 @@ namespace Flow_Network
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
+            plDraw.MouseMove += plDraw_ChangeState;
             plDraw.MouseMove += plDraw_HandleDynamicIcon;
             plDraw.MouseMove += plDraw_MoveDragElement;
             plDraw.MouseDown += plDraw_HandleStartDrag;
@@ -112,6 +113,31 @@ namespace Flow_Network
                 if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
                     plDraw.Invalidate();
             };
+        }
+        ConnectionZone lastHovered;
+        ConnectionZone lastHoveredConnected;
+        void plDraw_ChangeState(object sender, MouseEventArgs e)
+        {
+            ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
+            if (hovered != null)
+            {
+                lastHovered = hovered;
+                if(hovered.State ==1)
+                {
+                    lastHoveredConnected = hovered;
+                }
+                hovered.State = 2;
+                plDraw.Invalidate();
+            }
+            else if (FindConnectionZoneUnder(mousePosition) != lastHovered)
+            {
+                lastHovered.State = 0;
+                if(lastHoveredConnected!=null)
+                {
+                    lastHoveredConnected.State = 1;
+                }
+            }
+            
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -219,6 +245,7 @@ namespace Flow_Network
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
         }
+        
 
         void HandleConnectionToolClick()
         {
@@ -247,8 +274,10 @@ namespace Flow_Network
                     PathStart = null;
                     return;
                 }
+                PathStart.State = 1;
+                PathEnd.State = 1;
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
-
+                
                 result.OnCreated += () =>
                 {
                     result.Add();
@@ -387,9 +416,21 @@ namespace Flow_Network
                 if (ActiveTool == ActiveToolType.Pipe)
                     foreach (var con in item.ConnectionZones)
                     {
+                        if (con.State == 0)
+                        {
+                            e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
+                        }
+                        else if (con.State ==1)
+                        {
+                            e.Graphics.DrawImage(Properties.Resources.toggled2, con.Location.X, con.Location.Y, con.Width, con.Height);
+                        }
+                        else if (con.State ==2)
+                        {
+                            e.Graphics.DrawImage(Properties.Resources.toggled3, con.Location.X, con.Location.Y, con.Width, con.Height);
+                        }
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
                         //if mouse is on top - mark active
-                        e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
+                        
                     }
             }
 

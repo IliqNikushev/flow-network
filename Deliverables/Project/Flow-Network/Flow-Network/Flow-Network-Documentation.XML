@@ -323,7 +323,12 @@
               Looks up a localized resource of type System.Drawing.Bitmap.
             </summary>
         </member>
-        <member name="P:Flow_Network.Properties.Resources.toggled_converted">
+        <member name="P:Flow_Network.Properties.Resources.toggled2">
+            <summary>
+              Looks up a localized resource of type System.Drawing.Bitmap.
+            </summary>
+        </member>
+        <member name="P:Flow_Network.Properties.Resources.toggled3">
             <summary>
               Looks up a localized resource of type System.Drawing.Bitmap.
             </summary>

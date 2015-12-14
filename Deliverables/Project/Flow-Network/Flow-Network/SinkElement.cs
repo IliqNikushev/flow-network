@@ -12,7 +12,7 @@ namespace Flow_Network
 
         public SinkElement()
         {
-            this.In = new ConnectionZone(11, 12, this, true);
+            this.In = new ConnectionZone(11, 12, this, true,0);
         }
     }
 }

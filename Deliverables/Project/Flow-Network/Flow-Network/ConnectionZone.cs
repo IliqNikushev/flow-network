@@ -85,14 +85,15 @@ namespace Flow_Network
                 return 0;
             }
         }
+        public int State { get; set; }
+        public ConnectionZone(int x, int y, Element parent, bool isInFlow, int state) : this(new Point(x,y), parent, isInFlow, state) { }
 
-        public ConnectionZone(int x, int y, Element parent, bool isInFlow) : this(new Point(x,y), parent, isInFlow) { }
-
-        public ConnectionZone(Point margin, Element parent, bool isInflow)
+        public ConnectionZone(Point margin, Element parent, bool isInflow,int state)
         {
             this.Margin = margin;
             this.Parent = parent;
             this.isInFlow = isInflow;
+            this.State = state;
         }
 
         public static Path GetPathFromTo(ConnectionZone from, ConnectionZone to)

@@ -46,7 +46,7 @@
       </Path>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAABAAAABAAABgAgABIAwEAAAABAAAEACAAAAAAAAQA=</HashCode>
+      <HashCode>AAABAAAABAAABgAgABIAwEAAAABAAAEACAAABAAAAQA=</HashCode>
       <FileName>ConnectionZone.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -223,7 +223,7 @@
   <Class Name="Flow_Network.Properties.Resources" Collapsed="true">
     <Position X="16" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAICAEAEAgAABEoAAAQAAAAAAFIGABAAIAIA=</HashCode>
+      <HashCode>AABAAAAAAICAEAEAgAABEoAAAQAAAAAAEIGABAAIAIA=</HashCode>
     </TypeIdentifier>
   </Class>
   <Class Name="Flow_Network.UndoableActions.AddConnectionAction">
