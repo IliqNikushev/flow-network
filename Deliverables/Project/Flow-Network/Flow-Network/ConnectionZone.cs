@@ -166,7 +166,7 @@ namespace Flow_Network
 
             public Path(ConnectionZone from, ConnectionZone to)
             {
-                if (from.State == to.State) throw new ArgumentException("Two connection zones with same flow type connected");
+                if (from.isInFlow == to.isInFlow) throw new ArgumentException("Two connection zones with same flow type connected");
                 if (from.IsOutFlow)
                 {
                     this.From = to;
