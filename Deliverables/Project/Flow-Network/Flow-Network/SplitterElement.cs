@@ -16,9 +16,9 @@ namespace Flow_Network
 
         public SplitterElement()
         {
-            this.Up = new ConnectionZone(this.Width, 0, this, false,0);
-            this.Down = new ConnectionZone(this.Width, this.Height, this, false,0);
-            this.In = new ConnectionZone(0, this.Height / 2, this, true,0);
+            this.Up = new ConnectionZone(this.Width, 0, this, false);
+            this.Down = new ConnectionZone(this.Width, this.Height, this, false);
+            this.In = new ConnectionZone(0, this.Height / 2, this, true);
         }
     }
 }

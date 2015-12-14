@@ -10,7 +10,7 @@ namespace Flow_Network
     {
         public PumpElement ()
         {
-            this.Out = new ConnectionZone(28,34,this, false,0);
+            this.Out = new ConnectionZone(28,34,this, false);
         }
         public ConnectionZone Out { get; private set; }
 

@@ -86,14 +86,14 @@ namespace Flow_Network
             }
         }
         public int State { get; set; }
-        public ConnectionZone(int x, int y, Element parent, bool isInFlow, int state) : this(new Point(x,y), parent, isInFlow, state) { }
+        public ConnectionZone(int x, int y, Element parent, bool isInFlow) : this(new Point(x,y), parent, isInFlow) { }
 
-        public ConnectionZone(Point margin, Element parent, bool isInflow,int state)
+        public ConnectionZone(Point margin, Element parent, bool isInflow)
         {
             this.Margin = margin;
             this.Parent = parent;
             this.isInFlow = isInflow;
-            this.State = state;
+            this.State = 0;
         }
 
         public static Path GetPathFromTo(ConnectionZone from, ConnectionZone to)
@@ -166,8 +166,17 @@ namespace Flow_Network
 
             public Path(ConnectionZone from, ConnectionZone to)
             {
-                this.From = from;
-                this.To = to;
+                if (from.State == to.State) throw new ArgumentException("Two connection zones with same flow type connected");
+                if (from.IsOutFlow)
+                {
+                    this.From = to;
+                    this.To = from;
+                }
+                else
+                {
+                    this.From = from;
+                    this.To = to;
+                }
             }
 
             private bool isAdded = false;
@@ -176,6 +185,8 @@ namespace Flow_Network
             public void Add()
             {
                 if (isAdded) return;
+                this.To.State = 1;
+                this.From.State = 1;
                 ConnectionZone.Path.All.Add(this);
                 this.isAdded = true;
                 this.To.Previous = this.From;
@@ -185,6 +196,8 @@ namespace Flow_Network
             public void Remove()
             {
                 if (!isAdded) return;
+                this.From.State = 0;
+                this.To.State = 0;
                 ConnectionZone.Path.All.Remove(this);
                 this.isAdded = false;
                 this.To.Previous = null;

@@ -122,17 +122,18 @@ namespace Flow_Network
             if (hovered != null)
             {
                 lastHovered = hovered;
-                if(hovered.State ==1)
-                {
-                    lastHoveredConnected = hovered;
-                }
+                if (lastHovered != hovered)
+                    if (hovered.State == 1)
+                    {
+                        lastHoveredConnected = hovered;
+                    }
                 hovered.State = 2;
                 plDraw.Invalidate();
             }
-            else if (FindConnectionZoneUnder(mousePosition) != lastHovered)
+            else if (hovered != lastHovered)
             {
                 lastHovered.State = 0;
-                if(lastHoveredConnected!=null)
+                if (lastHoveredConnected != null)
                 {
                     lastHoveredConnected.State = 1;
                 }
@@ -258,20 +259,14 @@ namespace Flow_Network
             
             if (PathStart != null && PathEnd != null)
             {
-                if (PathStart.Parent == PathEnd.Parent)
-                {
-                    PathStart = null;
-                    PathStart = null;
-                    return;
-                }
-                else if(PathEnd.Parent is PumpElement)
+                if ((PathStart.IsInFlow && PathEnd.IsInFlow) || (PathStart.IsOutFlow && PathEnd.IsOutFlow))
                 {
                     PathEnd = null;
                     return;
                 }
-                else if (PathStart.Parent is SinkElement)
+                if (PathStart.Parent == PathEnd.Parent)
                 {
-                    PathStart = null;
+                    PathEnd = null;
                     return;
                 }
                 PathStart.State = 1;
@@ -430,7 +425,7 @@ namespace Flow_Network
                         }
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
                         //if mouse is on top - mark active
-                        
+
                     }
             }
 
