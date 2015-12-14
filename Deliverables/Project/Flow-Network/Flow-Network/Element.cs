@@ -40,12 +40,18 @@ namespace Flow_Network
             {
                 if (connectionZones == null)
                 {
-                    this.connectionZones =
-                        this.GetType().GetProperties(
+                    List<ConnectionZone> connectionZoneProps = new List<ConnectionZone>();
+                    Type type = this.GetType();
+                    while(type!=typeof(Element))
+                    {
+                        connectionZoneProps.AddRange(type.GetProperties(
                             System.Reflection.BindingFlags.Public |
                             System.Reflection.BindingFlags.Instance).
                         Where(x => x.PropertyType == typeof(ConnectionZone) && x.CanRead && x.CanWrite).
-                        Select(x => x.GetValue(this) as ConnectionZone);
+                        Select(x => x.GetValue(this) as ConnectionZone));
+                        type = type.BaseType;
+                    }
+                    this.connectionZones = connectionZoneProps;
                     if (this.connectionZones.Where(x => x == null).Any()) 
                         throw new NotImplementedException("A connection zone is not implemented in " + this.GetType().Name);
                 }

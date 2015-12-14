@@ -69,12 +69,11 @@ namespace Flow_Network
             oldDragElementPlaceholder.Visible = false;
 
             plDraw.Controls.Add(oldDragElementPlaceholder);
-
-            plDraw.Paint += plDraw_Redraw;
+            
             Resources.PumpIcon = this.pbPump.Image;
             Resources.SinkIcon = Properties.Resources.sinkRescaled;
-            Resources.MergerIcon = Properties.Resources.mergerRescaled;
-            Resources.SplitterIcon = this.pbSplitter.Image;
+            Resources.MergerIcon = Properties.Resources.merger1;
+            Resources.SplitterIcon = Properties.Resources.splitter1;
             Resources.AdjSplitterIcon = this.pbAdjSplitter.Image;
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
@@ -87,7 +86,7 @@ namespace Flow_Network
             plDraw.MouseMove += plDraw_MoveDragElement;
             plDraw.MouseDown += plDraw_HandleStartDrag;
             plDraw.MouseUp += plDraw_HandleStopDrag;
-
+            plDraw.Paint += plDraw_Redraw;
             plDraw.Click += plDraw_HandleClick;
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
@@ -223,14 +222,31 @@ namespace Flow_Network
 
         void HandleConnectionToolClick()
         {
+            //TO DO: if hovered is added to path and if the element is already added as start or end ... end method
             ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
             if (hovered == null) return;
 
             if (PathStart == null) PathStart = hovered;
             else PathEnd = hovered;
-
+            
             if (PathStart != null && PathEnd != null)
             {
+                if (PathStart.Parent == PathEnd.Parent)
+                {
+                    PathStart = null;
+                    PathStart = null;
+                    return;
+                }
+                else if(PathEnd.Parent is PumpElement)
+                {
+                    PathEnd = null;
+                    return;
+                }
+                else if (PathStart.Parent is SinkElement)
+                {
+                    PathStart = null;
+                    return;
+                }
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
 
                 result.OnCreated += () =>
