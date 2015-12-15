@@ -122,7 +122,6 @@ namespace Flow_Network
             if (hovered != null)
             {
                 lastHovered = hovered;
-                if (lastHovered != hovered)
                     if (hovered.State == 1)
                     {
                         lastHoveredConnected = hovered;
