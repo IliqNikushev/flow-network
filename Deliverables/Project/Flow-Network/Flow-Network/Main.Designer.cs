@@ -43,6 +43,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.plDraw = new System.Windows.Forms.Panel();
+            this.maxFlowPanel2 = new System.Windows.Forms.Panel();
+            this.maxflowlabel = new System.Windows.Forms.Label();
+            this.maxFlowProgressBar = new System.Windows.Forms.ProgressBar();
+            this.maxFlowUpDown = new System.Windows.Forms.NumericUpDown();
             this.pictureBox10 = new System.Windows.Forms.PictureBox();
             this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.btnLoad = new System.Windows.Forms.Button();
@@ -67,6 +71,9 @@
             this.label17 = new System.Windows.Forms.Label();
             this.pictureBox11 = new System.Windows.Forms.PictureBox();
             this.btnNew = new System.Windows.Forms.Button();
+            this.plDraw.SuspendLayout();
+            this.maxFlowPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maxFlowUpDown)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
@@ -85,7 +92,7 @@
             this.label10.AutoSize = true;
             this.label10.Location = new System.Drawing.Point(82, 487);
             this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(37, 14);
+            this.label10.Size = new System.Drawing.Size(49, 16);
             this.label10.TabIndex = 19;
             this.label10.Text = "Delete";
             // 
@@ -94,7 +101,7 @@
             this.label9.AutoSize = true;
             this.label9.Location = new System.Drawing.Point(82, 419);
             this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(27, 14);
+            this.label9.Size = new System.Drawing.Size(36, 16);
             this.label9.TabIndex = 18;
             this.label9.Text = "Pipe";
             // 
@@ -103,7 +110,7 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(82, 362);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(41, 14);
+            this.label8.Size = new System.Drawing.Size(53, 16);
             this.label8.TabIndex = 17;
             this.label8.Text = "Merger";
             // 
@@ -112,7 +119,7 @@
             this.label7.AutoSize = true;
             this.label7.Location = new System.Drawing.Point(82, 302);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(61, 14);
+            this.label7.Size = new System.Drawing.Size(78, 16);
             this.label7.TabIndex = 16;
             this.label7.Text = "Adj. splitter";
             // 
@@ -121,7 +128,7 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(82, 237);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(40, 14);
+            this.label6.Size = new System.Drawing.Size(52, 16);
             this.label6.TabIndex = 15;
             this.label6.Text = "Splitter";
             // 
@@ -130,7 +137,7 @@
             this.lbSink.AutoSize = true;
             this.lbSink.Location = new System.Drawing.Point(82, 180);
             this.lbSink.Name = "lbSink";
-            this.lbSink.Size = new System.Drawing.Size(27, 14);
+            this.lbSink.Size = new System.Drawing.Size(35, 16);
             this.lbSink.TabIndex = 14;
             this.lbSink.Text = "Sink";
             // 
@@ -139,7 +146,7 @@
             this.lbPump.AutoSize = true;
             this.lbPump.Location = new System.Drawing.Point(82, 121);
             this.lbPump.Name = "lbPump";
-            this.lbPump.Size = new System.Drawing.Size(33, 14);
+            this.lbPump.Size = new System.Drawing.Size(44, 16);
             this.lbPump.TabIndex = 13;
             this.lbPump.Text = "Pump";
             // 
@@ -148,7 +155,7 @@
             this.lbSelect.AutoSize = true;
             this.lbSelect.Location = new System.Drawing.Point(82, 61);
             this.lbSelect.Name = "lbSelect";
-            this.lbSelect.Size = new System.Drawing.Size(37, 14);
+            this.lbSelect.Size = new System.Drawing.Size(47, 16);
             this.lbSelect.TabIndex = 12;
             this.lbSelect.Text = "Select";
             // 
@@ -157,7 +164,7 @@
             this.tbMax.Location = new System.Drawing.Point(90, 579);
             this.tbMax.Name = "tbMax";
             this.tbMax.ReadOnly = true;
-            this.tbMax.Size = new System.Drawing.Size(127, 20);
+            this.tbMax.Size = new System.Drawing.Size(127, 23);
             this.tbMax.TabIndex = 3;
             // 
             // tbCurrent
@@ -165,7 +172,7 @@
             this.tbCurrent.Location = new System.Drawing.Point(90, 533);
             this.tbCurrent.Name = "tbCurrent";
             this.tbCurrent.ReadOnly = true;
-            this.tbCurrent.Size = new System.Drawing.Size(127, 20);
+            this.tbCurrent.Size = new System.Drawing.Size(127, 23);
             this.tbCurrent.TabIndex = 2;
             // 
             // label2
@@ -173,7 +180,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(14, 579);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 14);
+            this.label2.Size = new System.Drawing.Size(61, 16);
             this.label2.TabIndex = 1;
             this.label2.Text = "Max flow";
             // 
@@ -182,7 +189,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(14, 539);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 14);
+            this.label1.Size = new System.Drawing.Size(84, 16);
             this.label1.TabIndex = 0;
             this.label1.Text = "Current flow";
             // 
@@ -192,7 +199,7 @@
             this.label11.Font = new System.Drawing.Font("Arial", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label11.Location = new System.Drawing.Point(12, 16);
             this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(89, 25);
+            this.label11.Size = new System.Drawing.Size(106, 32);
             this.label11.TabIndex = 2;
             this.label11.Text = "Toolbox";
             // 
@@ -200,10 +207,44 @@
             // 
             this.plDraw.BackColor = System.Drawing.Color.OldLace;
             this.plDraw.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.plDraw.Controls.Add(this.maxFlowPanel2);
             this.plDraw.Location = new System.Drawing.Point(223, 43);
             this.plDraw.Name = "plDraw";
             this.plDraw.Size = new System.Drawing.Size(815, 556);
             this.plDraw.TabIndex = 2;
+            // 
+            // maxFlowPanel2
+            // 
+            this.maxFlowPanel2.Controls.Add(this.maxflowlabel);
+            this.maxFlowPanel2.Controls.Add(this.maxFlowProgressBar);
+            this.maxFlowPanel2.Controls.Add(this.maxFlowUpDown);
+            this.maxFlowPanel2.Location = new System.Drawing.Point(255, 131);
+            this.maxFlowPanel2.Name = "maxFlowPanel2";
+            this.maxFlowPanel2.Size = new System.Drawing.Size(200, 100);
+            this.maxFlowPanel2.TabIndex = 0;
+            // 
+            // maxflowlabel
+            // 
+            this.maxflowlabel.AutoSize = true;
+            this.maxflowlabel.Location = new System.Drawing.Point(1, 20);
+            this.maxflowlabel.Name = "maxflowlabel";
+            this.maxflowlabel.Size = new System.Drawing.Size(138, 16);
+            this.maxflowlabel.TabIndex = 2;
+            this.maxflowlabel.Text = "Max Flow of the path";
+            // 
+            // maxFlowProgressBar
+            // 
+            this.maxFlowProgressBar.Location = new System.Drawing.Point(4, 61);
+            this.maxFlowProgressBar.Name = "maxFlowProgressBar";
+            this.maxFlowProgressBar.Size = new System.Drawing.Size(193, 23);
+            this.maxFlowProgressBar.TabIndex = 1;
+            // 
+            // maxFlowUpDown
+            // 
+            this.maxFlowUpDown.Location = new System.Drawing.Point(150, 18);
+            this.maxFlowUpDown.Name = "maxFlowUpDown";
+            this.maxFlowUpDown.Size = new System.Drawing.Size(47, 23);
+            this.maxFlowUpDown.TabIndex = 0;
             // 
             // pictureBox10
             // 
@@ -374,7 +415,7 @@
             this.label12.AutoSize = true;
             this.label12.Location = new System.Drawing.Point(558, 5);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(71, 14);
+            this.label12.Size = new System.Drawing.Size(93, 16);
             this.label12.TabIndex = 21;
             this.label12.Text = "items to undo";
             // 
@@ -383,7 +424,7 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(662, 5);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(84, 14);
+            this.label13.Size = new System.Drawing.Size(110, 16);
             this.label13.TabIndex = 22;
             this.label13.Text = "Last thing done:";
             // 
@@ -392,7 +433,7 @@
             this.numberActionsToUndoLbl.AutoSize = true;
             this.numberActionsToUndoLbl.Location = new System.Drawing.Point(627, 5);
             this.numberActionsToUndoLbl.Name = "numberActionsToUndoLbl";
-            this.numberActionsToUndoLbl.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsToUndoLbl.Size = new System.Drawing.Size(40, 16);
             this.numberActionsToUndoLbl.TabIndex = 23;
             this.numberActionsToUndoLbl.Text = "####";
             // 
@@ -401,7 +442,7 @@
             this.lastActionToUndoLbl.AutoSize = true;
             this.lastActionToUndoLbl.Location = new System.Drawing.Point(752, 5);
             this.lastActionToUndoLbl.Name = "lastActionToUndoLbl";
-            this.lastActionToUndoLbl.Size = new System.Drawing.Size(43, 14);
+            this.lastActionToUndoLbl.Size = new System.Drawing.Size(56, 16);
             this.lastActionToUndoLbl.TabIndex = 24;
             this.lastActionToUndoLbl.Text = "............";
             // 
@@ -410,7 +451,7 @@
             this.lastActionUndone.AutoSize = true;
             this.lastActionUndone.Location = new System.Drawing.Point(752, 24);
             this.lastActionUndone.Name = "lastActionUndone";
-            this.lastActionUndone.Size = new System.Drawing.Size(43, 14);
+            this.lastActionUndone.Size = new System.Drawing.Size(56, 16);
             this.lastActionUndone.TabIndex = 28;
             this.lastActionUndone.Text = "............";
             // 
@@ -419,7 +460,7 @@
             this.numberActionsRedone.AutoSize = true;
             this.numberActionsRedone.Location = new System.Drawing.Point(627, 24);
             this.numberActionsRedone.Name = "numberActionsRedone";
-            this.numberActionsRedone.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsRedone.Size = new System.Drawing.Size(40, 16);
             this.numberActionsRedone.TabIndex = 27;
             this.numberActionsRedone.Text = "####";
             // 
@@ -428,7 +469,7 @@
             this.label16.AutoSize = true;
             this.label16.Location = new System.Drawing.Point(662, 24);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(84, 14);
+            this.label16.Size = new System.Drawing.Size(110, 16);
             this.label16.TabIndex = 26;
             this.label16.Text = "Last thing done:";
             // 
@@ -437,7 +478,7 @@
             this.label17.AutoSize = true;
             this.label17.Location = new System.Drawing.Point(558, 24);
             this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(69, 14);
+            this.label17.Size = new System.Drawing.Size(90, 16);
             this.label17.TabIndex = 25;
             this.label17.Text = "items to redo";
             // 
@@ -466,7 +507,7 @@
             // 
             // Main
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
@@ -511,6 +552,10 @@
             this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "Main";
             this.Text = "Form1";
+            this.plDraw.ResumeLayout(false);
+            this.maxFlowPanel2.ResumeLayout(false);
+            this.maxFlowPanel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.maxFlowUpDown)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).EndInit();
@@ -567,6 +612,10 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.PictureBox pictureBox11;
         private System.Windows.Forms.Button btnNew;
+        private System.Windows.Forms.Panel maxFlowPanel2;
+        private System.Windows.Forms.Label maxflowlabel;
+        private System.Windows.Forms.ProgressBar maxFlowProgressBar;
+        private System.Windows.Forms.NumericUpDown maxFlowUpDown;
     }
 }
 

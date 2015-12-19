@@ -594,6 +594,48 @@ namespace Flow_Network
             rightClickPanel.BringToFront();
             rightClickPanel.BackColor = Color.FromArgb(255, 157, 157, 157);
         }
+
+        //Panel for max flow 
+
+        //Panel maxFlowPanel2;
+        //Point rightClickMousePosition = new Point();
+
+        //private void HandleRightClick()
+        //{
+        //    if (ActiveTool == ActiveToolType.Select)
+        //    {
+        //        //right click over connection??
+        //        RevertDrag();
+        //        return;
+        //    }
+
+        //    RightClickOptions options = ~RightClickOptions.Remove;
+        //    rightClickMousePosition = mousePosition;
+
+        //    if (HasCollision(rightClickMousePosition))
+        //    {
+        //        Element e = FindElementUnder(rightClickMousePosition);
+        //        if (e != null)
+        //            options = RightClickOptions.Remove;
+        //    }
+
+        //    if (maxFlowPanel2 == null)
+        //    {
+        //        maxFlowPanel2 = new Panel();
+        //        plDraw.Controls.Add(maxFlowPanel2);
+
+        //        maxFlowPanel2.Width = 200;
+        //        maxFlowPanel2.Height = 100;
+
+        //        maxFlowPanel2.Controls.Add(this.maxFlowProgressBar);
+        //        maxFlowPanel2.Controls.Add(this.maxFlowUpDown);
+
+        //    maxFlowPanel2.Location = rightClickMousePosition;
+        //    maxFlowPanel2.Visible = true;
+        //    maxFlowPanel2.BringToFront();
+        //    maxFlowPanel2.BackColor = Color.FromArgb(255, 157, 157, 157);
+        //}
+        //end MaxFlowPanel
         #endregion
         #region collision,element detection
         private Element FindElementUnder(Point mousePosition)
@@ -726,6 +768,8 @@ namespace Flow_Network
 
             }
         }
+
+    
     }
 }
 
