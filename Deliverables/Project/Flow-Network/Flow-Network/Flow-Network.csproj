@@ -64,6 +64,12 @@
     <Compile Include="CustomComponents\PumpEditPopup.Designer.cs">
       <DependentUpon>PumpEditPopup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Drawable.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="UndoableAction.cs" />
     <Compile Include="AdjustableSplitter.cs" />
     <Compile Include="Collision.cs" />
@@ -78,11 +84,6 @@
     <Compile Include="MergerElement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="PumpElement.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="SinkElement.cs" />
@@ -98,7 +99,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
@@ -141,9 +142,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\pump.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\merger.png" />
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +179,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CustomComponents\pipeSliderArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\A. splitter.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\pump.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\toggled21.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

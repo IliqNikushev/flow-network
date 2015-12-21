@@ -70,11 +70,6 @@ namespace Flow_Network
 
             plDraw.Controls.Add(oldDragElementPlaceholder);
             
-            Resources.PumpIcon = this.pbPump.Image;
-            Resources.SinkIcon = Properties.Resources.sinkRescaled;
-            Resources.MergerIcon = Properties.Resources.merger1;
-            Resources.SplitterIcon = Properties.Resources.splitter1;
-            Resources.AdjSplitterIcon = this.pbAdjSplitter.Image;
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
             iconBelowCursor.Height = 16;
@@ -122,19 +117,19 @@ namespace Flow_Network
             if (hovered != null)
             {
                 lastHovered = hovered;
-                    if (hovered.State == 1)
+                    if (hovered.DrawState == DrawState.Blocking)
                     {
                         lastHoveredConnected = hovered;
                     }
-                hovered.State = 2;
+                hovered.DrawState = DrawState.Hovered;
                 plDraw.Invalidate();
             }
             else if (hovered != lastHovered)
             {
-                lastHovered.State = 0;
+                lastHovered.DrawState = DrawState.Normal;
                 if (lastHoveredConnected != null)
                 {
-                    lastHoveredConnected.State = 1;
+                    lastHoveredConnected.DrawState = DrawState.Blocking;
                 }
             }
         }
@@ -311,8 +306,8 @@ namespace Flow_Network
                     PathEnd = null;
                     return;
                 }
-                PathStart.State = 1;
-                PathEnd.State = 1;
+                PathStart.DrawState = DrawState.Blocking;
+                PathEnd.DrawState = DrawState.Blocking;
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
                 
                 result.OnCreated += () =>
@@ -454,18 +449,7 @@ namespace Flow_Network
                 if (ActiveTool == ActiveToolType.Pipe)
                     foreach (var con in item.ConnectionZones)
                     {
-                        if (con.State == 0)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
-                        else if (con.State ==1)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled2, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
-                        else if (con.State ==2)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled3, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
+                        con.Draw(e.Graphics);
                         //if connection is taken make red, if connection is empty green, if connection is in use yellow
                         //if mouse is on top - mark active
 

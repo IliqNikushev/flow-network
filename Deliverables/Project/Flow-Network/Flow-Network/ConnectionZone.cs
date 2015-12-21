@@ -7,25 +7,29 @@ using System.Drawing;
 namespace Flow_Network
 {
     /// <summary>Zone in which an element can be connected with a path</summary>
-    public class ConnectionZone
+    public class ConnectionZone : IconDrawable
     {
         /// <summary>Constant Default size for width and height when drawn</summary>
         public static readonly Point DefaultSize = new Point(20, 20);
         private bool isInFlow;
-        
+
         /// <summary>Element that the zone belongs to</summary>
         public Element Parent { get; private set; }
 
         /// <summary>Distance from the parent's X,Y</summary>
-        public Point Margin { get; private set; }
+        public Point Margin
+        {
+            get { return new Point(this.X, this.Y); }
+            set { this.X = value.X; this.Y = value.Y; }
+        }
 
         /// <summary>returns DefaultSize.X</summary>
-        public int Width { get { return DefaultSize.X; } }
+        public override int Width { get { return DefaultSize.X; } }
         /// <summary>returns DefaultSize.Y</summary>
-        public int Height { get { return DefaultSize.Y; } }
+        public override int Height { get { return DefaultSize.Y; } }
 
         /// <summary>Returns the parent's location + current (X,Y)</summary>
-        public Point Location
+        public override Point Location
         {
             get
             {
@@ -35,18 +39,12 @@ namespace Flow_Network
 
         public bool IsInFlow
         {
-            get
-            {
-                return isInFlow;
-            }
+            get { return isInFlow; }
         }
 
         public bool IsOutFlow
         {
-            get
-            {
-                return !isInFlow;
-            }
+            get { return !isInFlow; }
         }
 
         /// <summary>If connected, returns the element prior to the current on the path they are connected</summary>
@@ -60,20 +58,20 @@ namespace Flow_Network
                 if (Previous != null)
                 {
                     float flow = Previous.Flow;
-                        
+
                     if (this.Parent is SplitterElement)
                         flow *= 0.5f;
-                    else if(this.Parent is AdjustableSplitter)
+                    else if (this.Parent is AdjustableSplitter)
                     {
                         AdjustableSplitter splitter = this.Parent as AdjustableSplitter;
                         float percent = 1;
-                        if (this == splitter.Up) 
+                        if (this == splitter.Up)
                             percent = ((100 - splitter.UpFlowPercent) / 100);
                         else
                             percent = ((100 - splitter.DownFlowPercent) / 100);
-                            flow *= percent;
+                        flow *= percent;
                     }
-                    else if(this.Parent is MergerElement)
+                    else if (this.Parent is MergerElement)
                     {
                         MergerElement merger = this.Parent as MergerElement;
                         flow = merger.Up.Flow + merger.Down.Flow;
@@ -85,15 +83,14 @@ namespace Flow_Network
                 return 0;
             }
         }
-        public int State { get; set; }
-        public ConnectionZone(int x, int y, Element parent, bool isInFlow) : this(new Point(x,y), parent, isInFlow) { }
+
+        public ConnectionZone(int x, int y, Element parent, bool isInFlow) : this(new Point(x, y), parent, isInFlow) { }
 
         public ConnectionZone(Point margin, Element parent, bool isInflow)
         {
             this.Margin = margin;
             this.Parent = parent;
             this.isInFlow = isInflow;
-            this.State = 0;
         }
 
         public static Path GetPathFromTo(ConnectionZone from, ConnectionZone to)
@@ -112,8 +109,9 @@ namespace Flow_Network
         }
 
         /// <summary>Path from 2 connection zones.</summary>
-        public class Path
+        public class Path : Drawable
         {
+            public const int DEFAULT_WIDTH = 3;
             public delegate void FlowAlteredEvent(Path path, float previous, float current);
             /// <summary>Returns all paths defineed in the Main form</summary>
             public static List<Path> All { get { return Main.AllPaths; } }
@@ -143,7 +141,7 @@ namespace Flow_Network
             public float Flow { get { return this.From.Flow; } }
 
             /// <summary>Called when the max flow has been altered</summary>
-            public event FlowAlteredEvent OnMaxFlowChanged = (x,y,z) => { };
+            public event FlowAlteredEvent OnMaxFlowChanged = (x, y, z) => { };
 
             /// <summary>Returns a path starting at the FROM zone to the TO zone, with all midpoints inbetween</summary>
             public List<Point> PathPoints
@@ -187,8 +185,8 @@ namespace Flow_Network
             public void Add()
             {
                 if (isAdded) return;
-                this.To.State = 1;
-                this.From.State = 1;
+                this.To.DrawState = Flow_Network.DrawState.Blocking;
+                this.From.DrawState = Flow_Network.DrawState.Blocking;
                 ConnectionZone.Path.All.Add(this);
                 this.isAdded = true;
                 this.To.Previous = this.From;
@@ -198,8 +196,8 @@ namespace Flow_Network
             public void Remove()
             {
                 if (!isAdded) return;
-                this.From.State = 0;
-                this.To.State = 0;
+                this.To.DrawState = Flow_Network.DrawState.Normal;
+                this.From.DrawState = Flow_Network.DrawState.Normal;
                 ConnectionZone.Path.All.Remove(this);
                 this.isAdded = false;
                 this.To.Previous = null;
@@ -394,6 +392,39 @@ namespace Flow_Network
                     }
                 });
                 activeAdjuster.Start();
+            }
+
+            static Pen onHoveredPen = new Pen(Color.Orange, Path.DEFAULT_WIDTH + 2);
+            static Pen onDeletePen = new Pen(Color.Red, Path.DEFAULT_WIDTH + 2);
+            static Pen onNormalPen = new Pen(Color.Black, Path.DEFAULT_WIDTH);
+
+            public override void Draw(Graphics graphics)
+            {
+                Point previous = this.From;
+                Pen currentPen = onNormalPen;
+                switch (this.DrawState)
+                {
+                    case DrawState.Normal:
+                        currentPen = onNormalPen;
+                        break;
+                    case DrawState.Hovered:
+                        currentPen = onHoveredPen;
+                        break;
+                    case DrawState.Delete:
+                        currentPen = onDeletePen;
+                        break;
+                    case DrawState.Blocking:
+                        currentPen = onDeletePen;
+                        break;
+                    default:
+                        break;
+                }
+
+                foreach (Point currentPoint in this.PathPoints)
+                {
+                    if (previous == currentPoint) continue;
+                    graphics.DrawLine(currentPen, previous, currentPoint);
+                }
             }
         }
     }

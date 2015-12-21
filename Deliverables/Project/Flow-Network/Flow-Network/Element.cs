@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace Flow_Network
 {
-    public abstract class Element
+    public abstract class Element : IconDrawable
     {
         /// <summary>Constant Default size for width and height when drawn</summary>
         public static readonly Point DefaultSize = new Point(42, 42);
@@ -73,19 +73,8 @@ namespace Flow_Network
         public Point D { get { return new Point(this.X, this.Y - 2); } }
 
         /// <summary>Returns DefaultSize.X</summary>
-        public int Width { get { return DefaultSize.X; } }
+        public override int Width { get { return DefaultSize.X; } }
         /// <summary>Returns DefaultSize.Y</summary>
-        public int Height { get { return DefaultSize.Y; } }
-
-        /// <summary>Gets the icon found in the Resources assosiacted to the current element</summary>
-        public System.Drawing.Image Icon { get { return Resources.Icon(this); } }
-
-        /// <summary>X coordinate in the 4-th sector of the coordinate system</summary>
-        public int X { get; set; }
-        /// <summary>Y coordinate in the 4-th sector of the coordinate system, where 4-th sector is positive, 2-nd is negative</summary>
-        public int Y { get; set; }
-        /// <summary>Location based on the X and Y</summary>
-        public Point Location { get { return new Point(X, Y); } set { this.X = value.X; this.Y = value.Y; } }
-
+        public override int Height { get { return DefaultSize.Y; } }
     }
 }
