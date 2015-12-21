@@ -73,6 +73,16 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap adjustableSplitterClear {
+            get {
+                object obj = ResourceManager.GetObject("adjustableSplitterClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap close {
             get {
                 object obj = ResourceManager.GetObject("close", resourceCulture);
@@ -116,6 +126,16 @@ namespace Flow_Network.Properties {
         public static System.Drawing.Bitmap connectionZoneBlocking {
             get {
                 object obj = ResourceManager.GetObject("connectionZoneBlocking", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneClear {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneClear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,6 +193,16 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap mergerClear {
+            get {
+                object obj = ResourceManager.GetObject("mergerClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap pipeSlider {
             get {
                 object obj = ResourceManager.GetObject("pipeSlider", resourceCulture);
@@ -203,6 +233,16 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap pumpClear {
+            get {
+                object obj = ResourceManager.GetObject("pumpClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap save {
             get {
                 object obj = ResourceManager.GetObject("save", resourceCulture);
@@ -223,6 +263,16 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap sinkClear {
+            get {
+                object obj = ResourceManager.GetObject("sinkClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap sinkRescaled {
             get {
                 object obj = ResourceManager.GetObject("sinkRescaled", resourceCulture);
@@ -236,6 +286,16 @@ namespace Flow_Network.Properties {
         public static System.Drawing.Bitmap splitter {
             get {
                 object obj = ResourceManager.GetObject("splitter", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap splitterClear {
+            get {
+                object obj = ResourceManager.GetObject("splitterClear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -35,7 +35,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.pump},
             {DrawState.Delete, Properties.Resources.pump},
             {DrawState.Blocking, Properties.Resources.pump},
-            {DrawState.Active, Properties.Resources.pump}
+            {DrawState.Active, Properties.Resources.pump},
+            {DrawState.Clear, Properties.Resources.pumpClear}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> SinkIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -44,7 +45,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.sink},
             {DrawState.Delete, Properties.Resources.sink},
             {DrawState.Blocking, Properties.Resources.sink},
-            {DrawState.Active, Properties.Resources.sink}
+            {DrawState.Active, Properties.Resources.sink},
+            {DrawState.Clear, Properties.Resources.sinkClear}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> MergerIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -53,7 +55,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.merger},
             {DrawState.Delete, Properties.Resources.merger},
             {DrawState.Blocking, Properties.Resources.merger},
-            {DrawState.Active, Properties.Resources.merger}
+            {DrawState.Active, Properties.Resources.merger},
+            {DrawState.Clear, Properties.Resources.mergerClear}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> SplitterIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -62,7 +65,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.splitter},
             {DrawState.Delete, Properties.Resources.splitter},
             {DrawState.Blocking, Properties.Resources.splitter},
-            {DrawState.Active, Properties.Resources.splitter}
+            {DrawState.Active, Properties.Resources.splitter},
+            {DrawState.Clear, Properties.Resources.splitterClear}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> AdjSplitterIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -71,7 +75,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.adjustableSplitter},
             {DrawState.Delete, Properties.Resources.adjustableSplitter},
             {DrawState.Blocking, Properties.Resources.adjustableSplitter},
-            {DrawState.Active, Properties.Resources.adjustableSplitter}
+            {DrawState.Active, Properties.Resources.adjustableSplitter},
+            {DrawState.Clear, Properties.Resources.adjustableSplitterClear}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> ConnectionZoneIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -80,7 +85,8 @@ namespace Flow_Network
             {DrawState.Blocking, Properties.Resources.connectionZoneBlocking},
             {DrawState.Delete, Properties.Resources.connectionZoneDelete},
             {DrawState.Hovered, Properties.Resources.connectionZoneHovered},
-            {DrawState.Active, Properties.Resources.connectionZoneActive}
+            {DrawState.Active, Properties.Resources.connectionZoneActive},
+            {DrawState.Clear, Properties.Resources.connectionZoneClear}
         };
 
         /// <summary>Iterates the resources to find the specified element's proper icon</summary>

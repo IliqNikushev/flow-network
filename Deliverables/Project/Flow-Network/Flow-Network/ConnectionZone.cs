@@ -60,6 +60,9 @@ namespace Flow_Network
         {
             get
             {
+                if (this.Parent is PumpElement)
+                    return (this.Parent as PumpElement).Flow;
+
                 if (ConnectedZone != null)
                 {
                     float flow = ConnectedZone.Flow;
@@ -83,8 +86,6 @@ namespace Flow_Network
                     }
                     return flow;
                 }
-                if (this.Parent is PumpElement)
-                    return (this.Parent as PumpElement).Flow;
                 return 0;
             }
         }
@@ -405,7 +406,7 @@ namespace Flow_Network
             static Pen onDeletePen = new Pen(Color.Red, Path.DEFAULT_WIDTH + 2);
             static Pen onNormalPen = new Pen(Color.Black, Path.DEFAULT_WIDTH);
 
-            public override void Draw(Graphics graphics)
+            public override void Draw(Graphics graphics, Color backgroundColor)
             {
                 Point previous = this.From;
                 Pen currentPen = onNormalPen;

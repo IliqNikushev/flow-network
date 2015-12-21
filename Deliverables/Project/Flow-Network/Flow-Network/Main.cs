@@ -152,7 +152,7 @@ namespace Flow_Network
                     }
                     else
                         lastHoveredDrawable.DrawState = lastHoveredDrawable.LastState;
-                    lastHoveredDrawable.Draw(plDrawGraphics);
+                    lastHoveredDrawable.Draw(plDrawGraphics, plDraw.BackColor);
                 }
                 
                 lastHoveredDrawable = null;
@@ -187,13 +187,13 @@ namespace Flow_Network
                state = DrawState.Normal;
 
             hovered.DrawState = state;
-            hovered.Draw(plDrawGraphics);
+            hovered.Draw(plDrawGraphics, plDraw.BackColor);
             if(ActiveTool == ActiveToolType.Pipe)
                 if (hovered is Element)
                 {
                     foreach (ConnectionZone zone in (hovered as Element).ConnectionZones)
                     {
-                        zone.Draw(plDrawGraphics);
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
                     }
                 }
             lastHoveredDrawable = hovered;
@@ -231,11 +231,13 @@ namespace Flow_Network
             PictureBox clickedPbox = (PictureBox)sender;
             if (clickedPbox == null)
                 return;
+
             if (currentActiveToolPbox != null)
             {
                 currentActiveToolPbox.BackColor = Color.AliceBlue;
             }
             currentActiveToolPbox = clickedPbox;
+            ActiveToolType previousTool = ActiveTool;
             if (currentActiveToolPbox == pbSelect)
                 ActiveTool = ActiveToolType.Select;
             else if (currentActiveToolPbox == pbPump)
@@ -255,7 +257,17 @@ namespace Flow_Network
             else
                 ActiveTool = ActiveToolType.None;
             clickedPbox.BackColor = Color.Gold;
-            plDraw.Invalidate();
+            if (previousTool == ActiveTool) return;
+            if (previousTool != ActiveToolType.Pipe && ActiveTool == ActiveToolType.Pipe)
+                foreach (Element el in AllElements)
+                {
+                    foreach (ConnectionZone zone in el.ConnectionZones)
+                    {
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                    }
+                }
+            else if (previousTool == ActiveToolType.Pipe && ActiveTool != ActiveToolType.Pipe)
+                plDraw.Invalidate();
         }
 
         void plDraw_HandleClick(object sender, EventArgs e)
@@ -443,7 +455,7 @@ namespace Flow_Network
                         zone.DrawState = DrawState.Blocking;
                     else
                         zone.DrawState = DrawState.Normal;
-                    zone.Draw(plDrawGraphics);
+                    zone.Draw(plDrawGraphics, plDraw.BackColor);
                 }
             }
         }
@@ -458,7 +470,7 @@ namespace Flow_Network
                     if (zone.FlowIsSameAs(PathStart))
                         zone.DrawState = DrawState.Blocking;
                     if(redraw)
-                        zone.Draw(plDrawGraphics);
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
                 }
             }
         }
@@ -495,7 +507,6 @@ namespace Flow_Network
             {
                 dragElement.Location = mousePosition;
             }
-
         }
 
         void plDraw_MoveDragElement(object sender, MouseEventArgs e)
@@ -577,32 +588,17 @@ namespace Flow_Network
         {
             foreach (var item in AllElements)
             {
-                e.Graphics.DrawImage(item.Icon, item.Location.X, item.Location.Y, item.Width, item.Height);
+                item.Draw(e.Graphics, plDraw.BackColor);
                 if (ActiveTool == ActiveToolType.Pipe)
                     foreach (var con in item.ConnectionZones)
                     {
-                        con.Draw(e.Graphics);
-                        //if connection is taken make red, if connection is empty green, if connection is in use yellow
-                        //if mouse is on top - mark active
-
+                        con.Draw(e.Graphics, plDraw.BackColor);
                     }
             }
 
             foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
             {
-                Pen pen = Pens.Black;
-
-                if (pathToDelete == path)
-                    pen = new Pen(Color.Red, 3);
-                else
-                    pen = Pens.Black;
-
-                Point previous = path.From;
-                foreach (Point point in path.PathPoints)
-                {
-                    e.Graphics.DrawLine(pen, previous, point);
-                    previous = point;
-                }
+                path.Draw(e.Graphics, plDraw.BackColor);
             }
         }
         private bool LineIntersectsAt(Point a, Point b, Point mouse)
