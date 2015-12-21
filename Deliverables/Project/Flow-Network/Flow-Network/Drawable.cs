@@ -10,10 +10,12 @@ namespace Flow_Network
 {
     public enum DrawState
     {
+        None = 0,
         Normal,
         Hovered,
         Delete,
-        Blocking
+        Blocking,
+        Active
     }
 
     public abstract class IconDrawable : Drawable
@@ -34,13 +36,31 @@ namespace Flow_Network
 
         public override void Draw(System.Drawing.Graphics graphics)
         {
-            graphics.DrawImage(this.Icon, this.X, this.Y, this.Width, this.Height);
+            graphics.DrawImage(this.Icon, this.Location.X, this.Location.Y, this.Width, this.Height);
         }
     }
 
     public abstract class Drawable
     {
-        public DrawState DrawState { get; set; }
+        public Drawable()
+        {
+            this.LastState = Flow_Network.DrawState.Normal;
+            this.DrawState = Flow_Network.DrawState.Normal;
+        }
+
+        private DrawState state;
+        public DrawState LastState { get; set; }
+        public DrawState DrawState
+        {
+            get { return state; }
+            set
+            {
+                if (value == Flow_Network.DrawState.None) value = Flow_Network.DrawState.Normal;
+                if (this.state == value) return;
+                this.LastState = this.state;
+                this.state = value;
+            }
+        }
 
         public abstract void Draw(System.Drawing.Graphics graphics);
     }

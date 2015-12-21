@@ -28,9 +28,11 @@ namespace Flow_Network.UndoableActions
             Element.AllElements.Add(this.Element);
         }
 
+        static string capitalLetterSplitters = "abcdefghijklmnopqrstuvwxyz".ToUpper();
+
         protected override string AsString
         {
-            get { return "Add Element"; }
+            get { return "Add" + string.Join("", Element.GetType().Name.Select(x=>capitalLetterSplitters.Contains(x) ? " " + x : x.ToString())); }
         }
     }
 }

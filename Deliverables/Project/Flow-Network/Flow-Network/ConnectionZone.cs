@@ -13,15 +13,14 @@ namespace Flow_Network
         public static readonly Point DefaultSize = new Point(20, 20);
         private bool isInFlow;
 
+        public bool IsConnected { get { return this.ConnectedZone != null; } }
+        public bool IsFree { get { return !this.IsConnected; } }
+
         /// <summary>Element that the zone belongs to</summary>
         public Element Parent { get; private set; }
 
         /// <summary>Distance from the parent's X,Y</summary>
-        public Point Margin
-        {
-            get { return new Point(this.X, this.Y); }
-            set { this.X = value.X; this.Y = value.Y; }
-        }
+        public Point Margin { get; set; }
 
         /// <summary>returns DefaultSize.X</summary>
         public override int Width { get { return DefaultSize.X; } }
@@ -47,17 +46,23 @@ namespace Flow_Network
             get { return !isInFlow; }
         }
 
-        /// <summary>If connected, returns the element prior to the current on the path they are connected</summary>
-        public ConnectionZone Previous { get; private set; }
+        public bool FlowIsSameAs(ConnectionZone other)
+        {
+            if (other == null) return false;
+            return this.isInFlow == other.isInFlow;
+        }
+
+        /// <summary>If connected, returns the zone prior to the current on the path they are connected</summary>
+        public ConnectionZone ConnectedZone { get; private set; }
 
         /// <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
         public float Flow
         {
             get
             {
-                if (Previous != null)
+                if (ConnectedZone != null)
                 {
-                    float flow = Previous.Flow;
+                    float flow = ConnectedZone.Flow;
 
                     if (this.Parent is SplitterElement)
                         flow *= 0.5f;
@@ -88,8 +93,8 @@ namespace Flow_Network
 
         public ConnectionZone(Point margin, Element parent, bool isInflow)
         {
-            this.Margin = margin;
             this.Parent = parent;
+            this.Margin = margin;
             this.isInFlow = isInflow;
         }
 
@@ -189,7 +194,8 @@ namespace Flow_Network
                 this.From.DrawState = Flow_Network.DrawState.Blocking;
                 ConnectionZone.Path.All.Add(this);
                 this.isAdded = true;
-                this.To.Previous = this.From;
+                this.To.ConnectedZone = this.From;
+                this.From.ConnectedZone = this.To;
             }
 
             /// <summary>Removes from the All collection of paths if present</summary>
@@ -200,7 +206,8 @@ namespace Flow_Network
                 this.From.DrawState = Flow_Network.DrawState.Normal;
                 ConnectionZone.Path.All.Remove(this);
                 this.isAdded = false;
-                this.To.Previous = null;
+                this.To.ConnectedZone = null;
+                this.From.ConnectedZone = null;
             }
 
             /// <summary>Called when the path is adjusted for the first time</summary>

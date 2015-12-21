@@ -56,11 +56,13 @@ namespace Flow_Network
         /// Subscribes for the Undo and Redo events of the UndoStack
         /// Subscribes the draw panel for the different events
         /// </summary>
+        /// 
+        Graphics plDrawGraphics;
 
         public Main()
         {
             InitializeComponent();
-
+            this.plDrawGraphics = this.plDraw.CreateGraphics();
             oldDragElementPlaceholder = new PictureBox();
             oldDragElementPlaceholder.Height = Element.DefaultSize.Y;
             oldDragElementPlaceholder.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -77,13 +79,12 @@ namespace Flow_Network
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
-            plDraw.MouseMove += plDraw_ChangeState;
-            plDraw.MouseMove += plDraw_HandleDynamicIcon;
-            plDraw.MouseMove += plDraw_MoveDragElement;
+            plDraw.Click += plDraw_HandleClick;
+            plDraw.MouseMove += plDraw_MouseMove;
             plDraw.MouseDown += plDraw_HandleStartDrag;
             plDraw.MouseUp += plDraw_HandleStopDrag;
             plDraw.Paint += plDraw_Redraw;
-            plDraw.Click += plDraw_HandleClick;
+            
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
             {
@@ -109,18 +110,109 @@ namespace Flow_Network
                     plDraw.Invalidate();
             };
         }
+
+        void plDraw_MouseMove(object sender, MouseEventArgs e)
+        {
+            plDraw_HandleHover(sender, e);
+            plDraw_HandleDynamicIcon(sender, e);
+            if (dragElement != null)
+            {
+                plDraw_MoveDragElement(sender, e);
+            }
+        }
+
+        Drawable lastHoveredDrawable = null;
+
         ConnectionZone lastHovered;
         ConnectionZone lastHoveredConnected;
-        void plDraw_ChangeState(object sender, MouseEventArgs e)
+        void plDraw_HandleHover(object sender, MouseEventArgs e)
         {
-            ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
+            Drawable hovered = null;
+            DrawState state = DrawState.None;
+            if (ActiveTool == ActiveToolType.Pipe)
+                hovered = FindConnectionZoneUnder(mousePosition);
+            else
+                if (hovered == null)
+                    hovered = FindElementUnder(mousePosition);
+            if(hovered == null)
+                hovered = FindPathUnder(mousePosition);
+            if(hovered == null)
+            {
+                if (lastHoveredDrawable != null)
+                {
+                    if (lastHoveredDrawable is ConnectionZone)
+                    {
+                        ConnectionZone z = lastHoveredDrawable as ConnectionZone;
+                        if (z == PathStart)
+                            z.DrawState = DrawState.Active;
+                        else if (z.IsConnected || z.FlowIsSameAs(PathStart))
+                            z.DrawState = DrawState.Blocking;
+                        else
+                            z.DrawState = DrawState.Normal;
+                    }
+                    else
+                        lastHoveredDrawable.DrawState = lastHoveredDrawable.LastState;
+                    lastHoveredDrawable.Draw(plDrawGraphics);
+                }
+                
+                lastHoveredDrawable = null;
+                return;
+            }
+            if (hovered is ConnectionZone)
+            {
+                if (hovered == PathStart)
+                    state = DrawState.Active;
+                else if ((hovered as ConnectionZone).IsConnected)
+                    state = DrawState.Blocking;
+                else if (PathStart != null)
+                {
+                    if (PathStart.FlowIsSameAs(hovered as ConnectionZone))
+                        state = DrawState.Blocking;
+                    else
+                        state = DrawState.Hovered;
+                }
+                else
+                    state = DrawState.Hovered;
+            }
+            else if (hovered is Element)
+            {
+                if (ActiveTool == ActiveToolType.Delete)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Select)
+                    state = DrawState.Hovered;
+                else
+                    state = DrawState.Blocking;
+            }
+            if (state == DrawState.None)
+               state = DrawState.Normal;
+
+            hovered.DrawState = state;
+            hovered.Draw(plDrawGraphics);
+            if(ActiveTool == ActiveToolType.Pipe)
+                if (hovered is Element)
+                {
+                    foreach (ConnectionZone zone in (hovered as Element).ConnectionZones)
+                    {
+                        zone.Draw(plDrawGraphics);
+                    }
+                }
+            lastHoveredDrawable = hovered;
+                //HandleHoverOverZone(zone);
+            //Element element = FindElementUnder(mousePosition);
+            //if (element != null)// if current element == previous -> nothing happens, else previous is unhovered
+
+
+        }
+
+        void HandleHoverOverZone(ConnectionZone hovered)
+        {
             if (hovered != null)
             {
                 lastHovered = hovered;
-                    if (hovered.DrawState == DrawState.Blocking)
-                    {
-                        lastHoveredConnected = hovered;
-                    }
+                if (hovered.DrawState == DrawState.Blocking)
+                {
+                    lastHoveredConnected = hovered;
+                }
                 hovered.DrawState = DrawState.Hovered;
                 plDraw.Invalidate();
             }
@@ -186,7 +278,7 @@ namespace Flow_Network
                 case ActiveToolType.AdjustableSplitter:
                 case ActiveToolType.Merger:
                     HandleCreateElementToolClick(); return;
-                case ActiveToolType.Pipe: HandleConnectionToolClick(); return;
+                case ActiveToolType.Pipe: HandlePipeToolClick(); return;
                 case ActiveToolType.Delete: HandleDeleteToolClick(); return;
                 case ActiveToolType.Select: HandleSelectToolClick(); return;
                 case ActiveToolType.None: return;
@@ -212,6 +304,7 @@ namespace Flow_Network
                 ShowEditPath(path);
                 return;
             }
+
         }
 
         void ShowEditPath(ConnectionZone.Path path)
@@ -230,11 +323,11 @@ namespace Flow_Network
             pipeEditPopup.Location = mousePosition;
         }
 
-        void HandleSelectToolOverPump()
+        void ShowEditPump()
         {
         }
 
-        void HandleSelectToolOverAdjustableSplitter()
+        void ShowEditAdjustableSplitter()
         {
 
         }
@@ -285,18 +378,25 @@ namespace Flow_Network
         }
         
 
-        void HandleConnectionToolClick()
+        void HandlePipeToolClick()
         {
-            //TO DO: if hovered is added to path and if the element is already added as start or end ... end method
+            //TO DO: end if cycle;
             ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
             if (hovered == null) return;
 
+            if (PathStart != null) if (PathStart.Parent == hovered.Parent) return;
+            if (hovered.IsConnected) return;
+
             if (PathStart == null) PathStart = hovered;
             else PathEnd = hovered;
-            
+            if (PathStart != null && PathEnd == null)
+            {
+                PathStart.DrawState = DrawState.Active;
+                SetBlockedForSameFlowZones(true);
+            }
             if (PathStart != null && PathEnd != null)
             {
-                if ((PathStart.IsInFlow && PathEnd.IsInFlow) || (PathStart.IsOutFlow && PathEnd.IsOutFlow))
+                if (PathStart.FlowIsSameAs(PathEnd))
                 {
                     PathEnd = null;
                     return;
@@ -306,6 +406,8 @@ namespace Flow_Network
                     PathEnd = null;
                     return;
                 }
+                ResetBlockedForSameFlowZones(true);
+
                 PathStart.DrawState = DrawState.Blocking;
                 PathEnd.DrawState = DrawState.Blocking;
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
@@ -329,6 +431,36 @@ namespace Flow_Network
                 PathEnd = null;
             }
 
+        }
+
+        private void ResetBlockedForSameFlowZones(bool redraw)
+        {
+            foreach (Element e in AllElements)
+            {
+                foreach (ConnectionZone zone in e.ConnectionZones)
+                {
+                    if (zone.IsConnected)
+                        zone.DrawState = DrawState.Blocking;
+                    else
+                        zone.DrawState = DrawState.Normal;
+                    zone.Draw(plDrawGraphics);
+                }
+            }
+        }
+
+        private void SetBlockedForSameFlowZones(bool redraw)
+        {
+            foreach (Element e in AllElements)
+            {
+                foreach (ConnectionZone zone in e.ConnectionZones)
+                {
+                    if (zone == PathStart) continue;
+                    if (zone.FlowIsSameAs(PathStart))
+                        zone.DrawState = DrawState.Blocking;
+                    if(redraw)
+                        zone.Draw(plDrawGraphics);
+                }
+            }
         }
         #endregion
         #region drag
@@ -550,6 +682,19 @@ namespace Flow_Network
             if (ActiveTool == ActiveToolType.Select)
             {
                 RevertDrag();
+                HandleEdit();
+                return;
+            }
+
+            if (ActiveTool == ActiveToolType.Pipe)
+            {
+                if (PathStart != null)
+                {
+                    ResetBlockedForSameFlowZones(false);
+                    PathStart.DrawState = DrawState.Normal;
+                }
+                
+                PathStart = null;
                 return;
             }
 
