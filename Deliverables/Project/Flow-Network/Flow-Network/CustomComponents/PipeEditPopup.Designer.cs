@@ -74,7 +74,7 @@
             // lblCurrentFlow
             // 
             this.lblCurrentFlow.AutoSize = true;
-            this.lblCurrentFlow.Location = new System.Drawing.Point(22, 0);
+            this.lblCurrentFlow.Location = new System.Drawing.Point(21, 39);
             this.lblCurrentFlow.Name = "lblCurrentFlow";
             this.lblCurrentFlow.Size = new System.Drawing.Size(35, 13);
             this.lblCurrentFlow.TabIndex = 3;
@@ -103,7 +103,7 @@
             this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label3.Location = new System.Drawing.Point(54, 15);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(2, 110);
+            this.label3.Size = new System.Drawing.Size(2, 112);
             this.label3.TabIndex = 6;
             // 
             // lblCurrentText
@@ -131,7 +131,7 @@
             this.label6.Size = new System.Drawing.Size(27, 2);
             this.label6.TabIndex = 9;
             // 
-            // PipePopup
+            // PipeEditPopup
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -146,7 +146,7 @@
             this.Controls.Add(this.numericValuePicker);
             this.Controls.Add(this.lblCurrentPercent);
             this.Controls.Add(this.lblMin);
-            this.Name = "PipePopup";
+            this.Name = "PipeEditPopup";
             this.Size = new System.Drawing.Size(99, 148);
             ((System.ComponentModel.ISupportInitialize)(this.numericValuePicker)).EndInit();
             this.ResumeLayout(false);

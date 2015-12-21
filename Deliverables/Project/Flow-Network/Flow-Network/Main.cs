@@ -206,15 +206,20 @@ namespace Flow_Network
         {
             if (dragElement != null) return;
 
+            HandleEdit();
+        }
+
+        void HandleEdit()
+        {
             ConnectionZone.Path path = FindPathUnder(mousePosition);
             if (path != null)
             {
-                HandleSelectToolOverPath(path);
+                ShowEditPath(path);
                 return;
             }
         }
 
-        void HandleSelectToolOverPath(ConnectionZone.Path path)
+        void ShowEditPath(ConnectionZone.Path path)
         {
             foreach (Point midPoint in path.UserDefinedMidPoints)
             {
@@ -222,7 +227,7 @@ namespace Flow_Network
             }
             if (pipeEditPopup == null)
             {
-                pipeEditPopup = new CustomComponents.PipeEditPopup(null);
+                pipeEditPopup = new CustomComponents.PipeEditPopup(path);
 
                 this.plDraw.Controls.Add(pipeEditPopup);
             }
@@ -581,11 +586,15 @@ namespace Flow_Network
             if (rightClickPanel == null)
             {
                 rightClickPanel = new Panel();
+                rightClickPanel.LostFocus += (x, y) => rightClickPanel.Visible = false;
                 plDraw.Controls.Add(rightClickPanel);
 
                 rightClickPanel.Width = 100;
 
-                rightClickPanel.AddButton("Edit", (x, y) => { }).Name = "edit";
+                rightClickPanel.AddButton("Edit", (x, y) => 
+                {
+                    HandleEdit();
+                }).Name = "edit";
 
                 rightClickPanel.AddButton("Remove", (x, y) =>
                 {

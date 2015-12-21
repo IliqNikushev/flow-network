@@ -12,9 +12,6 @@ namespace Flow_Network.CustomComponents
 {
     public partial class PipeEditPopup : UserControl
     {
-        private static Image SliderImage { get { return Properties.Resources.pipeSlider; } }
-        private static Image ArrowImage { get { return Properties.Resources.pipeSliderArrow; } }
-
         private Graphics controlGraphics;
 
         private Flow_Network.ConnectionZone.Path currentPath;
@@ -64,8 +61,6 @@ namespace Flow_Network.CustomComponents
         public PipeEditPopup(ConnectionZone.Path path)
         {
             InitializeComponent();
-            this.Paint += (x,y) => PaintSlider();
-            controlGraphics = this.CreateGraphics();
 
             this.numericValuePicker.ValueChanged += numericValuePicker_ValueChanged;
 
@@ -75,26 +70,23 @@ namespace Flow_Network.CustomComponents
         void numericValuePicker_ValueChanged(object sender, EventArgs e)
         {
             if (CurrentPath == null) return;
-            ClearPreviousDrawn();
 
             currentPath.MaxFlow = (float)numericValuePicker.Value;
 
             this.lblCurrentPercent.Text = FlowPercent + "%";
-            this.lblCurrentPercent.Top = ArrowTop + ArrowImage.Height / 4;
+            this.lblCurrentPercent.Top = ArrowTop;
 
             this.lblCurrentFlow.Text = "("+Flow+")";
             this.lblCurrentFlow.Top = lblCurrentPercent.Top - lblCurrentFlow.Height;
 
             this.lblCurrentText.Top = lblCurrentPercent.Top;
-
-            PaintSlider();
         }
 
         int SliderTop
         {
             get
             {
-                return lblMin.Top + lblMin.Height;
+                return lblMin.Top + lblMin.Height + 2;
             }
         }
 
@@ -102,7 +94,7 @@ namespace Flow_Network.CustomComponents
         {
             get
             {
-                return numericValuePicker.Top - this.SliderTop;
+                return numericValuePicker.Top - this.SliderTop - 10;
             }
         }
 
@@ -110,7 +102,7 @@ namespace Flow_Network.CustomComponents
         {
             get
             {
-                int arrowTop = this.SliderHeight - ArrowImage.Height;
+                int arrowTop = this.SliderHeight;
                 arrowTop = (int)(arrowTop * (FlowPercent / 100.0f));
                 arrowTop = SliderTop + arrowTop;
                 return arrowTop;
@@ -128,35 +120,6 @@ namespace Flow_Network.CustomComponents
             this.numericValuePicker.Value = (decimal)MaxFlow;
             
             numericValuePicker_ValueChanged(null, null);
-        }
-
-        private Rectangle SliderRect
-        {
-            get
-            {
-                return new Rectangle(lblMin.Left + 3, this.SliderTop, SliderImage.Width, this.SliderHeight);
-            }
-        }
-
-        private Rectangle ArrowRect
-        {
-            get
-            {
-                return new Rectangle(lblMin.Left + 3, this.ArrowTop, ArrowImage.Width, ArrowImage.Height);
-            }
-        }
-
-        void ClearPreviousDrawn()
-        {
-            Brush b = new SolidBrush(this.BackColor);
-            controlGraphics.FillRectangle(b, ArrowRect);
-        }
-
-        void PaintSlider()
-        {
-            controlGraphics.DrawImage(SliderImage, SliderRect);
-
-            controlGraphics.DrawImage(ArrowImage, ArrowRect);
         }
     }
 }
