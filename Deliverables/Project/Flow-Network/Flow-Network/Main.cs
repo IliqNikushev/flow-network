@@ -737,13 +737,27 @@ namespace Flow_Network
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-
+            MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
+            DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
+            if (dr == DialogResult.Yes)
+            {
+                btnSave_Click(sender, e);
+            }
+            else if (dr == DialogResult.No)
+            {
+                AllPaths.Clear();
+                AllElements.Clear();
+                plDraw.Invalidate();
+            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            AllPaths.Clear();
+            AllElements.Clear();
+            plDraw.Invalidate();
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = "D:\\";
+            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             openFileDialog.Filter = "pipeline file(*.pipelane)|*.pipelane";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.FilterIndex = 1;
@@ -752,14 +766,48 @@ namespace Flow_Network
                 FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open);
                 StreamReader sr = new StreamReader(fs);
                 string nextLine;
+                string[] a;
+                Element l = null;
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
-                    
-                    {
-
+                    { 
+                        a= nextLine.Split(',');
+                        if (a[0] == typeof(SinkElement).Name)
+                        {
+                            l = new SinkElement();
+                        }
+                        if (a[0] == typeof(PumpElement).Name)
+                        {
+                            l = new PumpElement();
+                        } 
+                        if (a[0] == typeof(MergerElement).Name)
+                        {
+                            l = new MergerElement();
+                        }
+                        if (a[0] == typeof(SplitterElement).Name)
+                        {
+                            l = new SplitterElement();
+                        }
+                        if (a[0] == typeof(AdjustableSplitter).Name)
+                        {
+                            l = new AdjustableSplitter();
+                        }
+                        if (a[0] == typeof(ConnectionZone.Path).Name)
+                        {
+                            Point from = new Point(int.Parse(a[1]), int.Parse(a[2]));
+                            Point to = new Point(int.Parse(a[3]), int.Parse(a[4]));
+                            ConnectionZone f = new ConnectionZone(from, l, true);
+                            ConnectionZone t = new ConnectionZone(to, l, false);
+                            ConnectionZone.Path p = new ConnectionZone.Path(f, t);
+                            AllPaths.Add(p);
+                        }
+                        AllElements.Add(l);
+                        l.X = int.Parse(a[1]);
+                        l.Y = int.Parse(a[2]);
                     }
-                } 
+                }
+                plDraw.Invalidate();
             }
         }
 
@@ -767,7 +815,7 @@ namespace Flow_Network
         {
             Stream myStream;
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.InitialDirectory = "D:\\";
+            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             sfd.Filter = "pipeline file(*.pipelane)|*.pipelane";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
@@ -779,14 +827,16 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            sw.WriteLine(item + "," + x +","+ y);
-                            // following is the connection need to be corrected
-                            foreach (var con in item.Connections)
-                            {
-                                sw.WriteLine("line" + "," + x + "," + y);
-                            }
-                            // does not work the right way, dont know about how connection is working
+                            sw.WriteLine((item.GetType().Name + "," + x +","+ y));
                         }
+                            foreach (var con in AllPaths)
+                            {
+                                string a = con.From.Location.X.ToString();
+                                string b = con.From.Location.Y.ToString();
+                                string c = con.To.Location.X.ToString();
+                                string d = con.To.Location.Y.ToString();
+                                sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c +","+ d);
+                            }
                     }
                     myStream.Close();
                     MessageBox.Show("Saved");
