@@ -137,7 +137,6 @@ namespace Flow_Network
                     lastHoveredConnected.State = 1;
                 }
             }
-            
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -174,6 +173,10 @@ namespace Flow_Network
 
         void plDraw_HandleClick(object sender, EventArgs e)
         {
+            if (rightClickPanel != null)
+                if (rightClickPanel.Visible)
+                    rightClickPanel.Visible = false;
+
             if (((MouseEventArgs)e).Button == MouseButtons.Right)
             {
                 HandleRightClick();
@@ -196,7 +199,42 @@ namespace Flow_Network
             }
         }
         #region tools
+
+        private CustomComponents.PipeEditPopup pipeEditPopup;
+
         void HandleSelectToolClick()
+        {
+            if (dragElement != null) return;
+
+            ConnectionZone.Path path = FindPathUnder(mousePosition);
+            if (path != null)
+            {
+                HandleSelectToolOverPath(path);
+                return;
+            }
+        }
+
+        void HandleSelectToolOverPath(ConnectionZone.Path path)
+        {
+            foreach (Point midPoint in path.UserDefinedMidPoints)
+            {
+                //if mousePosition is within midpoint => DRAG midpoint
+            }
+            if (pipeEditPopup == null)
+            {
+                pipeEditPopup = new CustomComponents.PipeEditPopup(null);
+
+                this.plDraw.Controls.Add(pipeEditPopup);
+            }
+
+            pipeEditPopup.Location = mousePosition;
+        }
+
+        void HandleSelectToolOverPump()
+        {
+        }
+
+        void HandleSelectToolOverAdjustableSplitter()
         {
 
         }
@@ -307,24 +345,25 @@ namespace Flow_Network
 
         void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
         {
-            if (ActiveTool == ActiveToolType.Select)
+            if (ActiveTool != ActiveToolType.Select)
+                return;
+            if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
+            if (dragElement == null)
             {
-                if (dragElement == null)
+                dragElement = FindElementUnder(mousePosition);
+                if (dragElement != null)
                 {
-                    dragElement = FindElementUnder(mousePosition);
-                    if (dragElement != null)
-                    {
-                        dragStart = dragElement.Location;
-                        oldDragElementPlaceholder.Visible = true;
-                        oldDragElementPlaceholder.Location = dragStart;
-                        oldDragElementPlaceholder.Image = dragElement.Icon;
-                    }
-                }
-                else
-                {
-                    dragElement.Location = mousePosition;
+                    dragStart = dragElement.Location;
+                    oldDragElementPlaceholder.Visible = true;
+                    oldDragElementPlaceholder.Location = dragStart;
+                    oldDragElementPlaceholder.Image = dragElement.Icon;
                 }
             }
+            else
+            {
+                dragElement.Location = mousePosition;
+            }
+
         }
 
         void plDraw_MoveDragElement(object sender, MouseEventArgs e)
@@ -510,6 +549,7 @@ namespace Flow_Network
             Merger,
             Adjustable,
             Remove,
+            Edit,
             Cancel
         }
 
@@ -531,7 +571,11 @@ namespace Flow_Network
             {
                 Element e = FindElementUnder(rightClickMousePosition);
                 if (e != null)
+                {
                     options = RightClickOptions.Remove;
+                    if (e is AdjustableSplitter || e is PumpElement)
+                        options |= RightClickOptions.Edit;
+                }
             }
 
             if (rightClickPanel == null)
@@ -540,9 +584,10 @@ namespace Flow_Network
                 plDraw.Controls.Add(rightClickPanel);
 
                 rightClickPanel.Width = 100;
-                rightClickPanel.Height = 140;
 
-                rightClickPanel.AddButton("Remove", 0, (x, y) =>
+                rightClickPanel.AddButton("Edit", (x, y) => { }).Name = "edit";
+
+                rightClickPanel.AddButton("Remove", (x, y) =>
                 {
                     Element e = FindElementUnder(rightClickMousePosition);
                     if (e == null) return;
@@ -551,12 +596,12 @@ namespace Flow_Network
                         RemoveElement(e);
                     }
                 }).Name = "remove";
-                rightClickPanel.AddButton("Add Pump", 20, (x, y) => { AddElement<PumpElement>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Sink", 40, (x, y) => { AddElement<SinkElement>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Splitter", 60, (x, y) => { AddElement<SplitterElement>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Adjustable", 80, (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Add Merger", 100, (x, y) => { AddElement<MergerElement>(rightClickMousePosition); });
-                rightClickPanel.AddButton("Cancel", 120).Name = "cancel";
+                rightClickPanel.AddButton("Add Pump", (x, y) => { AddElement<PumpElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Sink", (x, y) => { AddElement<SinkElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Splitter", (x, y) => { AddElement<SplitterElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Adjustable", (x, y) => { AddElement<AdjustableSplitter>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Add Merger", (x, y) => { AddElement<MergerElement>(rightClickMousePosition); });
+                rightClickPanel.AddButton("Cancel").Name = "cancel";
 
                 foreach (var item in rightClickPanel.Controls)
                 {
@@ -573,9 +618,7 @@ namespace Flow_Network
                     (item as Button).Enabled = true;
                 }
             }
-            if (!options.HasFlag(RightClickOptions.Remove))
-                rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
-            else
+            if (options.HasFlag(RightClickOptions.Remove))
             {
                 foreach (var item in rightClickPanel.Controls)
                 {
@@ -586,56 +629,39 @@ namespace Flow_Network
                 }
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = true;
             }
+            else
+                rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
 
+            if(options.HasFlag(RightClickOptions.Edit))
+                rightClickPanel.Controls.Find("edit", false)[0].Enabled = true;
+            else
+                rightClickPanel.Controls.Find("edit", false)[0].Enabled = false;
             rightClickPanel.Controls.Find("cancel", false)[0].Enabled = true;
+
+            int current = 0;
+            foreach (var item in rightClickPanel.Controls)
+            {
+                Button i = item as Button;
+                if (i != null)
+                {
+                    if (i.Enabled)
+                    {
+                        i.Top = current;
+                        current += i.Height;
+                        i.Visible = true;
+                    }
+                    else
+                        i.Visible = false;
+                }
+            }
+
+            rightClickPanel.Height = current;
 
             rightClickPanel.Location = rightClickMousePosition;
             rightClickPanel.Visible = true;
             rightClickPanel.BringToFront();
             rightClickPanel.BackColor = Color.FromArgb(255, 157, 157, 157);
         }
-
-        //Panel for max flow 
-
-        //Panel maxFlowPanel2;
-        //Point rightClickMousePosition = new Point();
-
-        //private void HandleRightClick()
-        //{
-        //    if (ActiveTool == ActiveToolType.Select)
-        //    {
-        //        //right click over connection??
-        //        RevertDrag();
-        //        return;
-        //    }
-
-        //    RightClickOptions options = ~RightClickOptions.Remove;
-        //    rightClickMousePosition = mousePosition;
-
-        //    if (HasCollision(rightClickMousePosition))
-        //    {
-        //        Element e = FindElementUnder(rightClickMousePosition);
-        //        if (e != null)
-        //            options = RightClickOptions.Remove;
-        //    }
-
-        //    if (maxFlowPanel2 == null)
-        //    {
-        //        maxFlowPanel2 = new Panel();
-        //        plDraw.Controls.Add(maxFlowPanel2);
-
-        //        maxFlowPanel2.Width = 200;
-        //        maxFlowPanel2.Height = 100;
-
-        //        maxFlowPanel2.Controls.Add(this.maxFlowProgressBar);
-        //        maxFlowPanel2.Controls.Add(this.maxFlowUpDown);
-
-        //    maxFlowPanel2.Location = rightClickMousePosition;
-        //    maxFlowPanel2.Visible = true;
-        //    maxFlowPanel2.BringToFront();
-        //    maxFlowPanel2.BackColor = Color.FromArgb(255, 157, 157, 157);
-        //}
-        //end MaxFlowPanel
         #endregion
         #region collision,element detection
         private Element FindElementUnder(Point mousePosition)
@@ -775,13 +801,18 @@ namespace Flow_Network
 
         static class Extentions
         {
-            public static Button AddButton(this Panel panel, string text, int top, EventHandler onClick = null)
+            public static Button AddButton(this Panel panel, string text, EventHandler onClick = null)
             {
                 Button button = new Button();
                 button.Text = text;
                 button.Width = panel.Width;
                 button.Height = 20;
-                button.Top = top;
+                foreach (var item in panel.Controls)
+                {
+                    Control c = item as Control;
+                    if(c != null)
+                        button.Top += c.Height;
+                }
                 if (onClick != null)
                     button.Click += onClick;
 

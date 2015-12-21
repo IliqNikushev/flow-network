@@ -46,6 +46,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomComponents\AdjustableSplitterEditPopup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomComponents\AdjustableSplitterEditPopup.Designer.cs">
+      <DependentUpon>AdjustableSplitterEditPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomComponents\PipeEditPopup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomComponents\PipeEditPopup.Designer.cs">
+      <DependentUpon>PipeEditPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomComponents\PumpEditPopup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomComponents\PumpEditPopup.Designer.cs">
+      <DependentUpon>PumpEditPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="UndoableAction.cs" />
     <Compile Include="AdjustableSplitter.cs" />
     <Compile Include="Collision.cs" />
@@ -83,6 +101,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomComponents\PipeEditPopup.resx">
+      <DependentUpon>PipeEditPopup.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="ClassDiagram.cd" />
     <None Include="Properties\Settings.settings">
@@ -154,6 +175,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\toggled3.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CustomComponents\pipeSlider.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CustomComponents\pipeSliderArrow.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

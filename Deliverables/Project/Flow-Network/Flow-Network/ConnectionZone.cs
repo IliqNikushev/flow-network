@@ -140,6 +140,8 @@ namespace Flow_Network
                 }
             }
 
+            public float Flow { get { return this.From.Flow; } }
+
             /// <summary>Called when the max flow has been altered</summary>
             public event FlowAlteredEvent OnMaxFlowChanged = (x,y,z) => { };
 
@@ -169,13 +171,13 @@ namespace Flow_Network
                 if (from.isInFlow == to.isInFlow) throw new ArgumentException("Two connection zones with same flow type connected");
                 if (from.IsOutFlow)
                 {
-                    this.From = to;
-                    this.To = from;
+                    this.From = from;
+                    this.To = to;
                 }
                 else
                 {
-                    this.From = from;
-                    this.To = to;
+                    this.From = to;
+                    this.To = from;
                 }
             }
 
