@@ -116,25 +116,28 @@ namespace Flow_Network
         {
             if (width == -1) width = ConnectionZone.Path.DEFAULT_WIDTH;
             Point d = new Point(a2.X - a1.X, a2.Y - a1.Y);
+            d.X = (int)(d.X * 0.1f);
+            d.X = d.X == 0 ? 1 : d.X;
+            d.Y = (int)(d.Y * 0.1f);
+            d.Y = d.Y == 0 ? 1 : d.Y;
 
             Point normalUP = new Point(-d.Y, d.X);
+            
             Point normalDown = new Point(d.Y, -d.X);
             bool state = LineIntersection(a1, a2, b1, b2, out intersection);
             if (state) return state;
-            for (int i = 0; i < width / 2; i++)
-            {
-                Point up1 = new Point(a1.X + normalUP.X * (i + 1), a1.X + normalUP.Y * (i + 1));
-                Point up2 = new Point(a2.X + normalUP.X * (i + 1), a2.X + normalUP.Y * (i + 1)); 
-                state = LineIntersection(up1, up2, b1, b2, out intersection);
-                if (state)
-                    return state;
 
-                Point down1 = new Point(a1.X + normalDown.X * (i + 1), a1.X + normalDown.Y * (i + 1));
-                Point down2 = new Point(a2.X + normalDown.X * (i + 1), a2.X + normalDown.Y * (i + 1));
-                state = LineIntersection(down1, down2, b1, b2, out intersection);
-                if (state)
-                    return state;
-            }
+            Point up1 = new Point(a1.X + normalUP.X, a1.Y + normalUP.Y);
+            Point up2 = new Point(a2.X + normalUP.X, a2.Y + normalUP.Y); 
+            state = LineIntersection(up1, up2, b1, b2, out intersection);
+            if (state)
+                return state;
+
+            Point down1 = new Point(a1.X + normalDown.X, a1.Y + normalDown.Y);
+            Point down2 = new Point(a2.X + normalDown.X, a2.Y + normalDown.Y);
+            state = LineIntersection(down1, down2, b1, b2, out intersection);
+            if (state)
+                return state;
             intersection = new Point(-1, -1);
             return false;
         }
