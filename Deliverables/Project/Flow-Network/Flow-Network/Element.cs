@@ -21,16 +21,6 @@ namespace Flow_Network
                     this.Y <= point.Y && this.Y >= point.Y + this.Height;
         }
 
-        /// <summary>Recalculates all connections of this element</summary>
-        /// <param name="refresh">Passed to the ConnectionZone.Path.Adjust method</param>
-        public void RefreshConnections(bool refresh = false)
-        {
-            foreach (ConnectionZone.Path connection in this.Connections)
-            {
-                connection.Adjust(refresh);
-            }
-        }
-
         private IEnumerable<ConnectionZone> connectionZones;
 
         /// <summary>Gets all Properties that are a connection zone within the class</summary>
@@ -61,20 +51,38 @@ namespace Flow_Network
         /// <summary>Gets all connections that are defined in Path.All and are from this element to any other</summary>
         public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this); } }
 
+        const int POINT_DELTA = 0;//ConnectionZone.Path.DEFAULT_WIDTH / 2;
+
         /// <summary>Center of the bounding box of the element</summary>
         public Point Center { get { return new Point(this.X + this.Width / 2, this.Y + this.Height / 2); } }
         /// <summary>Bottom left point of the bounding box of the element</summary>
-        public Point A { get { return new Point(this.X - 1, this.Y + this.Height + 2); } }
+        public Point A { get { return new Point(this.X - POINT_DELTA, this.Y + this.Height + POINT_DELTA); } }
         /// <summary>Bottom right point of the bounding box of the element</summary>
-        public Point B { get { return new Point(this.X + this.Width + 1, this.Y + this.Height + 1); } }
+        public Point B { get { return new Point(this.X + this.Width + POINT_DELTA, this.Y + this.Height + POINT_DELTA); } }
         /// <summary>Top right point of the bounding box of the element</summary>
-        public Point C { get { return new Point(this.X + this.Width, this.Y - 2); } }
+        public Point C { get { return new Point(this.X + this.Width, this.Y - POINT_DELTA); } }
         /// <summary>Top left point of the bounding box of the element</summary>
-        public Point D { get { return new Point(this.X, this.Y - 2); } }
+        public Point D { get { return new Point(this.X, this.Y - POINT_DELTA); } }
 
         /// <summary>Returns DefaultSize.X</summary>
         public override int Width { get { return DefaultSize.X; } }
         /// <summary>Returns DefaultSize.Y</summary>
         public override int Height { get { return DefaultSize.Y; } }
+
+        protected override void OnDrawClear(Graphics graphics, Color backgroundColor)
+        {
+            graphics.FillRectangle(new SolidBrush(backgroundColor), this.Location.X, this.Location.Y, this.Width, this.Height);
+        }
+
+        protected override void OnDraw(Graphics graphics, Color backgroundColor)
+        {
+            this.OnDrawClear(graphics, backgroundColor);
+            base.OnDraw(graphics, backgroundColor);
+        }
+
+        public void OnlyDraw(Graphics graphics, Color backgroundColor)
+        {
+            base.OnDraw(graphics, backgroundColor);
+        }
     }
 }

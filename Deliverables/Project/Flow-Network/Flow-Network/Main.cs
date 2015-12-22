@@ -116,7 +116,7 @@ namespace Flow_Network
             plDraw_HandleDynamicIcon(sender, e);
             if (dragElement != null)
             {
-                plDraw_MoveDragElement(sender, e);
+                plDraw_HandleMoveDragElement(sender, e);
             }
         }
 
@@ -218,28 +218,6 @@ namespace Flow_Network
                     }
                 }
             lastHoveredDrawable = hovered;
-        }
-
-        void HandleHoverOverZone(ConnectionZone hovered)
-        {
-            if (hovered != null)
-            {
-                lastHovered = hovered;
-                if (hovered.DrawState == DrawState.Blocking)
-                {
-                    lastHoveredConnected = hovered;
-                }
-                hovered.DrawState = DrawState.Hovered;
-                plDraw.Invalidate();
-            }
-            else if (hovered != lastHovered)
-            {
-                lastHovered.DrawState = DrawState.Normal;
-                if (lastHoveredConnected != null)
-                {
-                    lastHoveredConnected.DrawState = DrawState.Blocking;
-                }
-            }
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -408,7 +386,6 @@ namespace Flow_Network
 
         void HandlePipeToolClick()
         {
-            
             //TO DO: end if cycle;
             ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
             if (hovered == null)
@@ -456,13 +433,18 @@ namespace Flow_Network
                 
                 result.OnCreated += () =>
                 {
-                    result.Add();
-                    plDraw.Invalidate();
+                    result.AddToSystem();
+                    result.Draw(plDrawGraphics, plDraw.BackColor);
+                };
+
+                result.OnBeforeAdjusted += () =>
+                {
+                    result.DrawClear(plDrawGraphics, plDraw.BackColor);
                 };
 
                 result.OnAdjusted += () =>
                 {
-                    plDraw.Invalidate();
+                    result.Draw(plDrawGraphics, plDraw.BackColor);
                 };
 
                 result.Adjust();
@@ -508,7 +490,8 @@ namespace Flow_Network
         #region drag
         void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
         {
-            if (HasCollision(mousePosition))
+            if (dragElement == null) return;
+            if (HasCollision(dragElement.Location))
             {
                 RevertDrag();
             }
@@ -539,13 +522,64 @@ namespace Flow_Network
             }
         }
 
-        void plDraw_MoveDragElement(object sender, MouseEventArgs e)
+        void plDraw_HandleMoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (dragElement.Location != e.Location)
+            Point location = e.Location;
+            if (location.X < 0)
+                location.X = 0;
+            else if (location.X > plDraw.Width - Element.DefaultSize.X)
+                location.X = plDraw.Width - Element.DefaultSize.X;
+            if (location.Y < 0)
+                location.Y = 0;
+            else if (location.Y > plDraw.Height - Element.DefaultSize.Y)
+                location.Y = plDraw.Height - Element.DefaultSize.Y;
+            
+            if (dragElement.Location != location)
             {
-                dragElement.Location = e.Location;
+                dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
+                dragElement.Location = location;
+
+                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+                {
+                    if (q == dragElement) continue;
+                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+
+                dragElement.OnlyDraw(plDrawGraphics, plDraw.BackColor);
+
+                RefreshDragElementPathCollisions();
                 RefreshConnections();
+            }
+        }
+
+        private void RefreshDragElementPathCollisions()
+        {
+            foreach (Element element in AllElements)
+            {
+                if (element == dragElement) continue;
+                bool redraw = false;
+                foreach (ConnectionZone.Path path in dragElement.Connections)
+                {
+                    Point previous = path.From;
+
+                    foreach (Point point in path.PathPoints)
+                    {
+                        if (point == previous) continue;
+                        if (
+                            Collision.Intersects(previous, point, element.A, element.B) ||
+                            Collision.Intersects(previous, point, element.B, element.C) ||
+                            Collision.Intersects(previous, point, element.C, element.D) ||
+                            Collision.Intersects(previous, point, element.D, element.A)
+                            )
+                        {
+                            element.Draw(plDrawGraphics, plDraw.BackColor);
+                            break;
+                        }
+                        previous = point;
+                    }
+                    if (redraw) break;
+                }
             }
         }
 
@@ -553,12 +587,24 @@ namespace Flow_Network
         {
             if (dragElement == null) return;
 
+            dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
+            foreach (ConnectionZone.Path path in dragElement.Connections)
+            {
+                path.DrawClear(plDrawGraphics, plDraw.BackColor);
+            }
+            //RefreshDragElementPathCollisions();
+
+            foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+            {
+                if (q == dragElement) continue;
+                q.Draw(plDrawGraphics, plDraw.BackColor);
+            }
+
             dragElement.Location = dragStart;
             oldDragElementPlaceholder.Visible = false;
             dragElement = null;
-
+            //plDraw.Invalidate();
             RefreshConnections();
-
         }
 
         #endregion
@@ -680,19 +726,59 @@ namespace Flow_Network
             RefreshConnections(e);
         }
 
+        static object refreshLock = new object();
+
         private void RefreshConnections(Element e = null)
         {
-            if (e == null)
-                foreach (Element item in AllElements)
-                    item.RefreshConnections();
-            else
-                foreach (Element item in AllElements)
-                    if (item == e)
-                        continue;
-                    else
-                        item.RefreshConnections();
+            foreach (Element element in AllElements)
+            {
+                if (e != null)
+                    if (e == element) continue;
 
-            plDraw.Invalidate();
+                foreach (ConnectionZone.Path p in element.Connections)
+                {
+                    ConnectionZone.Path path = p;
+                    List<Point> current = new List<Point>(path.PreviousPointsToGoThrough);
+                    path.Adjust(false, onDone: () =>
+                    {
+                        this.Invoke(new Action(() =>
+                        {
+                            path.To.Parent.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.To.Parent.Draw(plDrawGraphics, plDraw.BackColor);
+                            path.From.Parent.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.From.Parent.Draw(plDrawGraphics, plDraw.BackColor);
+                            List<Point> newPoints = new List<Point>(path.PreviousPointsToGoThrough);
+                            path.PreviousPointsToGoThrough = current;
+                            path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.PreviousPointsToGoThrough = newPoints;
+                            path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.Draw(plDrawGraphics, plDraw.BackColor);
+
+                            foreach (ConnectionZone.Path otherPath in AllPaths)
+                            {
+                                if (otherPath == path) continue;
+                                if (Collision.Intersects(path.From, path.To, otherPath.From, otherPath.To))
+                                {
+                                    otherPath.Draw(plDrawGraphics, plDraw.BackColor);
+                                }
+                            }
+                            List<Point> points = new List<Point>(path.PathPoints);
+                            foreach (Element el in AllElements)
+                            {
+                                foreach (Point pp in points)
+                                {
+                                    if (pp == el.A || pp == el.B || pp == el.C || pp == el.D)
+                                    {
+                                        el.OnlyDraw(plDrawGraphics, plDraw.BackColor);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        ));
+                    });
+                }
+            }
         }
 
         void AddElement<T>(Point position) where T : Element
@@ -904,6 +990,20 @@ namespace Flow_Network
         private Element FindCollisionForPlacementOfElementUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
+            {
+                if (q == dragElement) return false;
+                Point position = mousePosition;
+
+                if (q.X - q.Width <= position.X && q.X + q.Width >= position.X)
+                    if (q.Y - q.Height <= position.Y && q.Y + q.Height >= position.Y)
+                        return true;
+                return false;
+            });
+        }
+
+        private IEnumerable<Element> FindCollisionsForPlacementOfElementUnder(Point mousePosition)
+        {
+            return AllElements.Where(q =>
             {
                 if (q == dragElement) return false;
                 Point position = mousePosition;

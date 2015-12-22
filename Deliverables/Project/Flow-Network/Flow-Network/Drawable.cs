@@ -33,12 +33,14 @@ namespace Flow_Network
         /// <summary>Location based on the X and Y</summary>
         public virtual Point Location { get { return new Point(X, Y); } set { this.X = value.X; this.Y = value.Y; } }
 
-        public override void Draw(System.Drawing.Graphics graphics, Color backgroundColor)
+        protected override void OnDraw(System.Drawing.Graphics graphics, Color backgroundColor)
         {
-            if (this is Element)
-                graphics.FillRectangle(new SolidBrush(backgroundColor), this.Location.X, this.Location.Y, this.Width, this.Height);
-            //graphics.DrawImage(this.ClearIcon, this.Location.X, this.Location.y, this.Width, this.Height);
             graphics.DrawImage(this.Icon, this.Location.X, this.Location.Y, this.Width, this.Height);
+        }
+
+        protected override void OnDrawClear(Graphics g, Color backgroundColor)
+        {
+            
         }
     }
 
@@ -64,6 +66,31 @@ namespace Flow_Network
             }
         }
 
-        public abstract void Draw(System.Drawing.Graphics graphics, Color backgroundColor);
+        static Dictionary<System.Drawing.Graphics, object> singletonGraphics = new Dictionary<Graphics, object>();
+        static object singletonLock = new object();
+
+        public void Draw(System.Drawing.Graphics graphics, Color backgroundColor)
+        {
+            lock (singletonLock)
+                if (!singletonGraphics.ContainsKey(graphics))
+                    singletonGraphics.Add(graphics, new object());
+            
+            lock (singletonGraphics[graphics])
+                this.OnDraw(graphics, backgroundColor);
+
+        }
+        public void DrawClear(System.Drawing.Graphics g, Color backgroundColor)
+        {
+            lock (singletonLock)
+            {
+                if (!singletonGraphics.ContainsKey(g))
+                    singletonGraphics.Add(g, new object());
+            }
+            lock (singletonGraphics[g])
+                this.OnDrawClear(g,backgroundColor);
+        }
+
+        protected abstract void OnDraw(System.Drawing.Graphics graphics, Color backgroundColor);
+        protected abstract void OnDrawClear(System.Drawing.Graphics g, Color backgroundColor);
     }
 }

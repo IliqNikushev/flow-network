@@ -19,13 +19,13 @@ namespace Flow_Network.UndoableActions
         /// <summary>Invokes ConnectionZone.Path.Remove of this.Connection</summary>
         protected override void OnUndo()
         {
-            this.Connection.Remove();
+            this.Connection.RemoveFromSystem();
         }
 
         /// <summary>Invokes ConnectionZone.Path.Add of this.Connection</summary>
         protected override void OnRedo()
         {
-            this.Connection.Add();
+            this.Connection.AddToSystem();
         }
 
         protected override string AsString

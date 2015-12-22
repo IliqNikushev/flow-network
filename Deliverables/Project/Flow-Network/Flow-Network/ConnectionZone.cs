@@ -118,12 +118,14 @@ namespace Flow_Network
         public class Path : Drawable
         {
             public int Width { get { return DEFAULT_WIDTH; } }
-            public const int DEFAULT_WIDTH = 5;
+            public const int DEFAULT_WIDTH = 6;
             public delegate void FlowAlteredEvent(Path path, float previous, float current);
             /// <summary>Returns all paths defineed in the Main form</summary>
             public static List<Path> All { get { return Main.AllPaths; } }
             public ConnectionZone From { get; private set; }
             public ConnectionZone To { get; private set; }
+
+            public bool PointsHaveChanged { get; private set; }
 
             private float maxFlow;
             /// <summary>
@@ -157,7 +159,7 @@ namespace Flow_Network
                 {
                     List<Point> result = new List<Point>();
                     result.Add(From);
-                    lock (threadLock)
+                    lock (adjusterThreadLock)
                     {
                         result.AddRange(MidPoints);
                     }
@@ -168,6 +170,9 @@ namespace Flow_Network
 
             /// <summary>Points the path HAS to go to before reaching the TO zone</summary>
             public List<Point> UserDefinedMidPoints = new List<Point>();
+
+            public List<Point> PreviousPointsToGoThrough = new List<Point>();
+
             /// <summary>Points the path will go through before reaching the TO zone</summary>
             private List<Point> MidPoints = new List<Point>();
 
@@ -189,7 +194,7 @@ namespace Flow_Network
             private bool isAdded = false;
 
             /// <summary>Adds to the All collection of paths if not added</summary>
-            public void Add()
+            public void AddToSystem()
             {
                 if (isAdded) return;
                 this.To.DrawState = Flow_Network.DrawState.Blocking;
@@ -201,7 +206,7 @@ namespace Flow_Network
             }
 
             /// <summary>Removes from the All collection of paths if present</summary>
-            public void Remove()
+            public void RemoveFromSystem()
             {
                 if (!isAdded) return;
                 this.To.DrawState = Flow_Network.DrawState.Normal;
@@ -238,19 +243,30 @@ namespace Flow_Network
             /// <summary>Called when the path has been adjusted</summary>
             public event System.Action OnAdjusted = () => { };
 
+            /// <summary>Called when the path has been adjusted</summary>
+            public event System.Action OnBeforeAdjusted = () => { };
+
             private System.Threading.Thread activeAdjuster;
             private bool IsAdjusting { get { return activeAdjuster != null && activeAdjuster.ThreadState == System.Threading.ThreadState.Running; } }
 
             private bool isNew = true;
 
-            private object threadLock = new object();
+            private object adjusterThreadLock = new object();
+
+            public void LockForRender(Action a)
+            {
+                lock (adjusterThreadLock)
+                {
+                    a();
+                }
+            }
 
             /// <summary>Calculates the new midpoints based on the position of the Elements.All and the user defined mid points
             /// The process is executed on a different thread to not hold up the program</summary>
             /// <param name="refresh">If set to true, will call OnAdjusted</param>
-            public void Adjust(bool refresh = false)
+            public void Adjust(bool refresh = false, Action onDone = null)
             {
-                lock (threadLock)
+                lock (adjusterThreadLock)
                 {
                     if (IsAdjusting) activeAdjuster.Abort();
                 }
@@ -260,35 +276,39 @@ namespace Flow_Network
                 pointsToGoThrough.AddRange(UserDefinedMidPoints);
                 pointsToGoThrough.Add(this.To);
 
+                if (!isNew)
+                    if (refresh)
+                        lock(adjusterThreadLock)
+                            OnBeforeAdjusted();
+
+                List<Point> currentMidPoints = new List<Point>(this.MidPoints);
+
                 activeAdjuster = new System.Threading.Thread(() =>
                 {
                     try
                     {
-                        lock (threadLock)
+                        lock (adjusterThreadLock)
                         {
                             this.MidPoints.Clear();
-                        }
 
 
-                        HashSet<Element> elementsAlreadyCollided = new HashSet<Element>();
+                            HashSet<Element> elementsAlreadyCollided = new HashSet<Element>();
 
-                        int currentPointStartIndex = 0;
-                        Point start = pointsToGoThrough[currentPointStartIndex];
-                        Point end = pointsToGoThrough[currentPointStartIndex + 1];
+                            int currentPointStartIndex = 0;
+                            Point start = pointsToGoThrough[currentPointStartIndex];
+                            Point end = pointsToGoThrough[currentPointStartIndex + 1];
 
-                        while (true)
-                        {
-                            Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref elementsAlreadyCollided, Element.AllElements);
-                            if (!collision)
+                            while (true)
                             {
-                                currentPointStartIndex += 1;
-                                if (currentPointStartIndex + 1 >= pointsToGoThrough.Count) break;
-                                start = pointsToGoThrough[currentPointStartIndex];
-                                end = pointsToGoThrough[currentPointStartIndex + 1];
-                            }
-                            else
-                            {
-                                lock (threadLock)
+                                Collision collision = Collision.FindBetween(start, end, this.From, this.To, ref elementsAlreadyCollided, Element.AllElements);
+                                if (!collision)
+                                {
+                                    currentPointStartIndex += 1;
+                                    if (currentPointStartIndex + 1 >= pointsToGoThrough.Count) break;
+                                    start = pointsToGoThrough[currentPointStartIndex];
+                                    end = pointsToGoThrough[currentPointStartIndex + 1];
+                                }
+                                else
                                 {
                                     //1 3;2 4
                                     if (collision.SenderIsOnLeft && !collision.TargetIsOnLeft)
@@ -406,16 +426,34 @@ namespace Flow_Network
                                     }
                                 }
                             }
-                        }
 
-                        if (isNew)
-                        {
-                            OnCreated();
-                            isNew = false;
+                            if (isNew)
+                            {
+                                OnCreated();
+                                isNew = false;
+                            }
+                            else
+                                if (refresh)
+                                    OnAdjusted();
+                            PointsHaveChanged = false;
+                            List<Point> currentPoints = this.PathPoints;
+                            if (PreviousPointsToGoThrough.Count == currentPoints.Count)
+                                for (int i = 0; i < currentPoints.Count; i++)
+                                {
+                                    if (currentPoints[i] != PreviousPointsToGoThrough[i])
+                                    {
+                                        PointsHaveChanged = true;
+                                        break;
+                                    }
+                                }
+                            else
+                                PointsHaveChanged = true;
+
+                            this.PreviousPointsToGoThrough.Clear();
+                            this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
                         }
-                        else
-                            if (refresh)
-                                OnAdjusted();
+                            if (onDone != null) onDone();
+                        
                     }
                     catch (System.Threading.ThreadAbortException)
                     {
@@ -428,38 +466,63 @@ namespace Flow_Network
             static Pen onDeletePen = new Pen(Color.Red, Path.DEFAULT_WIDTH);
             static Pen onNormalPen = new Pen(Color.Black, Path.DEFAULT_WIDTH);
 
-            public override void Draw(Graphics graphics, Color backgroundColor)
+            protected override void OnDraw(Graphics graphics, Color backgroundColor)
             {
-                Point previous = this.From;
-                Pen currentPen = onNormalPen;
-                switch (this.DrawState)
+                lock (adjusterThreadLock)
                 {
-                    case DrawState.Normal:
-                        currentPen = onNormalPen;
-                        break;
-                    case DrawState.Hovered:
-                        currentPen = onHoveredPen;
-                        break;
-                    case DrawState.Delete:
-                        currentPen = onDeletePen;
-                        break;
-                    case DrawState.Blocking:
-                        currentPen = onDeletePen;
-                        break;
-                    default:
-                        break;
-                }
+                    Pen currentPen = onNormalPen;
+                    switch (this.DrawState)
+                    {
+                        case DrawState.Normal:
+                            currentPen = onNormalPen;
+                            break;
+                        case DrawState.Hovered:
+                            currentPen = onHoveredPen;
+                            break;
+                        case DrawState.Delete:
+                            currentPen = onDeletePen;
+                            break;
+                        case DrawState.Blocking:
+                            currentPen = onDeletePen;
+                            break;
+                        default:
+                            break;
+                    }
+                    Point previousPoint = this.From;
+                    foreach (Point currentPoint in this.PathPoints)
+                    {
+                        if (previousPoint == currentPoint) continue;
+                        graphics.DrawLine(currentPen, previousPoint, currentPoint);
+                        previousPoint = currentPoint;
+                    }
 
-                foreach (Point currentPoint in this.PathPoints)
-                {
-                    if (previous == currentPoint) continue;
-                    graphics.DrawLine(currentPen, previous, currentPoint);
+                    foreach (Point point in this.UserDefinedMidPoints)
+                    {
+                        graphics.FillEllipse(Brushes.Green, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
+                        graphics.FillEllipse(Brushes.Red, new Rectangle(point.X - this.Width / 2, point.Y - this.Width / 2, this.Width, this.Width));
+                    }
                 }
+            }
 
-                foreach (Point point in this.UserDefinedMidPoints)
+            protected override void OnDrawClear(Graphics g, Color backgroundColor)
+            {
+                lock (adjusterThreadLock)
                 {
-                    graphics.FillEllipse(Brushes.Green, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
-                    graphics.FillEllipse(Brushes.Red, new Rectangle(point.X - this.Width / 2, point.Y - this.Width / 2, this.Width, this.Width));
+                    if (this.PreviousPointsToGoThrough.Count == 0) this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
+                    Pen onClearPen = new Pen(backgroundColor, Path.DEFAULT_WIDTH);
+                    Brush onClearBrush = new SolidBrush(backgroundColor);
+                    Point previousPoint = this.PreviousPointsToGoThrough[0];
+                    foreach (Point currentPoint in this.PreviousPointsToGoThrough)
+                    {
+                        if (previousPoint == currentPoint) continue;
+                        g.DrawLine(onClearPen, previousPoint, currentPoint);
+                        previousPoint = currentPoint;
+                    }
+
+                    foreach (Point point in this.UserDefinedMidPoints)
+                    {
+                        g.FillEllipse(onClearBrush, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
+                    }
                 }
             }
         }
