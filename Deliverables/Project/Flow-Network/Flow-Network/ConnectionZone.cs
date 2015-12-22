@@ -117,7 +117,8 @@ namespace Flow_Network
         /// <summary>Path from 2 connection zones.</summary>
         public class Path : Drawable
         {
-            public const int DEFAULT_WIDTH = 3;
+            public int Width { get { return DEFAULT_WIDTH; } }
+            public const int DEFAULT_WIDTH = 5;
             public delegate void FlowAlteredEvent(Path path, float previous, float current);
             /// <summary>Returns all paths defineed in the Main form</summary>
             public static List<Path> All { get { return Main.AllPaths; } }
@@ -209,6 +210,27 @@ namespace Flow_Network
                 this.isAdded = false;
                 this.To.ConnectedZone = null;
                 this.From.ConnectedZone = null;
+            }
+
+            public Point FindClosestMidPointTo(Point position)
+            {
+                Point p = new Point(-1, -1);
+
+                foreach (Point point in this.UserDefinedMidPoints)
+                {
+                    float deltaX = point.X - position.X;
+                    float deltaY = point.Y - position.Y;
+                    deltaX *= deltaX;
+                    deltaY *= deltaY;
+                    float distance = (float)Math.Sqrt(deltaX + deltaY);
+                    if (distance <= this.Width)
+                    {
+                        p = point;
+                        break;
+                    }
+                }
+
+                return p;
             }
 
             /// <summary>Called when the path is adjusted for the first time</summary>
@@ -402,8 +424,8 @@ namespace Flow_Network
                 activeAdjuster.Start();
             }
 
-            static Pen onHoveredPen = new Pen(Color.Orange, Path.DEFAULT_WIDTH + 2);
-            static Pen onDeletePen = new Pen(Color.Red, Path.DEFAULT_WIDTH + 2);
+            static Pen onHoveredPen = new Pen(Color.Orange, Path.DEFAULT_WIDTH);
+            static Pen onDeletePen = new Pen(Color.Red, Path.DEFAULT_WIDTH);
             static Pen onNormalPen = new Pen(Color.Black, Path.DEFAULT_WIDTH);
 
             public override void Draw(Graphics graphics, Color backgroundColor)
@@ -432,6 +454,12 @@ namespace Flow_Network
                 {
                     if (previous == currentPoint) continue;
                     graphics.DrawLine(currentPen, previous, currentPoint);
+                }
+
+                foreach (Point point in this.UserDefinedMidPoints)
+                {
+                    graphics.FillEllipse(Brushes.Green, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
+                    graphics.FillEllipse(Brushes.Red, new Rectangle(point.X - this.Width / 2, point.Y - this.Width / 2, this.Width, this.Width));
                 }
             }
         }

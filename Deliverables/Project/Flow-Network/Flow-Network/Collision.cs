@@ -83,6 +83,13 @@ namespace Flow_Network
 
         public static bool Intersects(Point a1, Point a2, Point b1, Point b2)
         {
+            Point p;
+            return Intersects(a1, a2, b1, b2, out p);
+        }
+
+        public static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection)
+        {
+            intersection = new Point(-1, -1);
             Point b = new Point(a2.X - a1.X, a2.Y - a1.Y);
             Point d = new Point(b2.X - b1.X, b2.Y - b1.Y);
             float bDotDPerp = b.X * d.Y - b.Y * d.X;
@@ -100,7 +107,7 @@ namespace Flow_Network
             if (u < 0 || u > 1)
                 return false;
 
-            //intersection = new Point((int)(a1.X + t * b.X), (int)(a1.Y + t * b.Y));
+            intersection = new Point((int)(a1.X + t * b.X), (int)(a1.Y + t * b.Y));
 
             return true;
         }

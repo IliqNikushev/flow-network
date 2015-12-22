@@ -15,24 +15,13 @@ namespace Flow_Network
         Hovered,
         Delete,
         Blocking,
-        Active,
-        Clear
+        Active
     }
 
     public abstract class IconDrawable : Drawable
     {
         /// <summary>Gets the icon found in the Resources assosiacted to the current element</summary>
         public System.Drawing.Image Icon { get { return Resources.Icon(this); } }
-        public System.Drawing.Image ClearIcon
-        {
-            get
-            {
-                this.DrawState = Flow_Network.DrawState.Clear;
-                System.Drawing.Image image = this.Icon;
-                this.DrawState = this.LastState;
-                return image;
-            }
-        }
         /// <summary>X coordinate in the 4-th sector of the coordinate system</summary>
         public int X { get; set; }
         /// <summary>Y coordinate in the 4-th sector of the coordinate system, where 4-th sector is positive, 2-nd is negative</summary>
@@ -48,6 +37,7 @@ namespace Flow_Network
         {
             if (this is Element)
                 graphics.FillRectangle(new SolidBrush(backgroundColor), this.Location.X, this.Location.Y, this.Width, this.Height);
+            //graphics.DrawImage(this.ClearIcon, this.Location.X, this.Location.y, this.Width, this.Height);
             graphics.DrawImage(this.Icon, this.Location.X, this.Location.Y, this.Width, this.Height);
         }
     }

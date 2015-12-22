@@ -80,11 +80,10 @@ namespace Flow_Network
             Controls.Add(iconBelowCursor);
 
             plDraw.Click += plDraw_HandleClick;
-            plDraw.MouseMove += plDraw_MouseMove;
+            plDraw.MouseMove += plDraw_HandleMouseMove;
             plDraw.MouseDown += plDraw_HandleStartDrag;
             plDraw.MouseUp += plDraw_HandleStopDrag;
             plDraw.Paint += plDraw_Redraw;
-            
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
             {
@@ -111,7 +110,7 @@ namespace Flow_Network
             };
         }
 
-        void plDraw_MouseMove(object sender, MouseEventArgs e)
+        void plDraw_HandleMouseMove(object sender, MouseEventArgs e)
         {
             plDraw_HandleHover(sender, e);
             plDraw_HandleDynamicIcon(sender, e);
@@ -134,9 +133,13 @@ namespace Flow_Network
             else
                 if (hovered == null)
                     hovered = FindElementUnder(mousePosition);
-            if(hovered == null)
+            if (hovered == null)
                 hovered = FindPathUnder(mousePosition);
-            if(hovered == null)
+
+            if (hovered is Element && lastHoveredDrawable == hovered)
+                return;
+
+            if (hovered == null)
             {
                 if (lastHoveredDrawable != null)
                 {
@@ -151,13 +154,17 @@ namespace Flow_Network
                             z.DrawState = DrawState.Normal;
                     }
                     else
-                        lastHoveredDrawable.DrawState = lastHoveredDrawable.LastState;
+                        if (lastHoveredDrawable is ConnectionZone.Path)
+                            lastHoveredDrawable.DrawState = DrawState.Normal;
+                        else
+                            lastHoveredDrawable.DrawState = lastHoveredDrawable.LastState;
                     lastHoveredDrawable.Draw(plDrawGraphics, plDraw.BackColor);
                 }
-                
+
                 lastHoveredDrawable = null;
                 return;
             }
+
             if (hovered is ConnectionZone)
             {
                 if (hovered == PathStart)
@@ -183,12 +190,26 @@ namespace Flow_Network
                 else
                     state = DrawState.Blocking;
             }
+            else if (hovered is ConnectionZone.Path)
+            {
+                if (ActiveTool == ActiveToolType.Delete)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Pipe)
+                    state = DrawState.Hovered;
+                else if (ActiveTool == ActiveToolType.Select)
+                {
+                    ConnectionZone.Path path = hovered as ConnectionZone.Path;
+                    Point closest = path.FindClosestMidPointTo(mousePosition);
+                    if (closest.X != -1)
+                        state = DrawState.Hovered;
+                }
+            }
             if (state == DrawState.None)
-               state = DrawState.Normal;
+                state = DrawState.Normal;
 
             hovered.DrawState = state;
             hovered.Draw(plDrawGraphics, plDraw.BackColor);
-            if(ActiveTool == ActiveToolType.Pipe)
+            if (ActiveTool == ActiveToolType.Pipe)
                 if (hovered is Element)
                 {
                     foreach (ConnectionZone zone in (hovered as Element).ConnectionZones)
@@ -197,11 +218,6 @@ namespace Flow_Network
                     }
                 }
             lastHoveredDrawable = hovered;
-                //HandleHoverOverZone(zone);
-            //Element element = FindElementUnder(mousePosition);
-            //if (element != null)// if current element == previous -> nothing happens, else previous is unhovered
-
-
         }
 
         void HandleHoverOverZone(ConnectionZone hovered)
@@ -392,9 +408,23 @@ namespace Flow_Network
 
         void HandlePipeToolClick()
         {
+            
             //TO DO: end if cycle;
             ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
-            if (hovered == null) return;
+            if (hovered == null)
+            {
+                Point intersection;
+                ConnectionZone.Path path = FindPathUnder(mousePosition, out intersection);
+                if (path != null)
+                {
+                    Point midPoint = path.FindClosestMidPointTo(mousePosition);
+                    if (midPoint.X == -1)
+                    {
+                        path.UserDefinedMidPoints.Add(intersection);
+                    }
+                }
+                return;
+            }
 
             if (PathStart != null) if (PathStart.Parent == hovered.Parent) return;
             if (hovered.IsConnected) return;
@@ -601,15 +631,31 @@ namespace Flow_Network
                 path.Draw(e.Graphics, plDraw.BackColor);
             }
         }
-        private bool LineIntersectsAt(Point a, Point b, Point mouse)
+
+        private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth, out Point intersection)
         {
-            Point crossH1 = new Point(mouse.X, mouse.Y - 1);
-            Point crossH2 = new Point(mouse.X, mouse.Y + 1);
+            lineWidth /= 2;
+            if (lineWidth <= 0) lineWidth = 1;
 
-            Point crossV1 = new Point(mouse.X - 1, mouse.Y);
-            Point crossV2 = new Point(mouse.X + 1, mouse.Y);
+            Point crossH1 = new Point(mouse.X, mouse.Y - lineWidth);
+            Point crossH2 = new Point(mouse.X, mouse.Y + lineWidth);
+            Point diagTL = new Point(mouse.X - lineWidth, mouse.Y - lineWidth);
+            Point diagBR = new Point(mouse.X + lineWidth, mouse.Y + lineWidth);
 
-            return (Collision.Intersects(a, b, crossH1, crossH2) || Collision.Intersects(a, b, crossV1, crossV2));
+            Point diagBL = new Point(mouse.X - lineWidth, mouse.Y + lineWidth);
+            Point diagTR = new Point(mouse.X + lineWidth, mouse.Y - lineWidth);
+
+            Point crossV1 = new Point(mouse.X - lineWidth, mouse.Y);
+            Point crossV2 = new Point(mouse.X + lineWidth, mouse.Y);
+
+            return (Collision.Intersects(a, b, crossH1, crossH2, out intersection) || Collision.Intersects(a, b, crossV1, crossV2, out intersection) ||
+                    Collision.Intersects(a, b, diagTL, diagBR, out intersection) || Collision.Intersects(a, b, diagBL, diagTR, out intersection));
+        }
+
+        private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth = 1)
+        {
+            Point p;
+            return LineIntersectsAt(a, b, mouse, lineWidth, out p);
         }
 
         #region AddElement Remove
@@ -818,7 +864,23 @@ namespace Flow_Network
                 {
                     Point lineStart = path.PathPoints[i];
                     Point lineEnd = path.PathPoints[i + 1];
-                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition))
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, path.Width))
+                        return path;
+                }
+            }
+            return null;
+        }
+
+        private ConnectionZone.Path FindPathUnder(Point mousePosition, out Point intersection)
+        {
+            intersection = new Point(-1, -1);
+            foreach (ConnectionZone.Path path in AllPaths)
+            {
+                for (int i = 0; i < path.PathPoints.Count - 1; i++)
+                {
+                    Point lineStart = path.PathPoints[i];
+                    Point lineEnd = path.PathPoints[i + 1];
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, path.Width, out intersection))
                         return path;
                 }
             }
