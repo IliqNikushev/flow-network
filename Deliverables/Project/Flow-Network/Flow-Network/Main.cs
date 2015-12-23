@@ -197,7 +197,7 @@ namespace Flow_Network
             }
         }
 
-        Drawable lastHovered = null;
+        Drawable lastHoveredDrawable = null;
 
         void plDraw_HandleHover(object sender, MouseEventArgs e)
         {
@@ -211,16 +211,16 @@ namespace Flow_Network
             if (hovered == null)
                 hovered = FindPathUnder(mousePosition);
 
-            if (hovered is Element && lastHovered == hovered)
+            if (hovered is Element && lastHoveredDrawable == hovered)
                 return;
 
             if (hovered == null)
             {
-                if (lastHovered != null)
+                if (lastHoveredDrawable != null)
                 {
-                    if (lastHovered is ConnectionZone)
+                    if (lastHoveredDrawable is ConnectionZone)
                     {
-                        ConnectionZone z = lastHovered as ConnectionZone;
+                        ConnectionZone z = lastHoveredDrawable as ConnectionZone;
                         if (z == PathStart)
                             z.DrawState = DrawState.Active;
                         else if (z.IsConnected || z.FlowIsSameAs(PathStart))
@@ -229,14 +229,14 @@ namespace Flow_Network
                             z.DrawState = DrawState.Normal;
                     }
                     else
-                        if (lastHovered is ConnectionZone.Path)
-                            lastHovered.DrawState = DrawState.Normal;
+                        if (lastHoveredDrawable is ConnectionZone.Path)
+                            lastHoveredDrawable.DrawState = DrawState.Normal;
                         else
-                            lastHovered.DrawState = lastHovered.LastState;
-                    lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
+                            lastHoveredDrawable.DrawState = lastHoveredDrawable.LastState;
+                    lastHoveredDrawable.Draw(plDrawGraphics, plDraw.BackColor);
                 }
 
-                lastHovered = null;
+                lastHoveredDrawable = null;
                 return;
             }
 
@@ -276,12 +276,7 @@ namespace Flow_Network
                     ConnectionZone.Path path = hovered as ConnectionZone.Path;
                     Point closest = path.FindClosestMidPointTo(mousePosition);
                     if (closest.X != -1)
-                    {
-                        plDraw.Cursor = Cursors.SizeAll;
-                    }
-                    else
-                        plDraw.Cursor = Cursors.Arrow;
-                    state = DrawState.Hovered;
+                        state = DrawState.Hovered;
                 }
             }
             if (state == DrawState.None)
@@ -297,7 +292,7 @@ namespace Flow_Network
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
                     }
                 }
-            lastHovered = hovered;
+            lastHoveredDrawable = hovered;
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -378,16 +373,19 @@ namespace Flow_Network
         void HandleSelectToolClick()
         {
             if (dragElement != null) return;
+
+            HandleEdit();
         }
 
-        void HandleEdit(Drawable d)
+        void HandleEdit()
         {
-            if (d is ConnectionZone.Path)
-                ShowEditPath(d as ConnectionZone.Path);
-            else if (d is PumpElement)
-                ShowEditPump(d as PumpElement);
-            else if (d is AdjustableSplitter)
-                ShowEditAdjustableSplitter(d as AdjustableSplitter);
+            ConnectionZone.Path path = FindPathUnder(mousePosition);
+            if (path != null)
+            {
+                ShowEditPath(path);
+                return;
+            }
+
         }
 
         void ShowEditPath(ConnectionZone.Path path)
@@ -406,12 +404,11 @@ namespace Flow_Network
             pipeEditPopup.Location = mousePosition;
         }
 
-        void ShowEditPump(PumpElement pump)
+        void ShowEditPump()
         {
-
         }
 
-        void ShowEditAdjustableSplitter(AdjustableSplitter splitter)
+        void ShowEditAdjustableSplitter()
         {
 
         }
@@ -425,7 +422,7 @@ namespace Flow_Network
 
         void HandleCreateElementToolClick()
         {
-            if (HasElementUnder(mousePosition))
+            if (HasCollision(mousePosition))
             {
                 return;
             }
@@ -507,6 +504,7 @@ namespace Flow_Network
 
                 PathStart.DrawState = DrawState.Blocking;
                 PathEnd.DrawState = DrawState.Blocking;
+                plDraw.Invalidate();
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
                 
                 result.OnCreated += () =>
@@ -545,8 +543,7 @@ namespace Flow_Network
                         zone.DrawState = DrawState.Blocking;
                     else
                         zone.DrawState = DrawState.Normal;
-                    if(redraw)
-                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                    zone.Draw(plDrawGraphics, plDraw.BackColor);
                 }
             }
         }
@@ -570,7 +567,7 @@ namespace Flow_Network
         void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (HasElementUnder(dragElement.Location))
+            if (HasCollision(dragElement.Location))
             {
                 RevertDrag();
             }
@@ -702,15 +699,7 @@ namespace Flow_Network
                     this.Cursor = Cursors.SizeAll;
                 }
                 else
-                {
-                    ConnectionZone.Path path = FindPathUnder(mousePosition);
-                    bool foundPoint = false;
-                    if (path != null)
-                        if (path.FindClosestMidPointTo(mousePosition).X != -1)
-                            foundPoint = true;
-                    if(!foundPoint)
-                        this.Cursor = Cursors.Arrow;
-                }
+                    this.Cursor = Cursors.Arrow;
             }
 
             mousePosition = evnt.Location;
@@ -731,7 +720,7 @@ namespace Flow_Network
             else if (ActiveTool == ActiveToolType.Delete)
             {
                 iconBelowCursor.Visible = false;
-                if (HasElementUnder(mousePosition))
+                if (HasCollision(mousePosition))
                 {
                     this.Cursor = System.Windows.Forms.Cursors.No;
                 }
@@ -751,7 +740,7 @@ namespace Flow_Network
                 point.Offset(plDraw.Location);
                 point.Offset(16, 16);
                 this.iconBelowCursor.Location = point;
-                if (HasElementUnder(mousePosition))
+                if (HasCollision(mousePosition))
                 {
                     iconBelowCursor.BackColor = Color.Red;
                 }
@@ -810,7 +799,7 @@ namespace Flow_Network
         {
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
 
-            if (lastHovered == e) lastHovered = null;
+            if (lastHoveredDrawable == e) lastHoveredDrawable = null;
         }
 
         void AddElement(Element e, Point position)
@@ -911,7 +900,7 @@ namespace Flow_Network
             {
                 if (PathStart != null)
                 {
-                    ResetBlockedForSameFlowZones(true);
+                    ResetBlockedForSameFlowZones(false);
                     PathStart.DrawState = DrawState.Normal;
                 }
                 
@@ -922,7 +911,7 @@ namespace Flow_Network
             RightClickOptions options = ~RightClickOptions.Remove;
             rightClickMousePosition = mousePosition;
 
-            if (HasElementUnder(rightClickMousePosition))
+            if (HasCollision(rightClickMousePosition))
             {
                 Element e = FindElementUnder(rightClickMousePosition);
                 if (e != null)
@@ -931,11 +920,6 @@ namespace Flow_Network
                     if (e is AdjustableSplitter || e is PumpElement)
                         options |= RightClickOptions.Edit;
                 }
-            }
-            else if (FindPathUnder(rightClickMousePosition) != null)
-            {
-                HandleEdit(FindPathUnder(rightClickMousePosition));
-                return;
             }
 
             if (rightClickPanel == null)
@@ -948,7 +932,7 @@ namespace Flow_Network
 
                 rightClickPanel.AddButton("Edit", (x, y) => 
                 {
-                    HandleEdit(FindElementUnder(rightClickMousePosition));
+                    HandleEdit();
                 }).Name = "edit";
 
                 rightClickPanel.AddButton("Remove", (x, y) =>
@@ -1113,7 +1097,7 @@ namespace Flow_Network
             });
         }
 
-        private bool HasElementUnder(Point mousePosition)
+        private bool HasCollision(Point mousePosition)
         {
             return FindCollisionForPlacementOfElementUnder(mousePosition) != null;
         }
@@ -1127,6 +1111,7 @@ namespace Flow_Network
         private void redoButton_Click(object sender, EventArgs e)
         {
             UndoStack.Redo();
+            plDraw.Invalidate();
         }
 
         private void btnNew_Click(object sender, EventArgs e)
