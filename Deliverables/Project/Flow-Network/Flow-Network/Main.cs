@@ -796,12 +796,7 @@ namespace Flow_Network
 
         void RemoveElement(Element e)
         {
-            AllElements.Remove(e);
-           
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
-
-            RefreshConnections();
-            e.DrawClear(plDrawGraphics, plDraw.BackColor);//plDraw.BackColor);
 
             if (lastHoveredDrawable == e) lastHoveredDrawable = null;
         }
@@ -811,11 +806,7 @@ namespace Flow_Network
             e.X = position.X;
             e.Y = position.Y;
 
-            AllElements.Add(e);
-
             UndoStack.AddAction(new UndoableActions.AddElementAction(e));
-
-            RefreshConnections(e);
         }
 
         static object refreshLock = new object();
@@ -902,8 +893,6 @@ namespace Flow_Network
             if (ActiveTool == ActiveToolType.Select)
             {
                 RevertDrag();
-                HandleEdit();
-                return;
             }
 
             if (ActiveTool == ActiveToolType.Pipe)

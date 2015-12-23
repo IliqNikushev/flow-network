@@ -42,7 +42,7 @@ namespace Flow_Network
             activitiesStack.Push(action);
 
             //todo apply ( remove excess code )
-            //action.Apply();
+            action.Apply();
 
             OnUndoAltered(activitiesStack.Count, action);
             OnRedoAltered(redoStack.Count, null);
