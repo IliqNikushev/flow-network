@@ -84,6 +84,8 @@ namespace Flow_Network
             plDraw.MouseDown += plDraw_HandleStartDrag;
             plDraw.MouseUp += plDraw_HandleStopDrag;
             plDraw.Paint += plDraw_Redraw;
+            plDraw.MouseEnter += plDraw_HandleGainFocus;
+            plDraw.MouseLeave += plDraw_HandleLoseFocus;
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
             {
@@ -93,8 +95,40 @@ namespace Flow_Network
                 else
                     lastActionToUndoLbl.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
+                if (lastAction is UndoableActions.AddConnectionAction)
+                {
+                    UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
+
+                    if (action is UndoableActions.RemoveConnectionAction)
+                    {
+                        plDraw.Invalidate();
+                    }
+                    else
+                    {
+                        action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                    }
+                }
+
+                else if (lastAction is UndoableActions.AddElementAction)
+                {
+                    UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    if (action is UndoableActions.RemoveElementAction)
+                    {
+                        plDraw.Invalidate();
+                    }
+                    else
+                    {
+                        action.Element.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        RefreshConnections();
+                    }
+                }
+
+                else if (lastAction is UndoableActions.MoveElementAction)
+                {
+                    RefreshConnections();
                     plDraw.Invalidate();
+                }
             };
 
             UndoStack.OnRedoAltered += (numberLeft, lastAction) =>
@@ -105,9 +139,52 @@ namespace Flow_Network
                 else
                     lastActionUndone.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
+                if (lastAction is UndoableActions.AddConnectionAction)
+                {
+                    UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
+
+                    if (action is UndoableActions.RemoveConnectionAction)
+                    {
+                        action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                    }
+                    else
+                    {
+                        plDraw.Invalidate();
+                    }
+                }
+
+                else if (lastAction is UndoableActions.AddElementAction)
+                {
+                    UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    if (action is UndoableActions.RemoveElementAction)
+                    {
+                        action.Element.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        RefreshConnections();
+                    }
+                    else
+                    {
+                        plDraw.Invalidate();
+                    }
+                }
+
+                else if (lastAction is UndoableActions.MoveElementAction)
+                {
+                    RefreshConnections();
                     plDraw.Invalidate();
+                }
             };
+        }
+
+        void plDraw_HandleLoseFocus(object sender, EventArgs e)
+        {
+            iconBelowCursor.Visible = false;
+        }
+
+        void plDraw_HandleGainFocus(object sender, EventArgs e)
+        {
+            if (ActiveTool != ActiveToolType.Delete)
+                iconBelowCursor.Visible = true;
         }
 
         void plDraw_HandleMouseMove(object sender, MouseEventArgs e)
@@ -122,8 +199,6 @@ namespace Flow_Network
 
         Drawable lastHoveredDrawable = null;
 
-        ConnectionZone lastHovered;
-        ConnectionZone lastHoveredConnected;
         void plDraw_HandleHover(object sender, MouseEventArgs e)
         {
             Drawable hovered = null;
@@ -495,6 +570,10 @@ namespace Flow_Network
             {
                 RevertDrag();
             }
+            else
+            {
+                UndoStack.AddAction(new UndoableActions.MoveElementAction(dragElement, dragStart, dragElement.Location));
+            }
             oldDragElementPlaceholder.Visible = false;
             dragElement = null;
             plDraw.Cursor = Cursors.Arrow;
@@ -623,6 +702,15 @@ namespace Flow_Network
             }
 
             mousePosition = evnt.Location;
+            if (mousePosition.X < 0)
+                mousePosition.X = 0;
+            else if (mousePosition.X > plDraw.Width - iconBelowCursor.Width)
+                mousePosition.X = plDraw.Width - iconBelowCursor.Height;
+            if (mousePosition.Y < 0)
+                mousePosition.Y = 0;
+            else if (mousePosition.Y > plDraw.Height - iconBelowCursor.Height)
+                mousePosition.Y = plDraw.Height - iconBelowCursor.Height;
+
             if (ActiveTool == ActiveToolType.None)
             {
                 iconBelowCursor.Visible = false;
@@ -647,7 +735,7 @@ namespace Flow_Network
             else
             {
                 iconBelowCursor.Visible = true;
-                Point point = evnt.Location;
+                Point point = mousePosition;
                 point.Offset(plDraw.Location);
                 point.Offset(16, 16);
                 this.iconBelowCursor.Location = point;
@@ -709,9 +797,13 @@ namespace Flow_Network
         void RemoveElement(Element e)
         {
             AllElements.Remove(e);
+           
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
 
-            RefreshConnections(e);
+            RefreshConnections();
+            e.DrawClear(plDrawGraphics, plDraw.BackColor);//plDraw.BackColor);
+
+            if (lastHoveredDrawable == e) lastHoveredDrawable = null;
         }
 
         void AddElement(Element e, Point position)

@@ -89,8 +89,8 @@ namespace Flow_Network
             if (element is PumpElement) return IconFromDictionary(PumpIcons, element);
             else if (element is SinkElement) return IconFromDictionary(SinkIcons, element);
             else if (element is MergerElement) return IconFromDictionary(MergerIcons, element);
-            else if (element is SplitterElement) return IconFromDictionary(SplitterIcons, element);
             else if (element is AdjustableSplitter) return IconFromDictionary(AdjSplitterIcons, element);
+            else if (element is SplitterElement) return IconFromDictionary(SplitterIcons, element);
             else if (element is ConnectionZone) return Icon(element as ConnectionZone);
             throw new ArgumentException("Element not implemented, " + element.GetType().Name);
         }

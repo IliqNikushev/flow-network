@@ -53,7 +53,7 @@ namespace Flow_Network
         }
 
         /// <summary>If connected, returns the zone prior to the current on the path they are connected</summary>
-        public ConnectionZone ConnectedZone { get; private set; }
+        public ConnectionZone ConnectedZone { get; set; }
 
         /// <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
         public float Flow
