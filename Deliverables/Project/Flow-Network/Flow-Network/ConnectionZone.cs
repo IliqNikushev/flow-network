@@ -321,6 +321,7 @@ namespace Flow_Network
                                     location.X += this.UserDefinedMidPoints[currentPointStartIndex - 1].Width / 2;
                                     location.Y += this.UserDefinedMidPoints[currentPointStartIndex - 1].Height / 2;
                                     this.MidPoints.Add(location);
+                                    elementsAlreadyCollided.Clear();
                                 }
                                 else
                                 {

@@ -66,7 +66,7 @@ namespace Flow_Network
                                     if (state == DrawState.Clear)
                                         pixel = System.Drawing.Color.FromArgb(255, bg.R, bg.G, bg.B);
                                     else
-                                        pixel = System.Drawing.Color.FromArgb(pixel.A, bg.R, bg.G, bg.B);
+                                        pixel = System.Drawing.Color.FromArgb(pixel.A > 128 ? 255 : 0, bg.R, bg.G, bg.B);
                                     b.SetPixel(x, y, pixel);
                                 }
                             }

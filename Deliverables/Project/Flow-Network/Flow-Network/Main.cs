@@ -73,7 +73,7 @@ namespace Flow_Network
             oldDragElementPlaceholder.Visible = false;
 
             plDraw.Controls.Add(oldDragElementPlaceholder);
-            
+
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
             iconBelowCursor.Height = 16;
@@ -109,8 +109,6 @@ namespace Flow_Network
                     {
                         if (action.Connection.IsNew) return;
                         action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
-                        action.Connection.To.Draw(this.plDrawGraphics, this.plDraw.BackColor);
-                        action.Connection.From.Draw(this.plDrawGraphics, this.plDraw.BackColor);
                     }
                 }
 
@@ -194,6 +192,16 @@ namespace Flow_Network
 
         void plDraw_HandleMouseMove(object sender, MouseEventArgs e)
         {
+            mousePosition = e.Location;
+            if (mousePosition.X < 0)
+                mousePosition.X = 0;
+            else if (mousePosition.X > plDraw.Width - iconBelowCursor.Width)
+                mousePosition.X = plDraw.Width - iconBelowCursor.Height;
+            if (mousePosition.Y < 0)
+                mousePosition.Y = 0;
+            else if (mousePosition.Y > plDraw.Height - iconBelowCursor.Height)
+                mousePosition.Y = plDraw.Height - iconBelowCursor.Height;
+
             plDraw_HandleHover(sender, e);
             plDraw_HandleDynamicIcon(sender, e);
             if (dragElement != null)
@@ -273,7 +281,10 @@ namespace Flow_Network
                 if (ActiveTool == ActiveToolType.Delete)
                     state = DrawState.Delete;
                 else if (ActiveTool == ActiveToolType.Select)
-                    state = DrawState.Hovered;
+                    if (dragElement == null)
+                        state = DrawState.Hovered;
+                    else
+                        state = DrawState.Blocking;
                 else
                     state = DrawState.Blocking;
             }
@@ -471,6 +482,8 @@ namespace Flow_Network
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
         }
+
+
         void HandlePipeToolClick()
         {
             //TO DO: end if cycle;
@@ -554,7 +567,7 @@ namespace Flow_Network
                         zone.DrawState = DrawState.Blocking;
                     else
                         zone.DrawState = DrawState.Normal;
-                    if(redraw)
+                    if (redraw)
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
                 }
             }
@@ -569,27 +582,37 @@ namespace Flow_Network
                     if (zone == PathStart) continue;
                     if (zone.FlowIsSameAs(PathStart))
                         zone.DrawState = DrawState.Blocking;
-                    if(redraw)
+                    if (redraw)
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
                 }
             }
         }
         #endregion
         #region drag
-        void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
+
+        void HandleStopDrag(IconDrawable drawable)
         {
-            if (dragElement == null) return;
-            if (HasElementForPlacementUnder(dragElement.Location))
+            if (drawable == null) return;
+            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element))
             {
                 RevertDrag();
             }
             else
             {
-                UndoStack.AddAction(new UndoableActions.MoveElementAction(dragElement, dragStart, dragElement.Location));
+                UndoStack.AddAction(new UndoableActions.MoveElementAction(drawable, dragStart, mousePosition));
             }
             oldDragElementPlaceholder.Visible = false;
-            dragElement = null;
+            if (drawable is Element) dragElement = null;
+            else if (drawable is PathMidPointDrawable) dragMidPoint = null;
             plDraw.Cursor = Cursors.Arrow;
+        }
+
+        void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
+        {
+            if (dragElement != null)
+                HandleStopDrag(dragElement);
+            else if (dragMidPoint != null)
+                HandleStopDrag(dragMidPoint);
         }
 
         void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
@@ -597,7 +620,7 @@ namespace Flow_Network
             if (ActiveTool != ActiveToolType.Select)
                 return;
             if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
-            if (dragElement == null)
+            if (dragElement == null && dragMidPoint == null)
             {
                 dragElement = FindElementUnder(mousePosition);
                 if (dragElement != null)
@@ -615,7 +638,8 @@ namespace Flow_Network
                         PathMidPointDrawable point = path.GetClosestMidPointTo(mousePosition);
                         if (point != null)
                         {
-                            
+                            dragStart = point.Location;
+                            dragMidPoint = point;
                         }
                     }
                 }
@@ -629,16 +653,8 @@ namespace Flow_Network
         void plDraw_HandleMoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            Point location = e.Location;
-            if (location.X < 0)
-                location.X = 0;
-            else if (location.X > plDraw.Width - Element.DefaultSize.X)
-                location.X = plDraw.Width - Element.DefaultSize.X;
-            if (location.Y < 0)
-                location.Y = 0;
-            else if (location.Y > plDraw.Height - Element.DefaultSize.Y)
-                location.Y = plDraw.Height - Element.DefaultSize.Y;
-            
+            Point location = mousePosition;
+
             if (dragElement.Location != location)
             {
                 dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
@@ -657,35 +673,31 @@ namespace Flow_Network
             }
         }
 
+        Point oldMidPointLocation = new Point(0, 0);
+
         void plDraw_HandleMoveDragMidPoint(object sender, MouseEventArgs e)
         {
             if (dragMidPoint == null) return;
-            Point location = e.Location;
-            if (location.X < 0)
-                location.X = 0;
-            else if (location.X > plDraw.Width - Element.DefaultSize.X)
-                location.X = plDraw.Width - Element.DefaultSize.X;
-            if (location.Y < 0)
-                location.Y = 0;
-            else if (location.Y > plDraw.Height - Element.DefaultSize.Y)
-                location.Y = plDraw.Height - Element.DefaultSize.Y;
+            Point location = mousePosition;
 
             if (dragMidPoint.Location != location)
             {
-                Point oldLocation = dragMidPoint.Location;
                 dragMidPoint.DrawClear(plDrawGraphics, plDraw.BackColor);
                 dragMidPoint.Location = location;
 
-                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragMidPoint.Location))
+                Element found = FindElementUnder(location);
+                if(found != null)
                 {
-                    dragMidPoint.Location = oldLocation;
-                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                    dragMidPoint.Location = oldMidPointLocation;
+                    found.Draw(plDrawGraphics, plDraw.BackColor);
                 }
 
                 dragMidPoint.OnlyDraw(plDrawGraphics, plDraw.BackColor);
 
                 RefreshDragMidPointPathCollisions();
                 RefreshConnections();
+
+                oldMidPointLocation = location;
             }
         }
 
@@ -729,20 +741,11 @@ namespace Flow_Network
         {
             if (dragMidPoint != null)
             {
-                dragMidPoint.DrawClear(plDrawGraphics, plDraw.BackColor);
-                dragMidPoint.Path.DrawClear(plDrawGraphics, plDraw.BackColor);
-
-                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
-                {
-                    if (q == dragElement) continue;
-                    q.Draw(plDrawGraphics, plDraw.BackColor);
-                }
-
                 dragMidPoint.Location = dragStart;
                 oldDragElementPlaceholder.Visible = false;
+                
+                dragMidPoint.Path.Adjust(onDone: () => plDraw.Invalidate());
                 dragMidPoint = null;
-                //plDraw.Invalidate();
-                RefreshConnections();
             }
             else if (dragElement != null)
             {
@@ -770,6 +773,12 @@ namespace Flow_Network
 
         void plDraw_HandleDynamicIcon(object sender, MouseEventArgs evnt)
         {
+            if (ActiveTool == ActiveToolType.Pipe)
+            {
+                this.iconBelowCursor.Visible = false;
+                this.Cursor = Cursors.Arrow;
+                return;
+            }
             if (ActiveTool == ActiveToolType.Select)
             {
                 Element e = FindElementUnder(mousePosition);
@@ -784,20 +793,10 @@ namespace Flow_Network
                     if (path != null)
                         if (path.GetClosestMidPointTo(mousePosition) != null)
                             foundPoint = true;
-                    if(!foundPoint)
+                    if (!foundPoint)
                         this.Cursor = Cursors.Arrow;
                 }
             }
-
-            mousePosition = evnt.Location;
-            if (mousePosition.X < 0)
-                mousePosition.X = 0;
-            else if (mousePosition.X > plDraw.Width - iconBelowCursor.Width)
-                mousePosition.X = plDraw.Width - iconBelowCursor.Height;
-            if (mousePosition.Y < 0)
-                mousePosition.Y = 0;
-            else if (mousePosition.Y > plDraw.Height - iconBelowCursor.Height)
-                mousePosition.Y = plDraw.Height - iconBelowCursor.Height;
 
             if (ActiveTool == ActiveToolType.None)
             {
@@ -829,6 +828,8 @@ namespace Flow_Network
                 this.iconBelowCursor.Location = point;
 
                 IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                if (ActiveTool == ActiveToolType.Select)
+                    collisionsForPlacement = new Element[0];
                 if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;
@@ -1012,7 +1013,7 @@ namespace Flow_Network
                     ResetBlockedForSameFlowZones(true);
                     PathStart.DrawState = DrawState.Normal;
                 }
-                
+
                 PathStart = null;
                 return;
             }
@@ -1044,7 +1045,7 @@ namespace Flow_Network
 
                 rightClickPanel.Width = 100;
 
-                rightClickPanel.AddButton("Edit", (x, y) => 
+                rightClickPanel.AddButton("Edit", (x, y) =>
                 {
                     HandleEdit(FindElementUnder(rightClickMousePosition));
                 }).Name = "edit";
@@ -1094,7 +1095,7 @@ namespace Flow_Network
             else
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
 
-            if(options.HasFlag(RightClickOptions.Edit))
+            if (options.HasFlag(RightClickOptions.Edit))
                 rightClickPanel.Controls.Find("edit", false)[0].Enabled = true;
             else
                 rightClickPanel.Controls.Find("edit", false)[0].Enabled = false;
@@ -1129,14 +1130,14 @@ namespace Flow_Network
         private Element FindElementUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
-                {
-                    if (q == dragElement) return false;
+            {
+                if (q == dragElement) return false;
 
-                    if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
-                        if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
-                            return true;
-                    return false;
-                });
+                if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
+                    if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
+                        return true;
+                return false;
+            });
         }
         private ConnectionZone.Path FindPathUnder(Point mousePosition)
         {
@@ -1263,8 +1264,8 @@ namespace Flow_Network
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
-                    { 
-                        a= nextLine.Split(',');
+                    {
+                        a = nextLine.Split(',');
                         if (a[0] == typeof(SinkElement).Name)
                         {
                             l = new SinkElement();
@@ -1272,7 +1273,7 @@ namespace Flow_Network
                         if (a[0] == typeof(PumpElement).Name)
                         {
                             l = new PumpElement();
-                        } 
+                        }
                         if (a[0] == typeof(MergerElement).Name)
                         {
                             l = new MergerElement();
@@ -1319,16 +1320,16 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            sw.WriteLine((item.GetType().Name + "," + x +","+ y));
+                            sw.WriteLine((item.GetType().Name + "," + x + "," + y));
                         }
-                            foreach (var con in AllPaths)
-                            {
-                                string a = con.From.Location.X.ToString();
-                                string b = con.From.Location.Y.ToString();
-                                string c = con.To.Location.X.ToString();
-                                string d = con.To.Location.Y.ToString();
-                                sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c +","+ d);
-                            }
+                        foreach (var con in AllPaths)
+                        {
+                            string a = con.From.Location.X.ToString();
+                            string b = con.From.Location.Y.ToString();
+                            string c = con.To.Location.X.ToString();
+                            string d = con.To.Location.Y.ToString();
+                            sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c + "," + d);
+                        }
                     }
                     myStream.Close();
                     MessageBox.Show("Saved");
@@ -1337,30 +1338,29 @@ namespace Flow_Network
             }
         }
 
-    
+
     }
 }
 
-        static class Extentions
+static class Extentions
+{
+    public static Button AddButton(this Panel panel, string text, EventHandler onClick = null)
+    {
+        Button button = new Button();
+        button.Text = text;
+        button.Width = panel.Width;
+        button.Height = 20;
+        foreach (var item in panel.Controls)
         {
-            public static Button AddButton(this Panel panel, string text, EventHandler onClick = null)
-            {
-                Button button = new Button();
-                button.Text = text;
-                button.Width = panel.Width;
-                button.Height = 20;
-                foreach (var item in panel.Controls)
-                {
-                    Control c = item as Control;
-                    if(c != null)
-                        button.Top += c.Height;
-                }
-                if (onClick != null)
-                    button.Click += onClick;
-
-                panel.Controls.Add(button);
-
-                return button;
-            }
+            Control c = item as Control;
+            if (c != null)
+                button.Top += c.Height;
         }
+        if (onClick != null)
+            button.Click += onClick;
 
+        panel.Controls.Add(button);
+
+        return button;
+    }
+}
