@@ -18,12 +18,27 @@ namespace Flow_Network
 
         public override int Height
         {
-            get { return ConnectionZone.Path.DEFAULT_WIDTH; }
+            get { return ConnectionZone.Path.DEFAULT_WIDTH * 2; }
         }
 
         public override int Width
         {
-            get { return ConnectionZone.Path.DEFAULT_WIDTH; }
+            get { return ConnectionZone.Path.DEFAULT_WIDTH * 2; }
+        }
+
+        public override System.Drawing.Point Location
+        {
+            get
+            {
+                System.Drawing.Point location = base.Location;
+                location.X -= this.Width / 2;
+                location.Y -= this.Height / 2;
+                return location;
+            }
+            set
+            {
+                base.Location = value;
+            }
         }
 
         protected override void OnDraw(System.Drawing.Graphics graphics, System.Drawing.Color backgroundColor)

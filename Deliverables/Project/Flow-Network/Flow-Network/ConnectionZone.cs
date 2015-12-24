@@ -188,6 +188,7 @@ namespace Flow_Network
 
             public Path(ConnectionZone from, ConnectionZone to)
             {
+                this.IsNew = true;
                 if (from.isInFlow == to.isInFlow) throw new ArgumentException("Two connection zones with same flow type connected");
                 if (from.IsOutFlow)
                 {
@@ -259,7 +260,7 @@ namespace Flow_Network
             private System.Threading.Thread activeAdjuster;
             private bool IsAdjusting { get { return activeAdjuster != null && activeAdjuster.ThreadState == System.Threading.ThreadState.Running; } }
 
-            private bool isNew = true;
+            public bool IsNew { get; private set; }
 
             private object adjusterThreadLock = new object();
 
@@ -286,7 +287,7 @@ namespace Flow_Network
                 pointsToGoThrough.AddRange(UserDefinedMidPoints.Select(x=>x.Location));
                 pointsToGoThrough.Add(this.To);
 
-                if (!isNew)
+                if (!IsNew)
                     if (refresh)
                         lock(adjusterThreadLock)
                             OnBeforeAdjusted();
@@ -300,7 +301,6 @@ namespace Flow_Network
                         lock (adjusterThreadLock)
                         {
                             this.MidPoints.Clear();
-
 
                             HashSet<Element> elementsAlreadyCollided = new HashSet<Element>();
 
@@ -317,6 +317,10 @@ namespace Flow_Network
                                     if (currentPointStartIndex + 1 >= pointsToGoThrough.Count) break;
                                     start = pointsToGoThrough[currentPointStartIndex];
                                     end = pointsToGoThrough[currentPointStartIndex + 1];
+                                    Point location = start;
+                                    location.X += this.UserDefinedMidPoints[currentPointStartIndex - 1].Width / 2;
+                                    location.Y += this.UserDefinedMidPoints[currentPointStartIndex - 1].Height / 2;
+                                    this.MidPoints.Add(location);
                                 }
                                 else
                                 {
@@ -454,10 +458,10 @@ namespace Flow_Network
                             this.PreviousPointsToGoThrough.Clear();
                             this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
 
-                            if (isNew)
+                            if (IsNew)
                             {
                                 OnCreated();
-                                isNew = false;
+                                IsNew = false;
                             }
                             else
                                 if (refresh)

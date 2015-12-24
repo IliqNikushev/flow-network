@@ -81,12 +81,12 @@ namespace Flow_Network
 
         public static Dictionary<DrawState, System.Drawing.Image> MidPointIcons = new Dictionary<DrawState, System.Drawing.Image>()
         {
-            {DrawState.Normal, Properties.Resources.pump},
-            {DrawState.Hovered, Properties.Resources.pump},
-            {DrawState.Delete, Properties.Resources.pump},
-            {DrawState.Blocking, Properties.Resources.pump},
-            {DrawState.Active, Properties.Resources.pump},
-            {DrawState.Clear, Properties.Resources.pump}
+            {DrawState.Normal, Properties.Resources.pathMidPoint},
+            {DrawState.Hovered, Properties.Resources.pathMidPoint},
+            {DrawState.Delete, Properties.Resources.pathMidPoint},
+            {DrawState.Blocking, Properties.Resources.pathMidPoint},
+            {DrawState.Active, Properties.Resources.pathMidPoint},
+            {DrawState.Clear, Properties.Resources.pathMidPoint}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> PumpIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -158,6 +158,7 @@ namespace Flow_Network
             else if (element is AdjustableSplitter) return IconFromDictionary(AdjSplitterIcons, element);
             else if (element is SplitterElement) return IconFromDictionary(SplitterIcons, element);
             else if (element is ConnectionZone) return Icon(element as ConnectionZone);
+            else if (element is PathMidPointDrawable) return IconFromDictionary(MidPointIcons, element);
             throw new ArgumentException("Element not implemented, " + element.GetType().Name);
         }
 

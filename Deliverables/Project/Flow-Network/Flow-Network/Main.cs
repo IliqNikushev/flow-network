@@ -107,6 +107,7 @@ namespace Flow_Network
                     }
                     else
                     {
+                        if (action.Connection.IsNew) return;
                         action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
                     }
                 }
@@ -518,7 +519,6 @@ namespace Flow_Network
                 PathEnd.Draw(plDrawGraphics, plDraw.BackColor);
                 result.OnCreated += () =>
                 {
-                    result.AddToSystem();
                     result.Draw(plDrawGraphics, plDraw.BackColor);
                 };
 
