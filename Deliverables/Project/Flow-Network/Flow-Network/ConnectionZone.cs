@@ -178,7 +178,35 @@ namespace Flow_Network
 
             public void AddUserMidPoint(int x, int y)
             {
+                Point intersection = new Point();
+                Point p = new Point(x,y);
+                if (this.UserDefinedMidPoints.Count > 0)
+                {
+                    int position = 0;
+                    List<Point> pathPoints = new List<Point>(this.PathPoints);
+                    for (int i = 0; i < pathPoints.Count - 1; i++)
+                    {
+                        Point absoluteLocation = this.UserDefinedMidPoints[position].Location;
+                        absoluteLocation.X += this.UserDefinedMidPoints[position].Width / 2;
+                        absoluteLocation.Y += this.UserDefinedMidPoints[position].Height / 2;
+                        if (this.PathPoints[i] == absoluteLocation)
+                        {
+                            if (Collision.PointIsOnLine(pathPoints[i], pathPoints[i - 1], p, out intersection, this.Width))
+                            {
+                                this.UserDefinedMidPoints.Insert(position, new PathMidPointDrawable(x, y, this));
+                                this.Adjust();
+                                return;
+                            }
+                            else
+                            {
+                                position += 1;
+                                if (position >= this.MidPoints.Count) break;
+                            }
+                        }
+                    }
+                }
                 this.UserDefinedMidPoints.Add(new PathMidPointDrawable(x, y, this));
+                this.Adjust();
             }
 
             public List<Point> PreviousPointsToGoThrough = new List<Point>();

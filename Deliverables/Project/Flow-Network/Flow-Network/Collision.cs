@@ -81,6 +81,25 @@ namespace Flow_Network
             return minimum;
         }
 
+        public static bool PointIsOnLine(Point lineStart, Point lineEnd, Point point, out Point intersection, int width = -1)
+        {
+            int crossLength = 2;
+
+            Point crossH1 = new Point(point.X, point.Y - crossLength);
+            Point crossH2 = new Point(point.X, point.Y + crossLength);
+            Point diagTL = new Point(point.X - crossLength, point.Y - crossLength);
+            Point diagBR = new Point(point.X + crossLength, point.Y + crossLength);
+
+            Point diagBL = new Point(point.X - crossLength, point.Y + crossLength);
+            Point diagTR = new Point(point.X + crossLength, point.Y - crossLength);
+
+            Point crossV1 = new Point(point.X - crossLength, point.Y);
+            Point crossV2 = new Point(point.X + crossLength, point.Y);
+
+            return (Collision.Intersects(lineStart, lineEnd, crossH1, crossH2, out intersection, width)|| Collision.Intersects(lineStart, lineEnd, crossV1, crossV2, out intersection, width) ||
+                    Collision.Intersects(lineStart, lineEnd, diagTL, diagBR, out intersection, width) || Collision.Intersects(lineStart, lineEnd, diagBL, diagTR, out intersection, width));
+        }
+
         public static bool Intersects(Point a1, Point a2, Point b1, Point b2)
         {
             Point p;
@@ -114,6 +133,9 @@ namespace Flow_Network
 
         public static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection, int width = -1)
         {
+            bool state = LineIntersection(a1, a2, b1, b2, out intersection);
+            if (state || width == 0) return state;
+
             if (width == -1) width = ConnectionZone.Path.DEFAULT_WIDTH;
             Point d = new Point(a2.X - a1.X, a2.Y - a1.Y);
             d.X = d.X > 0 ? width / 2 : -width / 2;
@@ -122,8 +144,6 @@ namespace Flow_Network
             Point normalUP = new Point(-d.Y, d.X);
             
             Point normalDown = new Point(d.Y, -d.X);
-            bool state = LineIntersection(a1, a2, b1, b2, out intersection);
-            if (state) return state;
 
             Point up1 = new Point(a1.X + normalUP.X, a1.Y + normalUP.Y);
             Point up2 = new Point(a2.X + normalUP.X, a2.Y + normalUP.Y); 

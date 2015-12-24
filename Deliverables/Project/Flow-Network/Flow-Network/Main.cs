@@ -220,6 +220,12 @@ namespace Flow_Network
 
         void plDraw_HandleHover(object sender, MouseEventArgs e)
         {
+            if (dragMidPoint != null)
+            {
+                dragMidPoint.Path.DrawState = DrawState.Hovered;
+                return;
+            }
+
             Drawable hovered = null;
             DrawState state = DrawState.None;
             if (ActiveTool == ActiveToolType.Pipe)
@@ -853,6 +859,7 @@ namespace Flow_Network
                 this.iconBelowCursor.Location = point;
 
                 IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                if (dragMidPoint != null) collisionsForPlacement = new Element[]{FindElementUnder(mousePosition)}.Where(x=>x!=null);
                 if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;
@@ -905,29 +912,15 @@ namespace Flow_Network
             }
         }
 
-        private bool LineIntersectsAt(Point a, Point b, Point mouse, out Point intersection)
-        {
-            int crossLength = 2;
-
-            Point crossH1 = new Point(mouse.X, mouse.Y - crossLength);
-            Point crossH2 = new Point(mouse.X, mouse.Y + crossLength);
-            Point diagTL = new Point(mouse.X - crossLength, mouse.Y - crossLength);
-            Point diagBR = new Point(mouse.X + crossLength, mouse.Y + crossLength);
-
-            Point diagBL = new Point(mouse.X - crossLength, mouse.Y + crossLength);
-            Point diagTR = new Point(mouse.X + crossLength, mouse.Y - crossLength);
-
-            Point crossV1 = new Point(mouse.X - crossLength, mouse.Y);
-            Point crossV2 = new Point(mouse.X + crossLength, mouse.Y);
-
-            return (Collision.Intersects(a, b, crossH1, crossH2, out intersection) || Collision.Intersects(a, b, crossV1, crossV2, out intersection) ||
-                    Collision.Intersects(a, b, diagTL, diagBR, out intersection) || Collision.Intersects(a, b, diagBL, diagTR, out intersection));
-        }
-
         private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth = 1)
         {
             Point p;
             return LineIntersectsAt(a, b, mouse, out p);
+        }
+
+        private bool LineIntersectsAt(Point a, Point b, Point mouse,out Point p, int lineWidth = 1)
+        {
+            return Collision.PointIsOnLine(a, b, mouse, out p);
         }
 
         #region AddElement Remove
