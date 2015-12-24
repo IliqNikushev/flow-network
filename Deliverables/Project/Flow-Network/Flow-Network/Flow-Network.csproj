@@ -91,9 +91,11 @@
     <Compile Include="SplitterElement.cs" />
     <Compile Include="UndoableActions\AddConnectionAction.cs" />
     <Compile Include="UndoableActions\AddElementAction.cs" />
+    <Compile Include="UndoableActions\AddMidPointAction.cs" />
     <Compile Include="UndoableActions\MoveElementAction.cs" />
     <Compile Include="UndoableActions\RemoveConnectionAction.cs" />
     <Compile Include="UndoableActions\RemoveElementAction.cs" />
+    <Compile Include="UndoableActions\RemoveMidPointAction.cs" />
     <Compile Include="UndoStack.cs" />
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

@@ -171,12 +171,13 @@ namespace Flow_Network
             /// <summary>Points the path HAS to go to before reaching the TO zone</summary>
             public List<PathMidPointDrawable> UserDefinedMidPoints = new List<PathMidPointDrawable>();
 
-            public void AddUserMidPoint(Point pt)
+            /// <returns>Index of the point that was added/returns>
+            public int AddUserMidPoint(Point pt)
             {
-                AddUserMidPoint(pt.X, pt.Y);
+                return AddUserMidPoint(pt.X, pt.Y);
             }
 
-            public void AddUserMidPoint(int x, int y)
+            public int AddUserMidPoint(int x, int y)
             {
                 Point intersection = new Point();
                 Point p = new Point(x,y);
@@ -195,7 +196,7 @@ namespace Flow_Network
                             {
                                 this.UserDefinedMidPoints.Insert(position, new PathMidPointDrawable(x, y, this));
                                 this.Adjust();
-                                return;
+                                return position + 1;
                             }
                             else
                             {
@@ -206,6 +207,7 @@ namespace Flow_Network
                     }
                 }
                 this.UserDefinedMidPoints.Add(new PathMidPointDrawable(x, y, this));
+                return this.UserDefinedMidPoints.Count - 1;
                 this.Adjust();
             }
 
@@ -258,23 +260,14 @@ namespace Flow_Network
 
             public PathMidPointDrawable GetClosestMidPointTo(Point position)
             {
-                PathMidPointDrawable p = null;
-
                 foreach (PathMidPointDrawable point in this.UserDefinedMidPoints)
                 {
-                    float deltaX = point.X - position.X;
-                    float deltaY = point.Y - position.Y;
-                    deltaX *= deltaX;
-                    deltaY *= deltaY;
-                    float distance = (float)Math.Sqrt(deltaX + deltaY);
-                    if (distance <= this.Width)
-                    {
-                        p = point;
-                        break;
-                    }
+                    Rectangle r = new Rectangle(point.X, point.Y, point.Width, point.Height);
+                    if (r.Contains(position))
+                        return point;
                 }
 
-                return p;
+                return null;
             }
 
             /// <summary>Called when the path is adjusted for the first time</summary>

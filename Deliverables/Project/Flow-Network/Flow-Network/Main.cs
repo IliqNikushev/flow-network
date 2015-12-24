@@ -126,6 +126,8 @@ namespace Flow_Network
                         RefreshConnections();
                     }
                 }
+                else if (lastAction is UndoableActions.AddMidPointAction)
+                    plDraw.Invalidate();
 
                 else if (lastAction is UndoableActions.MoveElementAction)
                 {
@@ -217,6 +219,7 @@ namespace Flow_Network
         }
 
         Drawable lastHovered = null;
+        Drawable currentHovered = null;
 
         void plDraw_HandleHover(object sender, MouseEventArgs e)
         {
@@ -226,20 +229,30 @@ namespace Flow_Network
                 return;
             }
 
-            Drawable hovered = null;
+            currentHovered = null;
             DrawState state = DrawState.None;
             if (ActiveTool == ActiveToolType.Pipe)
-                hovered = FindConnectionZoneUnder(mousePosition);
+                currentHovered = FindConnectionZoneUnder(mousePosition);
             else
-                if (hovered == null)
-                    hovered = FindElementUnder(mousePosition);
-            if (hovered == null)
-                hovered = FindPathUnder(mousePosition);
+                if (currentHovered == null)
+                    currentHovered = FindElementUnder(mousePosition);
+            if (currentHovered == null)
+                currentHovered = FindPathUnder(mousePosition);
 
-            if (hovered == lastHovered)
+            if (currentHovered == lastHovered)
                 return;
 
-            if (lastHovered != hovered)
+            if (currentHovered is ConnectionZone.Path)
+            {
+                ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
+                PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
+                if (closest != null)
+                {
+                    currentHovered = closest;
+                }
+            }
+
+            if (lastHovered != currentHovered)
             {
                 if (lastHovered != null)
                 {
@@ -263,20 +276,20 @@ namespace Flow_Network
                     lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
                 }
 
-                lastHovered = hovered;
+                lastHovered = currentHovered;
             }
 
-            if (hovered == null) return;
+            if (currentHovered == null) return;
 
-            if (hovered is ConnectionZone)
+            if (currentHovered is ConnectionZone)
             {
-                if (hovered == PathStart)
+                if (currentHovered == PathStart)
                     state = DrawState.Active;
-                else if ((hovered as ConnectionZone).IsConnected)
+                else if ((currentHovered as ConnectionZone).IsConnected)
                     state = DrawState.Blocking;
                 else if (PathStart != null)
                 {
-                    if (PathStart.FlowIsSameAs(hovered as ConnectionZone))
+                    if (PathStart.FlowIsSameAs(currentHovered as ConnectionZone))
                         state = DrawState.Blocking;
                     else
                         state = DrawState.Hovered;
@@ -284,7 +297,7 @@ namespace Flow_Network
                 else
                     state = DrawState.Hovered;
             }
-            else if (hovered is Element)
+            else if (currentHovered is Element)
             {
                 if (ActiveTool == ActiveToolType.Delete)
                     state = DrawState.Delete;
@@ -296,7 +309,7 @@ namespace Flow_Network
                 else
                     state = DrawState.Blocking;
             }
-            else if (hovered is ConnectionZone.Path)
+            else if (currentHovered is ConnectionZone.Path)
             {
                 if (ActiveTool == ActiveToolType.Delete)
                     state = DrawState.Delete;
@@ -304,7 +317,7 @@ namespace Flow_Network
                     state = DrawState.Hovered;
                 else if (ActiveTool == ActiveToolType.Select)
                 {
-                    ConnectionZone.Path path = hovered as ConnectionZone.Path;
+                    ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
                     PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
                     if (closest != null)
                     {
@@ -318,12 +331,12 @@ namespace Flow_Network
             if (state == DrawState.None)
                 state = DrawState.Normal;
 
-            hovered.DrawState = state;
-            hovered.Draw(plDrawGraphics, plDraw.BackColor);
+            currentHovered.DrawState = state;
+            currentHovered.Draw(plDrawGraphics, plDraw.BackColor);
             if (ActiveTool == ActiveToolType.Pipe)
-                if (hovered is Element)
+                if (currentHovered is Element)
                 {
-                    foreach (ConnectionZone zone in (hovered as Element).ConnectionZones)
+                    foreach (ConnectionZone zone in (currentHovered as Element).ConnectionZones)
                     {
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
                     }
@@ -448,9 +461,16 @@ namespace Flow_Network
 
         void HandleDeleteToolClick()
         {
-            Element e = FindElementUnder(mousePosition);
-            if (e != null)
-                RemoveElement(e);
+            if (currentHovered == null) return;
+            else if (currentHovered is Element) RemoveElement(currentHovered as Element);
+            else if (currentHovered is ConnectionZone.Path) RemoveConnection(currentHovered as ConnectionZone.Path);
+            else if (currentHovered is PathMidPointDrawable) RemoveMidPoint(currentHovered as PathMidPointDrawable);
+            else if (currentHovered is ConnectionZone) return;
+            else
+                throw new NotImplementedException("Unknown hovered, " + currentHovered.GetType().Name);
+            if (lastHovered == currentHovered) lastHovered = null;
+            currentHovered.DrawState = DrawState.Normal;
+            currentHovered = null;
         }
 
         void HandleCreateElementToolClick()
@@ -528,7 +548,8 @@ namespace Flow_Network
                     PathMidPointDrawable midPoint = path.GetClosestMidPointTo(mousePosition);
                     if (midPoint == null)
                     {
-                        path.AddUserMidPoint(intersection);
+                        int index = path.AddUserMidPoint(intersection);
+                        UndoStack.AddAction(new UndoableActions.AddMidPointAction(path.UserDefinedMidPoints[index]));
                     }
                 }
                 return;
@@ -928,8 +949,16 @@ namespace Flow_Network
         void RemoveElement(Element e)
         {
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
+        }
 
-            if (lastHovered == e) lastHovered = null;
+        void RemoveConnection(ConnectionZone.Path e)
+        {
+            UndoStack.AddAction(new UndoableActions.RemoveConnectionAction(e));
+        }
+
+        void RemoveMidPoint(PathMidPointDrawable e)
+        {
+            UndoStack.AddAction(new UndoableActions.RemoveMidPointAction(e));
         }
 
         void AddElement(Element e, Point position)
