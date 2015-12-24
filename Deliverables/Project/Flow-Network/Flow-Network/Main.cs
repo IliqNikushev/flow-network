@@ -238,6 +238,8 @@ namespace Flow_Network
                     else
                         if (lastHovered is ConnectionZone.Path)
                             lastHovered.DrawState = DrawState.Normal;
+                        else if (lastHovered is Element)
+                            lastHovered.DrawState = DrawState.Normal;
                         else
                             lastHovered.DrawState = lastHovered.LastState;
                     lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
@@ -432,7 +434,7 @@ namespace Flow_Network
 
         void HandleCreateElementToolClick()
         {
-            if (HasElementUnder(mousePosition))
+            if (HasElementForPlacementUnder(mousePosition))
             {
                 return;
             }
@@ -577,7 +579,7 @@ namespace Flow_Network
         void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (HasElementUnder(dragElement.Location))
+            if (HasElementForPlacementUnder(dragElement.Location))
             {
                 RevertDrag();
             }
@@ -694,6 +696,7 @@ namespace Flow_Network
 
         private void RefreshDragElementPathCollisions()
         {
+            if (dragElement.Connections.Count() == 0) return;
             foreach (Element element in AllElements)
             {
                 if (element == dragElement) continue;
@@ -804,7 +807,7 @@ namespace Flow_Network
             else if (ActiveTool == ActiveToolType.Delete)
             {
                 iconBelowCursor.Visible = false;
-                if (HasElementUnder(mousePosition))
+                if (HasElementForPlacementUnder(mousePosition))
                 {
                     this.Cursor = System.Windows.Forms.Cursors.No;
                 }
@@ -824,14 +827,37 @@ namespace Flow_Network
                 point.Offset(plDraw.Location);
                 point.Offset(16, 16);
                 this.iconBelowCursor.Location = point;
-                if (HasElementUnder(mousePosition))
+
+                IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;
+                    foreach (Element collision in collisionsForPlacement)
+                    {
+                        if (collision.DrawState == DrawState.Blocking) continue;
+                        collision.DrawState = DrawState.Blocking;
+                        collision.Draw(plDrawGraphics, plDraw.BackColor);
+                    }
                 }
-                else iconBelowCursor.BackColor = Color.Green;
+                else
+                {
+                    iconBelowCursor.BackColor = Color.Green;
+                }
+
+                foreach (Element collision in lastCollisionsForPlacement)
+                {
+                    if (collisionsForPlacement.Contains(collision)) continue;
+                    if (collision.DrawState == DrawState.Normal) continue;
+                    collision.DrawState = DrawState.Normal;
+                    collision.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+                lastCollisionsForPlacement = collisionsForPlacement;
+
                 iconBelowCursor.BringToFront();
             }
         }
+
+        private IEnumerable<Element> lastCollisionsForPlacement = new Element[0];
 
         void plDraw_Redraw(object sender, PaintEventArgs e)
         {
@@ -994,7 +1020,7 @@ namespace Flow_Network
             RightClickOptions options = ~RightClickOptions.Remove;
             rightClickMousePosition = mousePosition;
 
-            if (HasElementUnder(rightClickMousePosition))
+            if (HasElementForPlacementUnder(rightClickMousePosition))
             {
                 Element e = FindElementUnder(rightClickMousePosition);
                 if (e != null)
@@ -1185,7 +1211,7 @@ namespace Flow_Network
             });
         }
 
-        private bool HasElementUnder(Point mousePosition)
+        private bool HasElementForPlacementUnder(Point mousePosition)
         {
             return FindCollisionForPlacementOfElementUnder(mousePosition) != null;
         }
