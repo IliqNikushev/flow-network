@@ -10,9 +10,9 @@ namespace Flow_Network.UndoableActions
     {
         private System.Drawing.Point OldCoordinates;
         private System.Drawing.Point NewCoordinates;
-        private Element element;
+        private IconDrawable element;
 
-        public MoveElementAction(Element element, System.Drawing.Point oldCoordinates, System.Drawing.Point newCoordinates)
+        public MoveElementAction(IconDrawable element, System.Drawing.Point oldCoordinates, System.Drawing.Point newCoordinates)
         {
             this.element = element;
             this.OldCoordinates = oldCoordinates;

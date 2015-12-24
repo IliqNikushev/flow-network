@@ -9,33 +9,94 @@ namespace Flow_Network
     /// <summary>Static class for resources</summary>
     static class Resources
     {
+        static Dictionary<DrawState, System.Drawing.Color> ImageColors = new Dictionary<DrawState, System.Drawing.Color>()
+        {
+            {DrawState.Normal, System.Drawing.Color.Black},
+            {DrawState.Hovered, System.Drawing.Color.Gold},
+            {DrawState.Delete, System.Drawing.Color.Red},
+            {DrawState.Blocking, System.Drawing.Color.DarkRed},
+            {DrawState.Active, System.Drawing.Color.Blue},
+            {DrawState.Clear, System.Drawing.Color.OldLace}
+        };
+
+        static Dictionary<DrawState, System.Drawing.Color> ConnectionZoneColors = new Dictionary<DrawState, System.Drawing.Color>()
+        {
+            {DrawState.Normal, System.Drawing.Color.Green},
+            {DrawState.Hovered, System.Drawing.Color.Blue},
+            {DrawState.Delete, System.Drawing.Color.Red},
+            {DrawState.Blocking, System.Drawing.Color.DarkRed},
+            {DrawState.Active, System.Drawing.Color.Purple},
+            {DrawState.Clear, System.Drawing.Color.OldLace}
+        };
+
+        public static void Initialize()
+        {
+        }
+
         static Resources()
         {
             string notFound = "";
-            foreach (var item in typeof(Resources).GetFields(System.Reflection.BindingFlags.Public| System.Reflection.BindingFlags.Static))
+            foreach (var item in typeof(Resources).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
             {
                 if (item.FieldType == typeof(Dictionary<DrawState, System.Drawing.Image>))
                 {
                     Dictionary<DrawState, System.Drawing.Image> collection = item.GetValue(null) as Dictionary<DrawState, System.Drawing.Image>;
 
-                    foreach (var state in Enum.GetValues(typeof(DrawState)))
+                    foreach (var s in Enum.GetValues(typeof(DrawState)))
                     {
-                        if ((DrawState)state == DrawState.None) continue;
-                        if (!collection.ContainsKey((DrawState)state))
-                            notFound += item.Name+"."+state+"\r\n";
+                        DrawState state = (DrawState)s;
+                        if (state == DrawState.None) continue;
+                        if (!collection.ContainsKey(state))
+                            notFound += item.Name + "." + state + "\r\n";
+                        System.Drawing.Color color = ImageColors[state];
+                        if (collection == ConnectionZoneIcons)
+                            color = ConnectionZoneColors[state];
+                        else
+                            color = ImageColors[state];
+                        System.Drawing.Bitmap b = new System.Drawing.Bitmap(collection[state]);
+                        for (int x = 0; x < b.Width; x++)
+                        {
+                            for (int y = 0; y < b.Height; y++)
+                            {
+                                System.Drawing.Color pixel = b.GetPixel(x, y);
+                                System.Drawing.Color bg = color;
+                                if (pixel.A != 0)
+                                {
+                                    //todo if A < 255 -> DRAW 100% or 100% - A%
+                                    if (state == DrawState.Clear)
+                                        pixel = System.Drawing.Color.FromArgb(255, bg.R, bg.G, bg.B);
+                                    else
+                                        pixel = System.Drawing.Color.FromArgb(pixel.A, bg.R, bg.G, bg.B);
+                                    b.SetPixel(x, y, pixel);
+                                }
+                            }
+                        }
+                        collection[state] = b;
                     }
                 }
             }
             if (notFound != "")
                 throw new Exception("Not found icons for:\r\n" + notFound);
         }
+
+        public static Dictionary<DrawState, System.Drawing.Image> MidPointIcons = new Dictionary<DrawState, System.Drawing.Image>()
+        {
+            {DrawState.Normal, Properties.Resources.pump},
+            {DrawState.Hovered, Properties.Resources.pump},
+            {DrawState.Delete, Properties.Resources.pump},
+            {DrawState.Blocking, Properties.Resources.pump},
+            {DrawState.Active, Properties.Resources.pump},
+            {DrawState.Clear, Properties.Resources.pump}
+        };
+
         public static Dictionary<DrawState, System.Drawing.Image> PumpIcons = new Dictionary<DrawState, System.Drawing.Image>()
         {
             {DrawState.Normal, Properties.Resources.pump},
             {DrawState.Hovered, Properties.Resources.pump},
             {DrawState.Delete, Properties.Resources.pump},
             {DrawState.Blocking, Properties.Resources.pump},
-            {DrawState.Active, Properties.Resources.pump}
+            {DrawState.Active, Properties.Resources.pump},
+            {DrawState.Clear, Properties.Resources.pump}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> SinkIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -44,7 +105,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.sink},
             {DrawState.Delete, Properties.Resources.sink},
             {DrawState.Blocking, Properties.Resources.sink},
-            {DrawState.Active, Properties.Resources.sink}
+            {DrawState.Active, Properties.Resources.sink},
+            {DrawState.Clear, Properties.Resources.sink}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> MergerIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -53,7 +115,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.merger},
             {DrawState.Delete, Properties.Resources.merger},
             {DrawState.Blocking, Properties.Resources.merger},
-            {DrawState.Active, Properties.Resources.merger}
+            {DrawState.Active, Properties.Resources.merger},
+            {DrawState.Clear, Properties.Resources.merger}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> SplitterIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -62,7 +125,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.splitter},
             {DrawState.Delete, Properties.Resources.splitter},
             {DrawState.Blocking, Properties.Resources.splitter},
-            {DrawState.Active, Properties.Resources.splitter}
+            {DrawState.Active, Properties.Resources.splitter},
+            {DrawState.Clear, Properties.Resources.splitter}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> AdjSplitterIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -71,7 +135,8 @@ namespace Flow_Network
             {DrawState.Hovered, Properties.Resources.adjustableSplitter},
             {DrawState.Delete, Properties.Resources.adjustableSplitter},
             {DrawState.Blocking, Properties.Resources.adjustableSplitter},
-            {DrawState.Active, Properties.Resources.adjustableSplitter}
+            {DrawState.Active, Properties.Resources.adjustableSplitter},
+            {DrawState.Clear, Properties.Resources.adjustableSplitter}
         };
 
         public static Dictionary<DrawState, System.Drawing.Image> ConnectionZoneIcons = new Dictionary<DrawState, System.Drawing.Image>()
@@ -80,7 +145,8 @@ namespace Flow_Network
             {DrawState.Blocking, Properties.Resources.connectionZoneBlocking},
             {DrawState.Delete, Properties.Resources.connectionZoneDelete},
             {DrawState.Hovered, Properties.Resources.connectionZoneHovered},
-            {DrawState.Active, Properties.Resources.connectionZoneActive}
+            {DrawState.Active, Properties.Resources.connectionZoneActive},
+            {DrawState.Clear, Properties.Resources.connectionZoneActive}
         };
 
         /// <summary>Iterates the resources to find the specified element's proper icon</summary>

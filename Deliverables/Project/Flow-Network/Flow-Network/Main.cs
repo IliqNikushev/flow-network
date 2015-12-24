@@ -45,6 +45,7 @@ namespace Flow_Network
         private ConnectionZone PathEnd;
 
         private Element dragElement;
+        private PathMidPointDrawable dragMidPoint;
         private PictureBox oldDragElementPlaceholder;
         private Point dragStart;
         private Point mousePosition = new Point(0, 0);
@@ -61,6 +62,7 @@ namespace Flow_Network
 
         public Main()
         {
+            Resources.Initialize();
             InitializeComponent();
             this.plDrawGraphics = this.plDraw.CreateGraphics();
             oldDragElementPlaceholder = new PictureBox();
@@ -195,6 +197,10 @@ namespace Flow_Network
             {
                 plDraw_HandleMoveDragElement(sender, e);
             }
+            else if (dragMidPoint != null)
+            {
+                plDraw_HandleMoveDragMidPoint(sender, e);
+            }
         }
 
         Drawable lastHovered = null;
@@ -274,8 +280,8 @@ namespace Flow_Network
                 else if (ActiveTool == ActiveToolType.Select)
                 {
                     ConnectionZone.Path path = hovered as ConnectionZone.Path;
-                    Point closest = path.FindClosestMidPointTo(mousePosition);
-                    if (closest.X != -1)
+                    PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
+                    if (closest != null)
                     {
                         plDraw.Cursor = Cursors.SizeAll;
                     }
@@ -392,7 +398,7 @@ namespace Flow_Network
 
         void ShowEditPath(ConnectionZone.Path path)
         {
-            foreach (Point midPoint in path.UserDefinedMidPoints)
+            foreach (PathMidPointDrawable midPoint in path.UserDefinedMidPoints)
             {
                 //if mousePosition is within midpoint => DRAG midpoint
             }
@@ -472,10 +478,10 @@ namespace Flow_Network
                 ConnectionZone.Path path = FindPathUnder(mousePosition, out intersection);
                 if (path != null)
                 {
-                    Point midPoint = path.FindClosestMidPointTo(mousePosition);
-                    if (midPoint.X == -1)
+                    PathMidPointDrawable midPoint = path.GetClosestMidPointTo(mousePosition);
+                    if (midPoint == null)
                     {
-                        path.UserDefinedMidPoints.Add(intersection);
+                        path.AddUserMidPoint(intersection);
                     }
                 }
                 return;
@@ -598,6 +604,18 @@ namespace Flow_Network
                     oldDragElementPlaceholder.Location = dragStart;
                     oldDragElementPlaceholder.Image = dragElement.Icon;
                 }
+                else
+                {
+                    ConnectionZone.Path path = FindPathUnder(mousePosition);
+                    if (path != null)
+                    {
+                        PathMidPointDrawable point = path.GetClosestMidPointTo(mousePosition);
+                        if (point != null)
+                        {
+                            
+                        }
+                    }
+                }
             }
             else
             {
@@ -636,6 +654,43 @@ namespace Flow_Network
             }
         }
 
+        void plDraw_HandleMoveDragMidPoint(object sender, MouseEventArgs e)
+        {
+            if (dragMidPoint == null) return;
+            Point location = e.Location;
+            if (location.X < 0)
+                location.X = 0;
+            else if (location.X > plDraw.Width - Element.DefaultSize.X)
+                location.X = plDraw.Width - Element.DefaultSize.X;
+            if (location.Y < 0)
+                location.Y = 0;
+            else if (location.Y > plDraw.Height - Element.DefaultSize.Y)
+                location.Y = plDraw.Height - Element.DefaultSize.Y;
+
+            if (dragMidPoint.Location != location)
+            {
+                Point oldLocation = dragMidPoint.Location;
+                dragMidPoint.DrawClear(plDrawGraphics, plDraw.BackColor);
+                dragMidPoint.Location = location;
+
+                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragMidPoint.Location))
+                {
+                    dragMidPoint.Location = oldLocation;
+                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+
+                dragMidPoint.OnlyDraw(plDrawGraphics, plDraw.BackColor);
+
+                RefreshDragMidPointPathCollisions();
+                RefreshConnections();
+            }
+        }
+
+        private void RefreshDragMidPointPathCollisions()
+        {
+            dragMidPoint.Path.Adjust();
+        }
+
         private void RefreshDragElementPathCollisions()
         {
             foreach (Element element in AllElements)
@@ -668,26 +723,43 @@ namespace Flow_Network
 
         private void RevertDrag()
         {
-            if (dragElement == null) return;
-
-            dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
-            foreach (ConnectionZone.Path path in dragElement.Connections)
+            if (dragMidPoint != null)
             {
-                path.DrawClear(plDrawGraphics, plDraw.BackColor);
-            }
-            //RefreshDragElementPathCollisions();
+                dragMidPoint.DrawClear(plDrawGraphics, plDraw.BackColor);
+                dragMidPoint.Path.DrawClear(plDrawGraphics, plDraw.BackColor);
 
-            foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+                {
+                    if (q == dragElement) continue;
+                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+
+                dragMidPoint.Location = dragStart;
+                oldDragElementPlaceholder.Visible = false;
+                dragMidPoint = null;
+                //plDraw.Invalidate();
+                RefreshConnections();
+            }
+            else if (dragElement != null)
             {
-                if (q == dragElement) continue;
-                q.Draw(plDrawGraphics, plDraw.BackColor);
-            }
+                dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
+                foreach (ConnectionZone.Path path in dragElement.Connections)
+                {
+                    path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                }
 
-            dragElement.Location = dragStart;
-            oldDragElementPlaceholder.Visible = false;
-            dragElement = null;
-            //plDraw.Invalidate();
-            RefreshConnections();
+                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+                {
+                    if (q == dragElement) continue;
+                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+
+                dragElement.Location = dragStart;
+                oldDragElementPlaceholder.Visible = false;
+                dragElement = null;
+                //plDraw.Invalidate();
+                RefreshConnections();
+            }
         }
 
         #endregion
@@ -706,7 +778,7 @@ namespace Flow_Network
                     ConnectionZone.Path path = FindPathUnder(mousePosition);
                     bool foundPoint = false;
                     if (path != null)
-                        if (path.FindClosestMidPointTo(mousePosition).X != -1)
+                        if (path.GetClosestMidPointTo(mousePosition) != null)
                             foundPoint = true;
                     if(!foundPoint)
                         this.Cursor = Cursors.Arrow;

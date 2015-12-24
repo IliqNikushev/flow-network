@@ -65,6 +65,7 @@
       <DependentUpon>PumpEditPopup.cs</DependentUpon>
     </Compile>
     <Compile Include="Drawable.cs" />
+    <Compile Include="PathMidPointDrawable.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

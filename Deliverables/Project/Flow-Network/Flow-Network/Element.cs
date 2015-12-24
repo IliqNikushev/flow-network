@@ -80,7 +80,7 @@ namespace Flow_Network
             base.OnDraw(graphics, backgroundColor);
         }
 
-        public void OnlyDraw(Graphics graphics, Color backgroundColor)
+        public override void OnlyDraw(Graphics graphics, Color backgroundColor)
         {
             base.OnDraw(graphics, backgroundColor);
         }

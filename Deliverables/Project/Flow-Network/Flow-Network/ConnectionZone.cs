@@ -169,7 +169,17 @@ namespace Flow_Network
             }
 
             /// <summary>Points the path HAS to go to before reaching the TO zone</summary>
-            public List<Point> UserDefinedMidPoints = new List<Point>();
+            public List<PathMidPointDrawable> UserDefinedMidPoints = new List<PathMidPointDrawable>();
+
+            public void AddUserMidPoint(Point pt)
+            {
+                AddUserMidPoint(pt.X, pt.Y);
+            }
+
+            public void AddUserMidPoint(int x, int y)
+            {
+                this.UserDefinedMidPoints.Add(new PathMidPointDrawable(x, y, this));
+            }
 
             public List<Point> PreviousPointsToGoThrough = new List<Point>();
 
@@ -217,11 +227,11 @@ namespace Flow_Network
                 this.From.ConnectedZone = null;
             }
 
-            public Point FindClosestMidPointTo(Point position)
+            public PathMidPointDrawable GetClosestMidPointTo(Point position)
             {
-                Point p = new Point(-1, -1);
+                PathMidPointDrawable p = null;
 
-                foreach (Point point in this.UserDefinedMidPoints)
+                foreach (PathMidPointDrawable point in this.UserDefinedMidPoints)
                 {
                     float deltaX = point.X - position.X;
                     float deltaY = point.Y - position.Y;
@@ -273,7 +283,7 @@ namespace Flow_Network
 
                 List<Point> pointsToGoThrough = new List<Point>();
                 pointsToGoThrough.Add(this.From);
-                pointsToGoThrough.AddRange(UserDefinedMidPoints);
+                pointsToGoThrough.AddRange(UserDefinedMidPoints.Select(x=>x.Location));
                 pointsToGoThrough.Add(this.To);
 
                 if (!isNew)
@@ -496,10 +506,9 @@ namespace Flow_Network
                         previousPoint = currentPoint;
                     }
 
-                    foreach (Point point in this.UserDefinedMidPoints)
+                    foreach (PathMidPointDrawable point in this.UserDefinedMidPoints)
                     {
-                        graphics.FillEllipse(Brushes.Green, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
-                        graphics.FillEllipse(Brushes.Red, new Rectangle(point.X - this.Width / 2, point.Y - this.Width / 2, this.Width, this.Width));
+                        point.Draw(graphics, backgroundColor);
                     }
                 }
             }
@@ -519,9 +528,9 @@ namespace Flow_Network
                         previousPoint = currentPoint;
                     }
 
-                    foreach (Point point in this.UserDefinedMidPoints)
+                    foreach (PathMidPointDrawable point in this.UserDefinedMidPoints)
                     {
-                        g.FillEllipse(onClearBrush, new Rectangle(point.X - this.Width, point.Y - this.Width, this.Width * 2, this.Width * 2));
+                        point.DrawClear(g, backgroundColor);
                     }
                 }
             }

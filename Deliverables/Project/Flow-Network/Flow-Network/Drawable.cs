@@ -15,7 +15,8 @@ namespace Flow_Network
         Hovered,
         Delete,
         Blocking,
-        Active
+        Active,
+        Clear
     }
 
     public abstract class IconDrawable : Drawable
@@ -38,9 +39,15 @@ namespace Flow_Network
             graphics.DrawImage(this.Icon, this.Location.X, this.Location.Y, this.Width, this.Height);
         }
 
+        public virtual void OnlyDraw(System.Drawing.Graphics graphics, Color backgroundColor) { }
+
         protected override void OnDrawClear(Graphics g, Color backgroundColor)
         {
-            
+            DrawState previous = this.LastState;
+            this.DrawState = Flow_Network.DrawState.Clear;
+            g.DrawImage(this.Icon, this.Location.X, this.Location.Y, this.Width, this.Height);
+            this.DrawState = this.LastState;
+            this.LastState = previous;
         }
     }
 
