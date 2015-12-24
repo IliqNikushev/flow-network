@@ -23,6 +23,14 @@ namespace Flow_Network
 
         private IEnumerable<ConnectionZone> connectionZones;
 
+        public IEnumerable<Element> ConnectedElements
+        {
+            get
+            {
+                return this.ConnectionZones.Where(x=>x.IsInFlow).Select(x => x.ConnectedZone == null ? null : x.ConnectedZone.Parent).Where(x=>x!=null);
+            }
+        }
+
         /// <summary>Gets all Properties that are a connection zone within the class</summary>
         public IEnumerable<ConnectionZone> ConnectionZones
         {

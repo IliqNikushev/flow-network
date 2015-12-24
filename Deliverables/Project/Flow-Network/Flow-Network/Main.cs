@@ -207,10 +207,12 @@ namespace Flow_Network
             if (dragElement != null)
             {
                 plDraw_HandleMoveDragElement(sender, e);
+                plDraw.Invalidate();
             }
             else if (dragMidPoint != null)
             {
                 plDraw_HandleMoveDragMidPoint(sender, e);
+                plDraw.Invalidate();
             }
         }
 
@@ -240,7 +242,7 @@ namespace Flow_Network
                         ConnectionZone z = lastHovered as ConnectionZone;
                         if (z == PathStart)
                             z.DrawState = DrawState.Active;
-                        else if (z.IsConnected || z.FlowIsSameAs(PathStart))
+                        else if (z.IsConnected || z.FlowIsSameAs(PathStart) || (PathStart != null && ZoneParentIsUsedInPath(z)))
                             z.DrawState = DrawState.Blocking;
                         else
                             z.DrawState = DrawState.Normal;
@@ -483,6 +485,29 @@ namespace Flow_Network
                 throw new ArgumentException("Unknown element " + ActiveTool);
         }
 
+        bool ElementIsUsedInPath(Element element, HashSet<Element> processed)
+        {
+            if (processed.Contains(element)) return true;
+            processed.Add(element);
+            foreach (ConnectionZone zone in element.ConnectionZones)
+            {
+                if(zone.IsOutFlow)
+                    if(zone.ConnectedZone != null)
+                        if (ElementIsUsedInPath(zone.ConnectedZone.Parent, processed))
+                            return true;
+            }
+            return false;
+        }
+
+        bool ZoneParentIsUsedInPath(ConnectionZone zone)
+        {
+            return ElementIsUsedInPath(zone.Parent, new HashSet<Element>(new Element[]{PathStart.Parent}));
+        }
+
+        bool PathResultsInCirular()
+        {
+            return ZoneParentIsUsedInPath(PathEnd);
+        }
 
         void HandlePipeToolClick()
         {
@@ -508,6 +533,14 @@ namespace Flow_Network
 
             if (PathStart == null) PathStart = hovered;
             else PathEnd = hovered;
+
+            if(PathEnd != null)
+                if (PathEnd.IsOutFlow)
+                {
+                    PathEnd = PathStart;
+                    PathStart = hovered;
+                }
+
             if (PathStart != null && PathEnd == null)
             {
                 PathStart.DrawState = DrawState.Active;
@@ -521,6 +554,11 @@ namespace Flow_Network
                     return;
                 }
                 if (PathStart.Parent == PathEnd.Parent)
+                {
+                    PathEnd = null;
+                    return;
+                }
+                if (PathResultsInCirular())
                 {
                     PathEnd = null;
                     return;
@@ -577,10 +615,11 @@ namespace Flow_Network
         {
             foreach (Element e in AllElements)
             {
+                bool isUsed = ElementIsUsedInPath(e, new HashSet<Element>(new Element[]{PathStart.Parent}));
                 foreach (ConnectionZone zone in e.ConnectionZones)
                 {
                     if (zone == PathStart) continue;
-                    if (zone.FlowIsSameAs(PathStart))
+                    if (isUsed || zone.FlowIsSameAs(PathStart))
                         zone.DrawState = DrawState.Blocking;
                     if (redraw)
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
@@ -657,18 +696,8 @@ namespace Flow_Network
 
             if (dragElement.Location != location)
             {
-                dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
                 dragElement.Location = location;
 
-                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
-                {
-                    if (q == dragElement) continue;
-                    q.Draw(plDrawGraphics, plDraw.BackColor);
-                }
-
-                dragElement.OnlyDraw(plDrawGraphics, plDraw.BackColor);
-
-                RefreshDragElementPathCollisions();
                 RefreshConnections();
             }
         }
@@ -682,17 +711,13 @@ namespace Flow_Network
 
             if (dragMidPoint.Location != location)
             {
-                dragMidPoint.DrawClear(plDrawGraphics, plDraw.BackColor);
                 dragMidPoint.Location = location;
 
                 Element found = FindElementUnder(location);
                 if(found != null)
                 {
                     dragMidPoint.Location = oldMidPointLocation;
-                    found.Draw(plDrawGraphics, plDraw.BackColor);
                 }
-
-                dragMidPoint.OnlyDraw(plDrawGraphics, plDraw.BackColor);
 
                 RefreshDragMidPointPathCollisions();
                 RefreshConnections();
@@ -828,8 +853,6 @@ namespace Flow_Network
                 this.iconBelowCursor.Location = point;
 
                 IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
-                if (ActiveTool == ActiveToolType.Select)
-                    collisionsForPlacement = new Element[0];
                 if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;
@@ -862,16 +885,20 @@ namespace Flow_Network
 
         void plDraw_Redraw(object sender, PaintEventArgs e)
         {
-            foreach (var item in AllElements)
+            foreach (Element element in AllElements)
             {
-                item.Draw(e.Graphics, plDraw.BackColor);
+                if (element == dragElement)
+                    continue;
+                else
+                    element.Draw(e.Graphics, plDraw.BackColor);
                 if (ActiveTool == ActiveToolType.Pipe)
-                    foreach (var con in item.ConnectionZones)
+                    foreach (ConnectionZone con in element.ConnectionZones)
                     {
                         con.Draw(e.Graphics, plDraw.BackColor);
                     }
             }
-
+            if (dragElement != null)
+                dragElement.OnlyDraw(e.Graphics, plDraw.BackColor);
             foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
             {
                 path.Draw(e.Graphics, plDraw.BackColor);
