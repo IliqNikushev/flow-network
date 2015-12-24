@@ -108,6 +108,8 @@ namespace Flow_Network
                     else
                     {
                         if (action.Connection.IsNew) return;
+                        action.Connection.To.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        action.Connection.From.Draw(this.plDrawGraphics, this.plDraw.BackColor);
                         action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
                     }
                 }
