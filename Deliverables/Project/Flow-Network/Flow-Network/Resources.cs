@@ -142,11 +142,11 @@ namespace Flow_Network
         public static Dictionary<DrawState, System.Drawing.Image> ConnectionZoneIcons = new Dictionary<DrawState, System.Drawing.Image>()
         {
             {DrawState.Normal, Properties.Resources.connectionZone},
-            {DrawState.Blocking, Properties.Resources.connectionZoneBlocking},
-            {DrawState.Delete, Properties.Resources.connectionZoneDelete},
-            {DrawState.Hovered, Properties.Resources.connectionZoneHovered},
-            {DrawState.Active, Properties.Resources.connectionZoneActive},
-            {DrawState.Clear, Properties.Resources.connectionZoneActive}
+            {DrawState.Blocking, Properties.Resources.connectionZone},
+            {DrawState.Delete, Properties.Resources.connectionZone},
+            {DrawState.Hovered, Properties.Resources.connectionZone},
+            {DrawState.Active, Properties.Resources.connectionZone},
+            {DrawState.Clear, Properties.Resources.connectionZone}
         };
 
         /// <summary>Iterates the resources to find the specified element's proper icon</summary>

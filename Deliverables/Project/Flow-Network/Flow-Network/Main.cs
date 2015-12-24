@@ -217,10 +217,10 @@ namespace Flow_Network
             if (hovered == null)
                 hovered = FindPathUnder(mousePosition);
 
-            if (hovered is Element && lastHovered == hovered)
+            if (hovered == lastHovered)
                 return;
 
-            if (hovered == null)
+            if (lastHovered != hovered)
             {
                 if (lastHovered != null)
                 {
@@ -242,9 +242,10 @@ namespace Flow_Network
                     lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
                 }
 
-                lastHovered = null;
-                return;
+                lastHovered = hovered;
             }
+
+            if (hovered == null) return;
 
             if (hovered is ConnectionZone)
             {
@@ -284,10 +285,10 @@ namespace Flow_Network
                     if (closest != null)
                     {
                         plDraw.Cursor = Cursors.SizeAll;
+                        state = DrawState.Hovered;
                     }
                     else
                         plDraw.Cursor = Cursors.Arrow;
-                    state = DrawState.Hovered;
                 }
             }
             if (state == DrawState.None)
@@ -303,7 +304,6 @@ namespace Flow_Network
                         zone.Draw(plDrawGraphics, plDraw.BackColor);
                     }
                 }
-            lastHovered = hovered;
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -514,7 +514,8 @@ namespace Flow_Network
                 PathStart.DrawState = DrawState.Blocking;
                 PathEnd.DrawState = DrawState.Blocking;
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
-                
+                PathStart.Draw(plDrawGraphics, plDraw.BackColor);
+                PathEnd.Draw(plDrawGraphics, plDraw.BackColor);
                 result.OnCreated += () =>
                 {
                     result.AddToSystem();

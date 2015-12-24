@@ -437,14 +437,6 @@ namespace Flow_Network
                                 }
                             }
 
-                            if (isNew)
-                            {
-                                OnCreated();
-                                isNew = false;
-                            }
-                            else
-                                if (refresh)
-                                    OnAdjusted();
                             PointsHaveChanged = false;
                             List<Point> currentPoints = this.PathPoints;
                             if (PreviousPointsToGoThrough.Count == currentPoints.Count)
@@ -461,9 +453,18 @@ namespace Flow_Network
 
                             this.PreviousPointsToGoThrough.Clear();
                             this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
+
+                            if (isNew)
+                            {
+                                OnCreated();
+                                isNew = false;
+                            }
+                            else
+                                if (refresh)
+                                    OnAdjusted();
                         }
-                            if (onDone != null) onDone();
-                        
+                        if (onDone != null) onDone();
+
                     }
                     catch (System.Threading.ThreadAbortException)
                     {

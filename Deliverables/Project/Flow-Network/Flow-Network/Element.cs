@@ -71,6 +71,7 @@ namespace Flow_Network
 
         protected override void OnDrawClear(Graphics graphics, Color backgroundColor)
         {
+            base.OnDrawClear(graphics,backgroundColor);
             graphics.FillRectangle(new SolidBrush(backgroundColor), this.Location.X, this.Location.Y, this.Width, this.Height);
         }
 
