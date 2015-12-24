@@ -851,21 +851,20 @@ namespace Flow_Network
             }
         }
 
-        private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth, out Point intersection)
+        private bool LineIntersectsAt(Point a, Point b, Point mouse, out Point intersection)
         {
-            lineWidth /= 2;
-            if (lineWidth <= 0) lineWidth = 1;
+            int crossLength = 2;
 
-            Point crossH1 = new Point(mouse.X, mouse.Y - lineWidth);
-            Point crossH2 = new Point(mouse.X, mouse.Y + lineWidth);
-            Point diagTL = new Point(mouse.X - lineWidth, mouse.Y - lineWidth);
-            Point diagBR = new Point(mouse.X + lineWidth, mouse.Y + lineWidth);
+            Point crossH1 = new Point(mouse.X, mouse.Y - crossLength);
+            Point crossH2 = new Point(mouse.X, mouse.Y + crossLength);
+            Point diagTL = new Point(mouse.X - crossLength, mouse.Y - crossLength);
+            Point diagBR = new Point(mouse.X + crossLength, mouse.Y + crossLength);
 
-            Point diagBL = new Point(mouse.X - lineWidth, mouse.Y + lineWidth);
-            Point diagTR = new Point(mouse.X + lineWidth, mouse.Y - lineWidth);
+            Point diagBL = new Point(mouse.X - crossLength, mouse.Y + crossLength);
+            Point diagTR = new Point(mouse.X + crossLength, mouse.Y - crossLength);
 
-            Point crossV1 = new Point(mouse.X - lineWidth, mouse.Y);
-            Point crossV2 = new Point(mouse.X + lineWidth, mouse.Y);
+            Point crossV1 = new Point(mouse.X - crossLength, mouse.Y);
+            Point crossV2 = new Point(mouse.X + crossLength, mouse.Y);
 
             return (Collision.Intersects(a, b, crossH1, crossH2, out intersection) || Collision.Intersects(a, b, crossV1, crossV2, out intersection) ||
                     Collision.Intersects(a, b, diagTL, diagBR, out intersection) || Collision.Intersects(a, b, diagBL, diagTR, out intersection));
@@ -874,7 +873,7 @@ namespace Flow_Network
         private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth = 1)
         {
             Point p;
-            return LineIntersectsAt(a, b, mouse, lineWidth, out p);
+            return LineIntersectsAt(a, b, mouse, out p);
         }
 
         #region AddElement Remove
@@ -1137,7 +1136,7 @@ namespace Flow_Network
                 {
                     Point lineStart = path.PathPoints[i];
                     Point lineEnd = path.PathPoints[i + 1];
-                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, path.Width, out intersection))
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, out intersection))
                         return path;
                 }
             }

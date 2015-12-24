@@ -116,10 +116,8 @@ namespace Flow_Network
         {
             if (width == -1) width = ConnectionZone.Path.DEFAULT_WIDTH;
             Point d = new Point(a2.X - a1.X, a2.Y - a1.Y);
-            d.X = (int)(d.X * 0.1f);
-            d.X = d.X == 0 ? 1 : d.X;
-            d.Y = (int)(d.Y * 0.1f);
-            d.Y = d.Y == 0 ? 1 : d.Y;
+            d.X = d.X > 0 ? width / 2 : -width / 2;
+            d.Y = d.Y > 0 ? width / 2 : -width / 2;
 
             Point normalUP = new Point(-d.Y, d.X);
             
