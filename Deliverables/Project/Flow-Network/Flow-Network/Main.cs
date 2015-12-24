@@ -109,6 +109,8 @@ namespace Flow_Network
                     {
                         if (action.Connection.IsNew) return;
                         action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        action.Connection.To.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        action.Connection.From.Draw(this.plDrawGraphics, this.plDraw.BackColor);
                     }
                 }
 
@@ -467,8 +469,6 @@ namespace Flow_Network
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
         }
-        
-
         void HandlePipeToolClick()
         {
             //TO DO: end if cycle;
