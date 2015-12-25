@@ -324,10 +324,10 @@ namespace Flow_Network
                     if (closest != null)
                     {
                         plDraw.Cursor = Cursors.SizeAll;
-                        state = DrawState.Hovered;
                     }
                     else
                         plDraw.Cursor = Cursors.Arrow;
+                    state = DrawState.Hovered;
                 }
             }
             if (state == DrawState.None)
@@ -448,9 +448,10 @@ namespace Flow_Network
                 if(activePopup != popup)
                     activePopup.Value = null;
 
-            
             activePopup = popup;
             activePopup.Value = value;
+
+            activePopup.Visible = true;
 
             activePopup.Location = mousePosition;
 
