@@ -57,7 +57,7 @@ namespace Flow_Network
             }
         }
         /// <summary>Gets all connections that are defined in Path.All and are from this element to any other</summary>
-        public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => x.From.Parent == this); } }
+        public IEnumerable<ConnectionZone.Path> Connections { get { return ConnectionZone.Path.All.Where(x => (x.From.Parent == this || x.To.Parent == this) && x.To != null); } }
 
         const int POINT_DELTA = 0;//ConnectionZone.Path.DEFAULT_WIDTH / 2;
 

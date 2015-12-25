@@ -52,6 +52,12 @@
     <Compile Include="CustomComponents\AdjustableSplitterEditPopup.Designer.cs">
       <DependentUpon>AdjustableSplitterEditPopup.cs</DependentUpon>
     </Compile>
+    <Compile Include="CustomComponents\EditPopup.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomComponents\EditPopup.Designer.cs">
+      <DependentUpon>EditPopup.cs</DependentUpon>
+    </Compile>
     <Compile Include="CustomComponents\PipeEditPopup.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -97,6 +103,12 @@
     <Compile Include="UndoableActions\RemoveElementAction.cs" />
     <Compile Include="UndoableActions\RemoveMidPointAction.cs" />
     <Compile Include="UndoStack.cs" />
+    <EmbeddedResource Include="CustomComponents\AdjustableSplitterEditPopup.resx">
+      <DependentUpon>AdjustableSplitterEditPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CustomComponents\PumpEditPopup.resx">
+      <DependentUpon>PumpEditPopup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
       <SubType>Designer</SubType>

@@ -28,10 +28,54 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.label1 = new System.Windows.Forms.Label();
+            this.nudFlow = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.nudFlow)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(10, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(43, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Outflow";
+            // 
+            // nudFlow
+            // 
+            this.nudFlow.Location = new System.Drawing.Point(7, 16);
+            this.nudFlow.Maximum = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            this.nudFlow.Name = "nudFlow";
+            this.nudFlow.Size = new System.Drawing.Size(46, 20);
+            this.nudFlow.TabIndex = 1;
+            this.nudFlow.Value = new decimal(new int[] {
+            9999,
+            0,
+            0,
+            0});
+            // 
+            // PumpEditPopup
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.nudFlow);
+            this.Controls.Add(this.label1);
+            this.Name = "PumpEditPopup";
+            this.Size = new System.Drawing.Size(60, 40);
+            ((System.ComponentModel.ISupportInitialize)(this.nudFlow)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.NumericUpDown nudFlow;
     }
 }

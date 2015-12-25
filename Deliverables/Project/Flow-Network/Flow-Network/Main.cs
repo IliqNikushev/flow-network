@@ -394,6 +394,9 @@ namespace Flow_Network
             if (rightClickPanel != null)
                 if (rightClickPanel.Visible)
                     rightClickPanel.Visible = false;
+            if (activePopup != null)
+                if (activePopup.Visible)
+                    activePopup.Visible = false;
 
             if (((MouseEventArgs)e).Button == MouseButtons.Right)
             {
@@ -418,7 +421,11 @@ namespace Flow_Network
         }
         #region tools
 
-        private CustomComponents.PipeEditPopup pipeEditPopup;
+        private CustomComponents.PipeEditPopup pipeEditPopup = new CustomComponents.PipeEditPopup(null);
+        private CustomComponents.PumpEditPopup pumpEditPopup = new CustomComponents.PumpEditPopup(null);
+        private CustomComponents.AdjustableSplitterEditPopup adjustableSplitterEditPopup = new CustomComponents.AdjustableSplitterEditPopup(null);
+
+        private CustomComponents.EditPopup activePopup;
 
         void HandleSelectToolClick()
         {
@@ -428,37 +435,27 @@ namespace Flow_Network
         void HandleEdit(Drawable d)
         {
             if (d is ConnectionZone.Path)
-                ShowEditPath(d as ConnectionZone.Path);
+                ShowEditPopup(d, pipeEditPopup);
             else if (d is PumpElement)
-                ShowEditPump(d as PumpElement);
+                ShowEditPopup(d, pumpEditPopup);
             else if (d is AdjustableSplitter)
-                ShowEditAdjustableSplitter(d as AdjustableSplitter);
+                ShowEditPopup(d, adjustableSplitterEditPopup);
         }
 
-        void ShowEditPath(ConnectionZone.Path path)
+        void ShowEditPopup(Object value, CustomComponents.EditPopup popup)
         {
-            foreach (PathMidPointDrawable midPoint in path.UserDefinedMidPoints)
-            {
-                //if mousePosition is within midpoint => DRAG midpoint
-            }
-            if (pipeEditPopup == null)
-            {
-                pipeEditPopup = new CustomComponents.PipeEditPopup(path);
+            if (activePopup != null)
+                if(activePopup != popup)
+                    activePopup.Value = null;
 
-                this.plDraw.Controls.Add(pipeEditPopup);
-            }
+            
+            activePopup = popup;
+            activePopup.Value = value;
 
-            pipeEditPopup.Location = mousePosition;
-        }
+            activePopup.Location = mousePosition;
 
-        void ShowEditPump(PumpElement pump)
-        {
-
-        }
-
-        void ShowEditAdjustableSplitter(AdjustableSplitter splitter)
-        {
-
+            if (activePopup.Parent != this)
+                this.plDraw.Controls.Add(activePopup);
         }
 
         void HandleDeleteToolClick()
@@ -950,16 +947,22 @@ namespace Flow_Network
 
         void RemoveElement(Element e)
         {
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
         }
 
         void RemoveConnection(ConnectionZone.Path e)
         {
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
             UndoStack.AddAction(new UndoableActions.RemoveConnectionAction(e));
         }
 
         void RemoveMidPoint(PathMidPointDrawable e)
         {
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
             UndoStack.AddAction(new UndoableActions.RemoveMidPointAction(e));
         }
 
@@ -1091,7 +1094,6 @@ namespace Flow_Network
             if (rightClickPanel == null)
             {
                 rightClickPanel = new Panel();
-                rightClickPanel.LostFocus += (x, y) => rightClickPanel.Visible = false;
                 plDraw.Controls.Add(rightClickPanel);
 
                 rightClickPanel.Width = 100;
