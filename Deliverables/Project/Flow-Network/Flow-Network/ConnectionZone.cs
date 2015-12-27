@@ -55,38 +55,61 @@ namespace Flow_Network
         /// <summary>If connected, returns the zone prior to the current on the path they are connected</summary>
         public ConnectionZone ConnectedZone { get; set; }
 
-        /// <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
-        public float Flow
+        private ConnectionZone getFlowStart = null;
+
+        private float GetInFlow
+        {
+            get
+            {
+                float flow = 0;
+                if (ConnectedZone != null && this.getFlowStart != ConnectedZone)
+                {
+                    this.ConnectedZone.getFlowStart = this;
+                    flow = ConnectedZone.Flow;
+                    this.ConnectedZone.getFlowStart = null;
+                }
+
+                return flow;
+            }
+        }
+
+        private float GetOutFlow
         {
             get
             {
                 if (this.Parent is PumpElement)
                     return (this.Parent as PumpElement).Flow;
-
-                if (ConnectedZone != null)
+                else if (this.Parent is AdjustableSplitter)
                 {
-                    float flow = ConnectedZone.Flow;
-
-                    if (this.Parent is SplitterElement)
-                        flow *= 0.5f;
-                    else if (this.Parent is AdjustableSplitter)
-                    {
-                        AdjustableSplitter splitter = this.Parent as AdjustableSplitter;
-                        float percent = 1;
-                        if (this == splitter.Up)
-                            percent = ((100 - splitter.UpFlowPercent) / 100);
-                        else
-                            percent = ((100 - splitter.DownFlowPercent) / 100);
-                        flow *= percent;
-                    }
-                    else if (this.Parent is MergerElement)
+                    AdjustableSplitter splitter = this.Parent as AdjustableSplitter;
+                    float percent = 1;
+                    if (this == splitter.Up)
+                        percent = ((100 - splitter.UpFlowPercent) / 100);
+                    else if (this == splitter.Down)
+                        percent = ((100 - splitter.DownFlowPercent) / 100);
+                    return splitter.In.Flow * percent;
+                }
+                else if (this.Parent is SplitterElement)
+                    return (this.Parent as SplitterElement).In.Flow * 0.5f;
+                else if (this.Parent is MergerElement)
+                    if (this.IsOutFlow)
                     {
                         MergerElement merger = this.Parent as MergerElement;
-                        flow = merger.Up.Flow + merger.Down.Flow;
+                        return merger.Up.Flow + merger.Down.Flow;
                     }
-                    return flow;
-                }
                 return 0;
+            }
+        }
+
+        /// <summary>returns the current flow that is passing through the zone, by going up the connected path it lays on</summary>
+        public float Flow
+        {
+            get
+            {
+                if (this.IsOutFlow)
+                    return GetOutFlow;
+                else
+                    return GetInFlow;
             }
         }
 
@@ -147,7 +170,7 @@ namespace Flow_Network
                 }
             }
 
-            public float Flow { get { return this.From.Flow; } }
+            public float Flow { get { return this.To.Flow; } }
 
             /// <summary>Called when the max flow has been altered</summary>
             public event FlowAlteredEvent OnMaxFlowChanged = (x, y, z) => { };

@@ -76,25 +76,24 @@ namespace Flow_Network
         static Dictionary<System.Drawing.Graphics, object> singletonGraphics = new Dictionary<Graphics, object>();
         static object singletonLock = new object();
 
-        public void Draw(System.Drawing.Graphics graphics, Color backgroundColor)
+        public static void LockGraphicsForDraw(Graphics graphics, Action draw)
         {
+            if (draw == null) return;
             lock (singletonLock)
                 if (!singletonGraphics.ContainsKey(graphics))
                     singletonGraphics.Add(graphics, new object());
-            
-            lock (singletonGraphics[graphics])
-                this.OnDraw(graphics, backgroundColor);
 
+            lock (singletonGraphics[graphics])
+                draw();
+        }
+
+        public void Draw(System.Drawing.Graphics graphics, Color backgroundColor)
+        {
+            LockGraphicsForDraw(graphics, () => this.OnDraw(graphics, backgroundColor));
         }
         public void DrawClear(System.Drawing.Graphics g, Color backgroundColor)
         {
-            lock (singletonLock)
-            {
-                if (!singletonGraphics.ContainsKey(g))
-                    singletonGraphics.Add(g, new object());
-            }
-            lock (singletonGraphics[g])
-                this.OnDrawClear(g,backgroundColor);
+            LockGraphicsForDraw(g, () => this.OnDrawClear(g, backgroundColor));
         }
 
         protected abstract void OnDraw(System.Drawing.Graphics graphics, Color backgroundColor);

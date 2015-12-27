@@ -229,7 +229,8 @@ namespace Flow_Network
 
                 p = new Point(midX, midY);
                 //plDrawGraphics.DrawImage(DrawText(path.Flow.ToString(), font, Color.Red, Color.AliceBlue), p);
-                plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p);
+
+                Drawable.LockGraphicsForDraw(plDrawGraphics, () => plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p));
             }
         }
         private double GetAngle(int x1,int x2,int y1,int y2)
