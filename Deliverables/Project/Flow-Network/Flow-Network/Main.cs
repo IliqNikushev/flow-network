@@ -37,7 +37,7 @@ namespace Flow_Network
         /// </summary>
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
-        public Font font = new Font("Times New Roman", 20, FontStyle.Bold);
+        public Font font = new Font("Times New Roman", 15, FontStyle.Bold);
         public SolidBrush myBrush = new SolidBrush(Color.Red);
         
         private ActiveToolType ActiveTool = ActiveToolType.None;
@@ -198,8 +198,8 @@ namespace Flow_Network
                 
                 if (angle >= 0 && angle <= 65)
                 {
-                    midX -= 10;
-                    midY += 10;
+                    midX -= 16;
+                    midY += 16;
                 }
                 else if (angle > 65 && angle <= 115)
                 {
@@ -208,8 +208,8 @@ namespace Flow_Network
                 }
                 else if (angle > 115 && angle <= 180)
                 {
-                    midX += 10;
-                    midY += 10;
+                    midX += 16;
+                    midY += 16;
                 }
                 else if (angle < 0 && angle >= -65)
                 {
@@ -228,8 +228,8 @@ namespace Flow_Network
                 }
 
                 p = new Point(midX, midY);
-                //plDrawGraphics.DrawImage(DrawText(path.Flow.ToString(), font, Color.Red, Color.AliceBlue), p);
-                plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p);
+                plDrawGraphics.DrawImage(DrawText(path.Flow.ToString(), font, Color.Red, Color.AliceBlue), p);
+                //plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p);
             }
         }
         private double GetAngle(int x1,int x2,int y1,int y2)
