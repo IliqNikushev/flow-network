@@ -25,6 +25,7 @@ namespace Flow_Network.CustomComponents
                 isSetting = true;
                 Splitter.DownFlowPercent = (int)nudDown.Value;
                 nudUp.Value = Splitter.UpFlowPercent;
+                OnFlowAltered();
                 isSetting = false;
             };
 
@@ -34,6 +35,7 @@ namespace Flow_Network.CustomComponents
                 isSetting = true;
                 Splitter.UpFlowPercent = (int)nudUp.Value;
                 nudDown.Value = Splitter.DownFlowPercent;
+                OnFlowAltered();
                 isSetting = false;
             };
         }

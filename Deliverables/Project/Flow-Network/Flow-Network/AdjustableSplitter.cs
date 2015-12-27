@@ -11,7 +11,7 @@ namespace Flow_Network
     public class AdjustableSplitter : SplitterElement
     {
         public delegate void AdjustEventArgs(AdjustableSplitter splitter, int previous, int current);
-        private int upPercent;
+        private int upPercent=100;
         /// <summary>
         /// Value of the % flow of the up stream
         /// range : 0-100

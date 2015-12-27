@@ -84,9 +84,9 @@ namespace Flow_Network
                     AdjustableSplitter splitter = this.Parent as AdjustableSplitter;
                     float percent = 1;
                     if (this == splitter.Up)
-                        percent = ((100 - splitter.UpFlowPercent) / 100);
+                        percent = (splitter.UpFlowPercent / 100f);
                     else if (this == splitter.Down)
-                        percent = ((100 - splitter.DownFlowPercent) / 100);
+                        percent = (splitter.DownFlowPercent / 100f);
                     return splitter.In.Flow * percent;
                 }
                 else if (this.Parent is SplitterElement)
@@ -303,7 +303,7 @@ namespace Flow_Network
 
             private System.Threading.Thread activeAdjuster;
             private bool IsAdjusting { get { return activeAdjuster != null && activeAdjuster.ThreadState == System.Threading.ThreadState.Running; } }
-
+            
             public bool IsNew { get; private set; }
 
             private object adjusterThreadLock = new object();
@@ -530,6 +530,10 @@ namespace Flow_Network
             {
                 lock (adjusterThreadLock)
                 {
+                    Point p = GetTextLocation();
+                    SizeF textSize = graphics.MeasureString(this.Flow.ToString(), font);
+                    graphics.FillRectangle(Brushes.AliceBlue, p.X, p.Y, textSize.Width, textSize.Height);
+                    graphics.DrawString(this.Flow.ToString(), font, Brushes.Red, p);
                     Pen currentPen = onNormalPen;
                     switch (this.DrawState)
                     {
@@ -560,16 +564,101 @@ namespace Flow_Network
                     {
                         point.Draw(graphics, backgroundColor);
                     }
+
                 }
+            }
+            private Point GetTextLocation()
+            {
+                //find midpoint
+                int midX = (this.From.Location.X + this.To.Location.X) / 2;
+                int midY = (this.From.Location.Y + this.To.Location.Y) / 2;
+                //find angle
+                double angle = GetAngle(this.From.Location.X, this.To.Location.X, this.From.Location.Y, this.To.Location.Y);
+
+                if (angle >= 0 && angle <= 65)
+                {
+                    midX -= 10;
+                    midY += 10;
+                }
+                else if (angle > 65 && angle <= 115)
+                {
+                    midY -= 15;
+                    midX -= 20;
+                }
+                else if (angle > 115 && angle <= 180)
+                {
+                    midX += 10;
+                    midY += 10;
+                }
+                else if (angle < 0 && angle >= -65)
+                {
+                    midY += 15;
+                    midX += 15;
+                }
+                else if (angle < -65 && angle >= -115)
+                {
+                    midY -= 15;
+                    midX -= 15;
+                }
+                else if (angle < -115 && angle >= -180)
+                {
+                    midX -= 10;
+                    midY += 10;
+                }
+                return new Point(midX, midY); 
+            }
+            private double GetAngle(int x1, int x2, int y1, int y2)
+            {
+                float xDiff = x2 - x1;
+                float yDiff = y2 - y1;
+                return Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI;
+            }
+            public Font font = new Font("Times New Roman", 15, FontStyle.Bold);
+            private Image DrawText(String text, Font font, Color textColor, Color backColor)
+            {
+                //first, create a dummy bitmap just to get a graphics object
+                Image img = new Bitmap(1, 1);
+                Graphics drawing = Graphics.FromImage(img);
+
+                //measure the string to see how big the image needs to be
+                SizeF textSize = drawing.MeasureString(text, font);
+
+                //free up the dummy image and old graphics object
+                img.Dispose();
+                drawing.Dispose();
+
+                //create a new image of the right size
+                img = new Bitmap((int)textSize.Width, (int)textSize.Height);
+
+                drawing = Graphics.FromImage(img);
+
+                //paint the background
+                drawing.Clear(backColor);
+
+                //create a brush for the text
+                Brush textBrush = new SolidBrush(textColor);
+
+                drawing.DrawString(text, font, textBrush, 0, 0);
+
+                drawing.Save();
+
+                textBrush.Dispose();
+                drawing.Dispose();
+
+                return img;
+
             }
 
             protected override void OnDrawClear(Graphics g, Color backgroundColor)
             {
                 lock (adjusterThreadLock)
                 {
+                    Brush onClearBrush = new SolidBrush(backgroundColor);
+                    Point p = GetTextLocation();
+                    SizeF textSize = g.MeasureString(this.Flow.ToString(), font);
+                    g.FillRectangle(onClearBrush, p.X, p.Y, textSize.Width, textSize.Height);
                     if (this.PreviousPointsToGoThrough.Count == 0) this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
                     Pen onClearPen = new Pen(backgroundColor, Path.DEFAULT_WIDTH);
-                    Brush onClearBrush = new SolidBrush(backgroundColor);
                     Point previousPoint = this.PreviousPointsToGoThrough[0];
                     foreach (Point currentPoint in this.PreviousPointsToGoThrough)
                     {
