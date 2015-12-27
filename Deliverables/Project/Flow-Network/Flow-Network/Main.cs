@@ -1405,49 +1405,58 @@ namespace Flow_Network
                 string nextLine;
                 string[] a;
                 Element l = null;
+                ConnectionZone.Path p = null;
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
                     {
                         a = nextLine.Split(',');
+                        
                         if (a[0] == typeof(SinkElement).Name)
                         {
                             l = new SinkElement();
+                            l.X = int.Parse(a[1]);
+                            l.Y = int.Parse(a[2]);
                         }
-                        if (a[0] == typeof(PumpElement).Name)
+                        else if (a[0] == typeof(PumpElement).Name)
                         {
                             l = new PumpElement();
+                            l.X = int.Parse(a[1]);
+                            l.Y = int.Parse(a[2]);
                         }
-                        if (a[0] == typeof(MergerElement).Name)
+                        else if (a[0] == typeof(MergerElement).Name)
                         {
                             l = new MergerElement();
+                            l.X = int.Parse(a[1]);
+                            l.Y = int.Parse(a[2]);
                         }
-                        if (a[0] == typeof(SplitterElement).Name)
+                        else if (a[0] == typeof(SplitterElement).Name)
                         {
                             l = new SplitterElement();
+                            l.X = int.Parse(a[1]);
+                            l.Y = int.Parse(a[2]);
                         }
-                        if (a[0] == typeof(AdjustableSplitter).Name)
+                        else if (a[0] == typeof(AdjustableSplitter).Name)
                         {
                             l = new AdjustableSplitter();
+                            l.X = int.Parse(a[1]);
+                            l.Y = int.Parse(a[2]);
                         }
-                        if (a[0] == typeof(ConnectionZone.Path).Name)
-                        {
-                            
-                            Point from = new Point(int.Parse(a[1]), int.Parse(a[2]));
-                            Point to = new Point(int.Parse(a[3]), int.Parse(a[4]));
-                            Element From = FindElementUnder(from);
-                            Element To = FindElementUnder(to);
-                            ConnectionZone f = new ConnectionZone(from, From, false);
-                            ConnectionZone t = new ConnectionZone(to, To, true);
-                            ConnectionZone.Path p = new ConnectionZone.Path(f,t);
+                        else if (a[0] == "Path")
+                        { 
+                            Point from = new Point(int.Parse(a[1]),int.Parse(a[2]));
+                            Point to = new Point(int.Parse(a[3]),int.Parse(a[4]));
+                            ConnectionZone f = FindConnectionZoneUnder(from);
+                            ConnectionZone t = FindConnectionZoneUnder(to);
+                            p = new ConnectionZone.Path(f, t);
                             AllPaths.Add(p);
                         }
                         AllElements.Add(l);
-                        l.X = int.Parse(a[1]);
-                        l.Y = int.Parse(a[2]);
+                        
                     }
                 }
                 plDraw.Invalidate();
+                fs.Close();
             }
         }
 
@@ -1475,7 +1484,7 @@ namespace Flow_Network
                             string b = con.From.Location.Y.ToString();
                             string c = con.To.Location.X.ToString();
                             string d = con.To.Location.Y.ToString();
-                            sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c + "," + d);
+                            sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c + "," + d + "," + con.From.Parent.ToString() + "," + con.To.Parent.ToString());
                         }
                     }
                     myStream.Close();
