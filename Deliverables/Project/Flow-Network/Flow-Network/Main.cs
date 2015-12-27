@@ -752,12 +752,9 @@ namespace Flow_Network
             {
                 btnSave_Click(sender, e);
             }
-            else if (dr == DialogResult.No)
-            {
                 AllPaths.Clear();
                 AllElements.Clear();
                 plDraw.Invalidate();
-            }
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
@@ -766,7 +763,7 @@ namespace Flow_Network
             AllElements.Clear();
             plDraw.Invalidate();
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            openFileDialog.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
             openFileDialog.Filter = "pipeline file(*.pipelane)|*.pipelane";
             openFileDialog.RestoreDirectory = true;
             openFileDialog.FilterIndex = 1;
@@ -804,11 +801,14 @@ namespace Flow_Network
                         }
                         if (a[0] == typeof(ConnectionZone.Path).Name)
                         {
+                            
                             Point from = new Point(int.Parse(a[1]), int.Parse(a[2]));
                             Point to = new Point(int.Parse(a[3]), int.Parse(a[4]));
-                            ConnectionZone f = new ConnectionZone(from, l, true);
-                            ConnectionZone t = new ConnectionZone(to, l, false);
-                            ConnectionZone.Path p = new ConnectionZone.Path(f, t);
+                            Element From = FindElementUnder(from);
+                            Element To = FindElementUnder(to);
+                            ConnectionZone f = new ConnectionZone(from, From, false);
+                            ConnectionZone t = new ConnectionZone(to, To, true);
+                            ConnectionZone.Path p = new ConnectionZone.Path(f,t);
                             AllPaths.Add(p);
                         }
                         AllElements.Add(l);
@@ -824,7 +824,7 @@ namespace Flow_Network
         {
             Stream myStream;
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            sfd.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
             sfd.Filter = "pipeline file(*.pipelane)|*.pipelane";
             if (sfd.ShowDialog() == DialogResult.OK)
             {
