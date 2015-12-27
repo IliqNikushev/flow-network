@@ -37,8 +37,6 @@ namespace Flow_Network
         /// </summary>
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
-        public Font font = new Font("Times New Roman", 20, FontStyle.Bold);
-        public SolidBrush myBrush = new SolidBrush(Color.Red);
         
         private ActiveToolType ActiveTool = ActiveToolType.None;
 
@@ -65,6 +63,8 @@ namespace Flow_Network
 
         public Main()
         {
+            this.pumpEditPopup.OnFlowAltered += () => RefreshConnections();
+            this.adjustableSplitterEditPopup.OnFlowAltered += () => RefreshConnections();
             Resources.Initialize();
             InitializeComponent();
             this.plDrawGraphics = this.plDraw.CreateGraphics();
@@ -185,95 +185,8 @@ namespace Flow_Network
                 }
             };
         }
-        Point p;
-        void ShowFlow()
-        {
-            foreach (ConnectionZone.Path path in AllPaths)
-            {
-                //find midpoint
-                int midX = (path.From.Location.X + path.To.Location.X) / 2;
-                int midY = (path.From.Location.Y + path.To.Location.Y) / 2;
-                //find angle
-                double angle = GetAngle(path.From.Location.X, path.To.Location.X, path.From.Location.Y, path.To.Location.Y);
-                
-                if (angle >= 0 && angle <= 65)
-                {
-                    midX -= 10;
-                    midY += 10;
-                }
-                else if (angle > 65 && angle <= 115)
-                {
-                    midY -= 15;
-                    midX -= 20;
-                }
-                else if (angle > 115 && angle <= 180)
-                {
-                    midX += 10;
-                    midY += 10;
-                }
-                else if (angle < 0 && angle >= -65)
-                {
-                    midY += 15;
-                    midX += 15;
-                }
-                else if (angle < -65 && angle >= -115)
-                {
-                    midY -= 15;
-                    midX -= 15;
-                }
-                else if (angle < -115 && angle >= -180)
-                {
-                    midX -= 10;
-                    midY += 10;
-                }
-
-                p = new Point(midX, midY);
-                //plDrawGraphics.DrawImage(DrawText(path.Flow.ToString(), font, Color.Red, Color.AliceBlue), p);
-
-                Drawable.LockGraphicsForDraw(plDrawGraphics, () => plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p));
-            }
-        }
-        private double GetAngle(int x1,int x2,int y1,int y2)
-        {
-            float xDiff = x2 - x1;
-            float yDiff = y2 - y1;
-            return Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI;
-        }
-        private Image DrawText(String text, Font font, Color textColor, Color backColor)
-        {
-            //first, create a dummy bitmap just to get a graphics object
-            Image img = new Bitmap(1, 1);
-            Graphics drawing = Graphics.FromImage(img);
-
-            //measure the string to see how big the image needs to be
-            SizeF textSize = drawing.MeasureString(text, font);
-
-            //free up the dummy image and old graphics object
-            img.Dispose();
-            drawing.Dispose();
-
-            //create a new image of the right size
-            img = new Bitmap((int)textSize.Width, (int)textSize.Height);
-
-            drawing = Graphics.FromImage(img);
-
-            //paint the background
-            drawing.Clear(backColor);
-
-            //create a brush for the text
-            Brush textBrush = new SolidBrush(textColor);
-
-            drawing.DrawString(text, font, textBrush, 0, 0);
-
-            drawing.Save();
-
-            textBrush.Dispose();
-            drawing.Dispose();
-
-            return img;
-
-        }
-
+        
+        
         void plDraw_HandleLoseFocus(object sender, EventArgs e)
         {
             iconBelowCursor.Visible = false;
@@ -704,7 +617,6 @@ namespace Flow_Network
                 };
 
                 result.Adjust();
-                ShowFlow();
                 UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
 
                 PathStart = null;
@@ -770,7 +682,6 @@ namespace Flow_Network
                 HandleStopDrag(dragElement);
             else if (dragMidPoint != null)
                 HandleStopDrag(dragMidPoint);
-            ShowFlow();
         }
 
         void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
@@ -1023,7 +934,6 @@ namespace Flow_Network
             {
                 path.Draw(e.Graphics, plDraw.BackColor);
             }
-            ShowFlow();
         }
 
         private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth = 1)

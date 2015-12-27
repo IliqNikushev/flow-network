@@ -13,6 +13,7 @@ namespace Flow_Network.CustomComponents
     public partial class EditPopup : UserControl
     {
         private Object valueObject;
+        public Action OnFlowAltered = () => { };
         public Object Value
         {
             get { return valueObject; }
