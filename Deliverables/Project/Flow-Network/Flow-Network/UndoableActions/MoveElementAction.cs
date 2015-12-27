@@ -10,9 +10,9 @@ namespace Flow_Network.UndoableActions
     {
         private System.Drawing.Point OldCoordinates;
         private System.Drawing.Point NewCoordinates;
-        private Element element;
+        private IconDrawable element;
 
-        public MoveElementAction(Element element, System.Drawing.Point oldCoordinates, System.Drawing.Point newCoordinates)
+        public MoveElementAction(IconDrawable element, System.Drawing.Point oldCoordinates, System.Drawing.Point newCoordinates)
         {
             this.element = element;
             this.OldCoordinates = oldCoordinates;
@@ -33,7 +33,7 @@ namespace Flow_Network.UndoableActions
 
         protected override string AsString
         {
-            get { return string.Format("Move element from {0} to {1}", this.OldCoordinates, this.NewCoordinates); }
+            get { return string.Format("Move {2} from {0} to {1}", this.OldCoordinates, this.NewCoordinates, this.element is Element ? "element" : "midpoint"); }
         }
     }
 }

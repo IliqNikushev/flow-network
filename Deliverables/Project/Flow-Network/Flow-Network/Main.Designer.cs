@@ -256,7 +256,7 @@
             // pbMerger
             // 
             this.pbMerger.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbMerger.Image = global::Flow_Network.Properties.Resources.merger;
+            this.pbMerger.Image = ((System.Drawing.Image)(resources.GetObject("pbMerger.Image")));
             this.pbMerger.Location = new System.Drawing.Point(17, 343);
             this.pbMerger.Name = "pbMerger";
             this.pbMerger.Size = new System.Drawing.Size(59, 54);
@@ -268,7 +268,7 @@
             // pbAdjSplitter
             // 
             this.pbAdjSplitter.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbAdjSplitter.Image = global::Flow_Network.Properties.Resources.A_splitter;
+            this.pbAdjSplitter.Image = global::Flow_Network.Properties.Resources.adjustableSplitter;
             this.pbAdjSplitter.Location = new System.Drawing.Point(17, 283);
             this.pbAdjSplitter.Name = "pbAdjSplitter";
             this.pbAdjSplitter.Size = new System.Drawing.Size(59, 54);
@@ -280,7 +280,7 @@
             // pbSplitter
             // 
             this.pbSplitter.BackColor = System.Drawing.Color.AliceBlue;
-            this.pbSplitter.Image = global::Flow_Network.Properties.Resources.splitter1;
+            this.pbSplitter.Image = ((System.Drawing.Image)(resources.GetObject("pbSplitter.Image")));
             this.pbSplitter.Location = new System.Drawing.Point(17, 223);
             this.pbSplitter.Name = "pbSplitter";
             this.pbSplitter.Size = new System.Drawing.Size(59, 54);

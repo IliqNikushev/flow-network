@@ -10,19 +10,22 @@ using System.Windows.Forms;
 
 namespace Flow_Network.CustomComponents
 {
-    public partial class PipeEditPopup : UserControl
+    public partial class PipeEditPopup : EditPopup
     {
-        private Graphics controlGraphics;
-
-        private Flow_Network.ConnectionZone.Path currentPath;
         public Flow_Network.ConnectionZone.Path CurrentPath
         {
-            get { return currentPath; }
+            get { return base.Value as Flow_Network.ConnectionZone.Path; }
             set
             {
-                this.currentPath = value;
-                RefreshPath();
+                this.Value = value;
             }
+        }
+
+        protected override void OnObjectChanged()
+        {
+            this.numericValuePicker.Value = (decimal)MaxFlow;
+
+            numericValuePicker_ValueChanged(null, null);
         }
 
         /// <summary>
@@ -32,9 +35,9 @@ namespace Flow_Network.CustomComponents
         {
             get
             {
-                if (currentPath == null) return 0;
-                if (currentPath.MaxFlow == 0) return 0;
-                int value = (int)((currentPath.Flow / currentPath.MaxFlow) * 100);
+                if (CurrentPath == null) return 0;
+                if (CurrentPath.MaxFlow == 0) return 0;
+                int value = (int)((CurrentPath.Flow / CurrentPath.MaxFlow) * 100);
                 if (value > 100) value = 100;
                 return value;
             }
@@ -44,8 +47,8 @@ namespace Flow_Network.CustomComponents
         {
             get
             {
-                if (currentPath == null) return 0;
-                return currentPath.MaxFlow;
+                if (CurrentPath == null) return 0;
+                return CurrentPath.MaxFlow;
             }
         }
 
@@ -53,25 +56,23 @@ namespace Flow_Network.CustomComponents
         {
             get
             {
-                if (currentPath == null) return 0;
-                return currentPath.Flow;
+                if (CurrentPath == null) return 0;
+                return CurrentPath.Flow;
             }
         }
 
-        public PipeEditPopup(ConnectionZone.Path path)
+        public PipeEditPopup(ConnectionZone.Path path) : base(path)
         {
             InitializeComponent();
 
             this.numericValuePicker.ValueChanged += numericValuePicker_ValueChanged;
-
-            this.CurrentPath = path;
         }
 
         void numericValuePicker_ValueChanged(object sender, EventArgs e)
         {
             if (CurrentPath == null) return;
 
-            currentPath.MaxFlow = (float)numericValuePicker.Value;
+            CurrentPath.MaxFlow = (float)numericValuePicker.Value;
 
             this.lblCurrentPercent.Text = FlowPercent + "%";
             this.lblCurrentPercent.Top = ArrowTop;
@@ -107,19 +108,6 @@ namespace Flow_Network.CustomComponents
                 arrowTop = SliderTop + arrowTop;
                 return arrowTop;
             }
-        }
-
-        private void RefreshPath()
-        {
-            if (this.CurrentPath == null)
-            {
-                this.Hide();
-                return;
-            }
-            this.Show();
-            this.numericValuePicker.Value = (decimal)MaxFlow;
-            
-            numericValuePicker_ValueChanged(null, null);
         }
     }
 }

@@ -13,12 +13,18 @@ namespace Flow_Network
         public ConnectionZone Down { get; private set; }
 
         public ConnectionZone In { get; private set; }
-
+        
         public SplitterElement()
         {
-            this.Up = new ConnectionZone(this.Width, 0, this, false);
-            this.Down = new ConnectionZone(this.Width, this.Height, this, false);
-            this.In = new ConnectionZone(0, this.Height / 2, this, true);
+            this.Up = new ConnectionZone(32, -10, this, false);
+            this.Down = new ConnectionZone(32, 30, this, false);
+            this.In = new ConnectionZone(-12, 12, this, true);
+            if(this is AdjustableSplitter)
+            {
+                this.Up = new ConnectionZone(32, 5, this, false);
+                this.Down = new ConnectionZone(32, 29, this, false);
+                this.In = new ConnectionZone(-10, 17, this, true);
+            }
         }
     }
 }

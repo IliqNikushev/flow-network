@@ -18,9 +18,9 @@ namespace Flow_Network
 
         public MergerElement()
         {
-            this.Up = new ConnectionZone(0, 0, this, true);
-            this.Down = new ConnectionZone(0, this.Height, this, true);
-            this.Out = new ConnectionZone(this.Width, this.Height / 2, this, false);
+            this.Up = new ConnectionZone(-10, -6, this, true);
+            this.Down = new ConnectionZone(-10, 30, this, true);
+            this.Out = new ConnectionZone(34, 12, this, false);
         }
     }
 }

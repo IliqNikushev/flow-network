@@ -81,8 +81,34 @@ namespace Flow_Network
             return minimum;
         }
 
+        public static bool PointIsOnLine(Point lineStart, Point lineEnd, Point point, out Point intersection, int width = -1)
+        {
+            int crossLength = 2;
+
+            Point crossH1 = new Point(point.X, point.Y - crossLength);
+            Point crossH2 = new Point(point.X, point.Y + crossLength);
+            Point diagTL = new Point(point.X - crossLength, point.Y - crossLength);
+            Point diagBR = new Point(point.X + crossLength, point.Y + crossLength);
+
+            Point diagBL = new Point(point.X - crossLength, point.Y + crossLength);
+            Point diagTR = new Point(point.X + crossLength, point.Y - crossLength);
+
+            Point crossV1 = new Point(point.X - crossLength, point.Y);
+            Point crossV2 = new Point(point.X + crossLength, point.Y);
+
+            return (Collision.Intersects(lineStart, lineEnd, crossH1, crossH2, out intersection, width)|| Collision.Intersects(lineStart, lineEnd, crossV1, crossV2, out intersection, width) ||
+                    Collision.Intersects(lineStart, lineEnd, diagTL, diagBR, out intersection, width) || Collision.Intersects(lineStart, lineEnd, diagBL, diagTR, out intersection, width));
+        }
+
         public static bool Intersects(Point a1, Point a2, Point b1, Point b2)
         {
+            Point p;
+            return Intersects(a1, a2, b1, b2, out p);
+        }
+
+        public static bool LineIntersection(Point a1, Point a2, Point b1, Point b2, out Point intersection)
+        {
+            intersection = new Point(-1, -1);
             Point b = new Point(a2.X - a1.X, a2.Y - a1.Y);
             Point d = new Point(b2.X - b1.X, b2.Y - b1.Y);
             float bDotDPerp = b.X * d.Y - b.Y * d.X;
@@ -100,9 +126,38 @@ namespace Flow_Network
             if (u < 0 || u > 1)
                 return false;
 
-            //intersection = new Point((int)(a1.X + t * b.X), (int)(a1.Y + t * b.Y));
+            intersection = new Point((int)(a1.X + t * b.X), (int)(a1.Y + t * b.Y));
 
             return true;
+        }
+
+        public static bool Intersects(Point a1, Point a2, Point b1, Point b2, out Point intersection, int width = -1)
+        {
+            bool state = LineIntersection(a1, a2, b1, b2, out intersection);
+            if (state || width == 0) return state;
+
+            if (width == -1) width = ConnectionZone.Path.DEFAULT_WIDTH;
+            Point d = new Point(a2.X - a1.X, a2.Y - a1.Y);
+            d.X = d.X > 0 ? width / 2 : -width / 2;
+            d.Y = d.Y > 0 ? width / 2 : -width / 2;
+
+            Point normalUP = new Point(-d.Y, d.X);
+            
+            Point normalDown = new Point(d.Y, -d.X);
+
+            Point up1 = new Point(a1.X + normalUP.X, a1.Y + normalUP.Y);
+            Point up2 = new Point(a2.X + normalUP.X, a2.Y + normalUP.Y); 
+            state = LineIntersection(up1, up2, b1, b2, out intersection);
+            if (state)
+                return state;
+
+            Point down1 = new Point(a1.X + normalDown.X, a1.Y + normalDown.Y);
+            Point down2 = new Point(a2.X + normalDown.X, a2.Y + normalDown.Y);
+            state = LineIntersection(down1, down2, b1, b2, out intersection);
+            if (state)
+                return state;
+            intersection = new Point(-1, -1);
+            return false;
         }
     }
 }

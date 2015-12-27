@@ -22,7 +22,7 @@ namespace Flow_Network.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace Flow_Network.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Flow_Network.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace Flow_Network.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,9 +63,9 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap A_splitter {
+        public static System.Drawing.Bitmap adjustableSplitter {
             get {
-                object obj = ResourceManager.GetObject("A_splitter", resourceCulture);
+                object obj = ResourceManager.GetObject("adjustableSplitter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,7 +73,17 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap close {
+        public static System.Drawing.Bitmap adjustableSplitterClear {
+            get {
+                object obj = ResourceManager.GetObject("adjustableSplitterClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap close {
             get {
                 object obj = ResourceManager.GetObject("close", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -83,7 +93,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap connect {
+        public static System.Drawing.Bitmap connect {
             get {
                 object obj = ResourceManager.GetObject("connect", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -93,7 +103,67 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cursor {
+        public static System.Drawing.Bitmap connectionZone {
+            get {
+                object obj = ResourceManager.GetObject("connectionZone", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneActive {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneActive", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneBlocking {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneBlocking", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneClear {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneDelete {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneDelete", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap connectionZoneHovered {
+            get {
+                object obj = ResourceManager.GetObject("connectionZoneHovered", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap cursor {
             get {
                 object obj = ResourceManager.GetObject("cursor", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -103,7 +173,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap load {
+        public static System.Drawing.Bitmap load {
             get {
                 object obj = ResourceManager.GetObject("load", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -113,7 +183,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap merger {
+        public static System.Drawing.Bitmap merger {
             get {
                 object obj = ResourceManager.GetObject("merger", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -123,9 +193,9 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap merger1 {
+        public static System.Drawing.Bitmap mergerClear {
             get {
-                object obj = ResourceManager.GetObject("merger1", resourceCulture);
+                object obj = ResourceManager.GetObject("mergerClear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +203,9 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap mergerRescaled {
+        public static System.Drawing.Bitmap pathMidPoint {
             get {
-                object obj = ResourceManager.GetObject("mergerRescaled", resourceCulture);
+                object obj = ResourceManager.GetObject("pathMidPoint", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,7 +213,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap pipeSlider {
+        public static System.Drawing.Bitmap pipeSlider {
             get {
                 object obj = ResourceManager.GetObject("pipeSlider", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -153,7 +223,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap pipeSliderArrow {
+        public static System.Drawing.Bitmap pipeSliderArrow {
             get {
                 object obj = ResourceManager.GetObject("pipeSliderArrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -161,19 +231,29 @@ namespace Flow_Network.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Icon pump {
+        public static System.Drawing.Bitmap pump {
             get {
                 object obj = ResourceManager.GetObject("pump", resourceCulture);
-                return ((System.Drawing.Icon)(obj));
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap save {
+        public static System.Drawing.Bitmap pumpClear {
+            get {
+                object obj = ResourceManager.GetObject("pumpClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap save {
             get {
                 object obj = ResourceManager.GetObject("save", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -183,7 +263,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap sink {
+        public static System.Drawing.Bitmap sink {
             get {
                 object obj = ResourceManager.GetObject("sink", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -193,7 +273,17 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap sinkRescaled {
+        public static System.Drawing.Bitmap sinkClear {
+            get {
+                object obj = ResourceManager.GetObject("sinkClear", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap sinkRescaled {
             get {
                 object obj = ResourceManager.GetObject("sinkRescaled", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -203,7 +293,7 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap splitter {
+        public static System.Drawing.Bitmap splitter {
             get {
                 object obj = ResourceManager.GetObject("splitter", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
@@ -213,39 +303,9 @@ namespace Flow_Network.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap splitter1 {
+        public static System.Drawing.Bitmap splitterClear {
             get {
-                object obj = ResourceManager.GetObject("splitter1", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap toggled {
-            get {
-                object obj = ResourceManager.GetObject("toggled", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap toggled2 {
-            get {
-                object obj = ResourceManager.GetObject("toggled2", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap toggled3 {
-            get {
-                object obj = ResourceManager.GetObject("toggled3", resourceCulture);
+                object obj = ResourceManager.GetObject("splitterClear", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

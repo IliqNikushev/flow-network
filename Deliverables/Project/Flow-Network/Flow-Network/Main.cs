@@ -37,6 +37,9 @@ namespace Flow_Network
         /// </summary>
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
+        public Font font = new Font("Times New Roman", 20, FontStyle.Bold);
+        public SolidBrush myBrush = new SolidBrush(Color.Red);
+        
         private ActiveToolType ActiveTool = ActiveToolType.None;
 
         private PictureBox iconBelowCursor;
@@ -45,6 +48,7 @@ namespace Flow_Network
         private ConnectionZone PathEnd;
 
         private Element dragElement;
+        private PathMidPointDrawable dragMidPoint;
         private PictureBox oldDragElementPlaceholder;
         private Point dragStart;
         private Point mousePosition = new Point(0, 0);
@@ -56,11 +60,14 @@ namespace Flow_Network
         /// Subscribes for the Undo and Redo events of the UndoStack
         /// Subscribes the draw panel for the different events
         /// </summary>
+        /// 
+        Graphics plDrawGraphics;
 
         public Main()
         {
+            Resources.Initialize();
             InitializeComponent();
-
+            this.plDrawGraphics = this.plDraw.CreateGraphics();
             oldDragElementPlaceholder = new PictureBox();
             oldDragElementPlaceholder.Height = Element.DefaultSize.Y;
             oldDragElementPlaceholder.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -69,12 +76,7 @@ namespace Flow_Network
             oldDragElementPlaceholder.Visible = false;
 
             plDraw.Controls.Add(oldDragElementPlaceholder);
-            
-            Resources.PumpIcon = this.pbPump.Image;
-            Resources.SinkIcon = Properties.Resources.sinkRescaled;
-            Resources.MergerIcon = Properties.Resources.merger1;
-            Resources.SplitterIcon = Properties.Resources.splitter1;
-            Resources.AdjSplitterIcon = this.pbAdjSplitter.Image;
+
             iconBelowCursor = new PictureBox();
             iconBelowCursor.Width = 16;
             iconBelowCursor.Height = 16;
@@ -82,13 +84,13 @@ namespace Flow_Network
             iconBelowCursor.Visible = false;
             Controls.Add(iconBelowCursor);
 
-            plDraw.MouseMove += plDraw_ChangeState;
-            plDraw.MouseMove += plDraw_HandleDynamicIcon;
-            plDraw.MouseMove += plDraw_MoveDragElement;
+            plDraw.Click += plDraw_HandleClick;
+            plDraw.MouseMove += plDraw_HandleMouseMove;
             plDraw.MouseDown += plDraw_HandleStartDrag;
             plDraw.MouseUp += plDraw_HandleStopDrag;
             plDraw.Paint += plDraw_Redraw;
-            plDraw.Click += plDraw_HandleClick;
+            plDraw.MouseEnter += plDraw_HandleGainFocus;
+            plDraw.MouseLeave += plDraw_HandleLoseFocus;
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
             {
@@ -98,8 +100,45 @@ namespace Flow_Network
                 else
                     lastActionToUndoLbl.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
+                if (lastAction is UndoableActions.AddConnectionAction)
+                {
+                    UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
+
+                    if (action is UndoableActions.RemoveConnectionAction)
+                    {
+                        plDraw.Invalidate();
+                    }
+                    else
+                    {
+                        if (action.Connection.IsNew) return;
+                        action.Connection.To.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        action.Connection.From.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                    }
+                }
+
+                else if (lastAction is UndoableActions.AddElementAction)
+                {
+                    UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    if (action is UndoableActions.RemoveElementAction)
+                    {
+                        plDraw.Invalidate();
+                    }
+                    else
+                    {
+                        action.Element.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        RefreshConnections();
+                    }
+                }
+                else if (lastAction is UndoableActions.AddMidPointAction)
                     plDraw.Invalidate();
+
+                else if (lastAction is UndoableActions.MoveElementAction)
+                {
+                    RefreshConnections();
+                    plDraw.Invalidate();
+                }
             };
 
             UndoStack.OnRedoAltered += (numberLeft, lastAction) =>
@@ -110,33 +149,291 @@ namespace Flow_Network
                 else
                     lastActionUndone.Text = lastAction.ToString();
 
-                if (lastAction is UndoableActions.RemoveConnectionAction || lastAction is UndoableActions.AddConnectionAction)
+                if (lastAction is UndoableActions.AddConnectionAction)
+                {
+                    UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
+
+                    if (action is UndoableActions.RemoveConnectionAction)
+                    {
+                        action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                    }
+                    else
+                    {
+                        plDraw.Invalidate();
+                    }
+                }
+
+                else if (lastAction is UndoableActions.AddElementAction)
+                {
+                    UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    if (action is UndoableActions.RemoveElementAction)
+                    {
+                        action.Element.Draw(this.plDrawGraphics, this.plDraw.BackColor);
+                        RefreshConnections();
+                    }
+                    else
+                    {
+                        plDraw.Invalidate();
+                    }
+                }
+
+                else if (lastAction is UndoableActions.MoveElementAction)
+                {
+                    RefreshConnections();
                     plDraw.Invalidate();
+                }
             };
         }
-        ConnectionZone lastHovered;
-        ConnectionZone lastHoveredConnected;
-        void plDraw_ChangeState(object sender, MouseEventArgs e)
+        Point p;
+        void ShowFlow()
         {
-            ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
-            if (hovered != null)
+            foreach (ConnectionZone.Path path in AllPaths)
             {
-                lastHovered = hovered;
-                    if (hovered.State == 1)
-                    {
-                        lastHoveredConnected = hovered;
-                    }
-                hovered.State = 2;
+                //find midpoint
+                int midX = (path.From.Location.X + path.To.Location.X) / 2;
+                int midY = (path.From.Location.Y + path.To.Location.Y) / 2;
+                //find angle
+                double angle = GetAngle(path.From.Location.X, path.To.Location.X, path.From.Location.Y, path.To.Location.Y);
+                
+                if (angle >= 0 && angle <= 65)
+                {
+                    midX -= 10;
+                    midY += 10;
+                }
+                else if (angle > 65 && angle <= 115)
+                {
+                    midY -= 15;
+                    midX -= 20;
+                }
+                else if (angle > 115 && angle <= 180)
+                {
+                    midX += 10;
+                    midY += 10;
+                }
+                else if (angle < 0 && angle >= -65)
+                {
+                    midY += 15;
+                    midX += 15;
+                }
+                else if (angle < -65 && angle >= -115)
+                {
+                    midY -= 15;
+                    midX -= 15;
+                }
+                else if (angle < -115 && angle >= -180)
+                {
+                    midX -= 10;
+                    midY += 10;
+                }
+
+                p = new Point(midX, midY);
+                //plDrawGraphics.DrawImage(DrawText(path.Flow.ToString(), font, Color.Red, Color.AliceBlue), p);
+
+                Drawable.LockGraphicsForDraw(plDrawGraphics, () => plDrawGraphics.DrawString(path.Flow.ToString(), font, myBrush, p));
+            }
+        }
+        private double GetAngle(int x1,int x2,int y1,int y2)
+        {
+            float xDiff = x2 - x1;
+            float yDiff = y2 - y1;
+            return Math.Atan2(yDiff, xDiff) * 180.0 / Math.PI;
+        }
+        private Image DrawText(String text, Font font, Color textColor, Color backColor)
+        {
+            //first, create a dummy bitmap just to get a graphics object
+            Image img = new Bitmap(1, 1);
+            Graphics drawing = Graphics.FromImage(img);
+
+            //measure the string to see how big the image needs to be
+            SizeF textSize = drawing.MeasureString(text, font);
+
+            //free up the dummy image and old graphics object
+            img.Dispose();
+            drawing.Dispose();
+
+            //create a new image of the right size
+            img = new Bitmap((int)textSize.Width, (int)textSize.Height);
+
+            drawing = Graphics.FromImage(img);
+
+            //paint the background
+            drawing.Clear(backColor);
+
+            //create a brush for the text
+            Brush textBrush = new SolidBrush(textColor);
+
+            drawing.DrawString(text, font, textBrush, 0, 0);
+
+            drawing.Save();
+
+            textBrush.Dispose();
+            drawing.Dispose();
+
+            return img;
+
+        }
+
+        void plDraw_HandleLoseFocus(object sender, EventArgs e)
+        {
+            iconBelowCursor.Visible = false;
+        }
+
+        void plDraw_HandleGainFocus(object sender, EventArgs e)
+        {
+            if (ActiveTool != ActiveToolType.Delete)
+                iconBelowCursor.Visible = true;
+        }
+
+        void plDraw_HandleMouseMove(object sender, MouseEventArgs e)
+        {
+            mousePosition = e.Location;
+            if (mousePosition.X < 0)
+                mousePosition.X = 0;
+            else if (mousePosition.X > plDraw.Width - iconBelowCursor.Width)
+                mousePosition.X = plDraw.Width - iconBelowCursor.Height;
+            if (mousePosition.Y < 0)
+                mousePosition.Y = 0;
+            else if (mousePosition.Y > plDraw.Height - iconBelowCursor.Height)
+                mousePosition.Y = plDraw.Height - iconBelowCursor.Height;
+
+            plDraw_HandleHover(sender, e);
+            plDraw_HandleDynamicIcon(sender, e);
+            if (dragElement != null)
+            {
+                plDraw_HandleMoveDragElement(sender, e);
                 plDraw.Invalidate();
             }
-            else if (hovered != lastHovered)
+            else if (dragMidPoint != null)
             {
-                lastHovered.State = 0;
-                if (lastHoveredConnected != null)
+                plDraw_HandleMoveDragMidPoint(sender, e);
+                plDraw.Invalidate();
+            }
+        }
+
+        Drawable lastHovered = null;
+        Drawable currentHovered = null;
+
+        void plDraw_HandleHover(object sender, MouseEventArgs e)
+        {
+            if (dragMidPoint != null)
+            {
+                dragMidPoint.Path.DrawState = DrawState.Hovered;
+                return;
+            }
+
+            currentHovered = null;
+            DrawState state = DrawState.None;
+            if (ActiveTool == ActiveToolType.Pipe)
+                currentHovered = FindConnectionZoneUnder(mousePosition);
+            else
+                if (currentHovered == null)
+                    currentHovered = FindElementUnder(mousePosition);
+            if (currentHovered == null)
+                currentHovered = FindPathUnder(mousePosition);
+
+            if (currentHovered == lastHovered)
+                return;
+
+            if (currentHovered is ConnectionZone.Path)
+            {
+                ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
+                PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
+                if (closest != null)
                 {
-                    lastHoveredConnected.State = 1;
+                    currentHovered = closest;
                 }
             }
+
+            if (lastHovered != currentHovered)
+            {
+                if (lastHovered != null)
+                {
+                    if (lastHovered is ConnectionZone)
+                    {
+                        ConnectionZone z = lastHovered as ConnectionZone;
+                        if (z == PathStart)
+                            z.DrawState = DrawState.Active;
+                        else if (z.IsConnected || z.FlowIsSameAs(PathStart) || (PathStart != null && ZoneParentIsUsedInPath(z)))
+                            z.DrawState = DrawState.Blocking;
+                        else
+                            z.DrawState = DrawState.Normal;
+                    }
+                    else
+                        if (lastHovered is ConnectionZone.Path)
+                            lastHovered.DrawState = DrawState.Normal;
+                        else if (lastHovered is Element)
+                            lastHovered.DrawState = DrawState.Normal;
+                        else
+                            lastHovered.DrawState = lastHovered.LastState;
+                    lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+
+                lastHovered = currentHovered;
+            }
+
+            if (currentHovered == null) return;
+
+            if (currentHovered is ConnectionZone)
+            {
+                if (currentHovered == PathStart)
+                    state = DrawState.Active;
+                else if ((currentHovered as ConnectionZone).IsConnected)
+                    state = DrawState.Blocking;
+                else if (PathStart != null)
+                {
+                    if (PathStart.FlowIsSameAs(currentHovered as ConnectionZone))
+                        state = DrawState.Blocking;
+                    else
+                        state = DrawState.Hovered;
+                }
+                else
+                    state = DrawState.Hovered;
+            }
+            else if (currentHovered is Element)
+            {
+                if (ActiveTool == ActiveToolType.Delete)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Select)
+                    if (dragElement == null)
+                        state = DrawState.Hovered;
+                    else
+                        state = DrawState.Blocking;
+                else
+                    state = DrawState.Blocking;
+            }
+            else if (currentHovered is ConnectionZone.Path)
+            {
+                if (ActiveTool == ActiveToolType.Delete)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Pipe)
+                    state = DrawState.Hovered;
+                else if (ActiveTool == ActiveToolType.Select)
+                {
+                    ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
+                    PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
+                    if (closest != null)
+                    {
+                        plDraw.Cursor = Cursors.SizeAll;
+                    }
+                    else
+                        plDraw.Cursor = Cursors.Arrow;
+                    state = DrawState.Hovered;
+                }
+            }
+            if (state == DrawState.None)
+                state = DrawState.Normal;
+
+            currentHovered.DrawState = state;
+            currentHovered.Draw(plDrawGraphics, plDraw.BackColor);
+            if (ActiveTool == ActiveToolType.Pipe)
+                if (currentHovered is Element)
+                {
+                    foreach (ConnectionZone zone in (currentHovered as Element).ConnectionZones)
+                    {
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                    }
+                }
         }
 
         protected void pboxToolClick(object sender, EventArgs e)
@@ -144,11 +441,13 @@ namespace Flow_Network
             PictureBox clickedPbox = (PictureBox)sender;
             if (clickedPbox == null)
                 return;
+
             if (currentActiveToolPbox != null)
             {
                 currentActiveToolPbox.BackColor = Color.AliceBlue;
             }
             currentActiveToolPbox = clickedPbox;
+            ActiveToolType previousTool = ActiveTool;
             if (currentActiveToolPbox == pbSelect)
                 ActiveTool = ActiveToolType.Select;
             else if (currentActiveToolPbox == pbPump)
@@ -168,7 +467,17 @@ namespace Flow_Network
             else
                 ActiveTool = ActiveToolType.None;
             clickedPbox.BackColor = Color.Gold;
-            plDraw.Invalidate();
+            if (previousTool == ActiveTool) return;
+            if (previousTool != ActiveToolType.Pipe && ActiveTool == ActiveToolType.Pipe)
+                foreach (Element el in AllElements)
+                {
+                    foreach (ConnectionZone zone in el.ConnectionZones)
+                    {
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                    }
+                }
+            else if (previousTool == ActiveToolType.Pipe && ActiveTool != ActiveToolType.Pipe)
+                plDraw.Invalidate();
         }
 
         void plDraw_HandleClick(object sender, EventArgs e)
@@ -176,6 +485,9 @@ namespace Flow_Network
             if (rightClickPanel != null)
                 if (rightClickPanel.Visible)
                     rightClickPanel.Visible = false;
+            if (activePopup != null)
+                if (activePopup.Visible)
+                    activePopup.Visible = false;
 
             if (((MouseEventArgs)e).Button == MouseButtons.Right)
             {
@@ -191,7 +503,7 @@ namespace Flow_Network
                 case ActiveToolType.AdjustableSplitter:
                 case ActiveToolType.Merger:
                     HandleCreateElementToolClick(); return;
-                case ActiveToolType.Pipe: HandleConnectionToolClick(); return;
+                case ActiveToolType.Pipe: HandlePipeToolClick(); return;
                 case ActiveToolType.Delete: HandleDeleteToolClick(); return;
                 case ActiveToolType.Select: HandleSelectToolClick(); return;
                 case ActiveToolType.None: return;
@@ -200,60 +512,61 @@ namespace Flow_Network
         }
         #region tools
 
-        private CustomComponents.PipeEditPopup pipeEditPopup;
+        private CustomComponents.PipeEditPopup pipeEditPopup = new CustomComponents.PipeEditPopup(null);
+        private CustomComponents.PumpEditPopup pumpEditPopup = new CustomComponents.PumpEditPopup(null);
+        private CustomComponents.AdjustableSplitterEditPopup adjustableSplitterEditPopup = new CustomComponents.AdjustableSplitterEditPopup(null);
+
+        private CustomComponents.EditPopup activePopup;
 
         void HandleSelectToolClick()
         {
             if (dragElement != null) return;
-
-            HandleEdit();
         }
 
-        void HandleEdit()
+        void HandleEdit(Drawable d)
         {
-            ConnectionZone.Path path = FindPathUnder(mousePosition);
-            if (path != null)
-            {
-                ShowEditPath(path);
-                return;
-            }
+            if (d is ConnectionZone.Path)
+                ShowEditPopup(d, pipeEditPopup);
+            else if (d is PumpElement)
+                ShowEditPopup(d, pumpEditPopup);
+            else if (d is AdjustableSplitter)
+                ShowEditPopup(d, adjustableSplitterEditPopup);
         }
 
-        void ShowEditPath(ConnectionZone.Path path)
+        void ShowEditPopup(Object value, CustomComponents.EditPopup popup)
         {
-            foreach (Point midPoint in path.UserDefinedMidPoints)
-            {
-                //if mousePosition is within midpoint => DRAG midpoint
-            }
-            if (pipeEditPopup == null)
-            {
-                pipeEditPopup = new CustomComponents.PipeEditPopup(path);
+            if (activePopup != null)
+                if(activePopup != popup)
+                    activePopup.Value = null;
 
-                this.plDraw.Controls.Add(pipeEditPopup);
-            }
+            activePopup = popup;
+            activePopup.Value = value;
 
-            pipeEditPopup.Location = mousePosition;
-        }
+            activePopup.Visible = true;
 
-        void HandleSelectToolOverPump()
-        {
-        }
+            activePopup.Location = mousePosition;
 
-        void HandleSelectToolOverAdjustableSplitter()
-        {
-
+            if (activePopup.Parent != this)
+                this.plDraw.Controls.Add(activePopup);
         }
 
         void HandleDeleteToolClick()
         {
-            Element e = FindElementUnder(mousePosition);
-            if (e != null)
-                RemoveElement(e);
+            if (currentHovered == null) return;
+            else if (currentHovered is Element) RemoveElement(currentHovered as Element);
+            else if (currentHovered is ConnectionZone.Path) RemoveConnection(currentHovered as ConnectionZone.Path);
+            else if (currentHovered is PathMidPointDrawable) RemoveMidPoint(currentHovered as PathMidPointDrawable);
+            else if (currentHovered is ConnectionZone) return;
+            else
+                throw new NotImplementedException("Unknown hovered, " + currentHovered.GetType().Name);
+            if (lastHovered == currentHovered) lastHovered = null;
+            currentHovered.DrawState = DrawState.Normal;
+            currentHovered = null;
         }
 
         void HandleCreateElementToolClick()
         {
-            if (HasCollision(mousePosition))
+            if (HasElementForPlacementUnder(mousePosition))
             {
                 return;
             }
@@ -288,20 +601,72 @@ namespace Flow_Network
             else
                 throw new ArgumentException("Unknown element " + ActiveTool);
         }
-        
 
-        void HandleConnectionToolClick()
+        bool ElementIsUsedInPath(Element element, HashSet<Element> processed)
         {
-            //TO DO: if hovered is added to path and if the element is already added as start or end ... end method
+            if (processed.Contains(element)) return true;
+            processed.Add(element);
+            foreach (ConnectionZone zone in element.ConnectionZones)
+            {
+                if(zone.IsOutFlow)
+                    if(zone.ConnectedZone != null)
+                        if (ElementIsUsedInPath(zone.ConnectedZone.Parent, processed))
+                            return true;
+            }
+            return false;
+        }
+
+        bool ZoneParentIsUsedInPath(ConnectionZone zone)
+        {
+            return ElementIsUsedInPath(zone.Parent, new HashSet<Element>(new Element[]{PathStart.Parent}));
+        }
+
+        bool PathResultsInCirular()
+        {
+            return ZoneParentIsUsedInPath(PathEnd);
+        }
+
+        void HandlePipeToolClick()
+        {
+            //TO DO: end if cycle;
             ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
-            if (hovered == null) return;
+            if (hovered == null)
+            {
+                Point intersection;
+                ConnectionZone.Path path = FindPathUnder(mousePosition, out intersection);
+                if (path != null)
+                {
+                    PathMidPointDrawable midPoint = path.GetClosestMidPointTo(mousePosition);
+                    if (midPoint == null)
+                    {
+                        int index = path.AddUserMidPoint(intersection);
+                        UndoStack.AddAction(new UndoableActions.AddMidPointAction(path.UserDefinedMidPoints[index]));
+                    }
+                }
+                return;
+            }
+
+            if (PathStart != null) if (PathStart.Parent == hovered.Parent) return;
+            if (hovered.IsConnected) return;
 
             if (PathStart == null) PathStart = hovered;
             else PathEnd = hovered;
-            
+
+            if(PathEnd != null)
+                if (PathEnd.IsOutFlow)
+                {
+                    PathEnd = PathStart;
+                    PathStart = hovered;
+                }
+
+            if (PathStart != null && PathEnd == null)
+            {
+                PathStart.DrawState = DrawState.Active;
+                SetBlockedForSameFlowZones(true);
+            }
             if (PathStart != null && PathEnd != null)
             {
-                if ((PathStart.IsInFlow && PathEnd.IsInFlow) || (PathStart.IsOutFlow && PathEnd.IsOutFlow))
+                if (PathStart.FlowIsSameAs(PathEnd))
                 {
                     PathEnd = null;
                     return;
@@ -311,23 +676,35 @@ namespace Flow_Network
                     PathEnd = null;
                     return;
                 }
-                PathStart.State = 1;
-                PathEnd.State = 1;
+                if (PathResultsInCirular())
+                {
+                    PathEnd = null;
+                    return;
+                }
+                ResetBlockedForSameFlowZones(true);
+
+                PathStart.DrawState = DrawState.Blocking;
+                PathEnd.DrawState = DrawState.Blocking;
                 ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
-                
+                PathStart.Draw(plDrawGraphics, plDraw.BackColor);
+                PathEnd.Draw(plDrawGraphics, plDraw.BackColor);
                 result.OnCreated += () =>
                 {
-                    result.Add();
-                    plDraw.Invalidate();
+                    result.Draw(plDrawGraphics, plDraw.BackColor);
+                };
+
+                result.OnBeforeAdjusted += () =>
+                {
+                    result.DrawClear(plDrawGraphics, plDraw.BackColor);
                 };
 
                 result.OnAdjusted += () =>
                 {
-                    plDraw.Invalidate();
+                    result.Draw(plDrawGraphics, plDraw.BackColor);
                 };
 
                 result.Adjust();
-
+                ShowFlow();
                 UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
 
                 PathStart = null;
@@ -335,17 +712,65 @@ namespace Flow_Network
             }
 
         }
+
+        private void ResetBlockedForSameFlowZones(bool redraw)
+        {
+            foreach (Element e in AllElements)
+            {
+                foreach (ConnectionZone zone in e.ConnectionZones)
+                {
+                    if (zone.IsConnected)
+                        zone.DrawState = DrawState.Blocking;
+                    else
+                        zone.DrawState = DrawState.Normal;
+                    if (redraw)
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+            }
+        }
+
+        private void SetBlockedForSameFlowZones(bool redraw)
+        {
+            foreach (Element e in AllElements)
+            {
+                bool isUsed = ElementIsUsedInPath(e, new HashSet<Element>(new Element[]{PathStart.Parent}));
+                foreach (ConnectionZone zone in e.ConnectionZones)
+                {
+                    if (zone == PathStart) continue;
+                    if (isUsed || zone.FlowIsSameAs(PathStart))
+                        zone.DrawState = DrawState.Blocking;
+                    if (redraw)
+                        zone.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+            }
+        }
         #endregion
         #region drag
-        void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
+
+        void HandleStopDrag(IconDrawable drawable)
         {
-            if (HasCollision(mousePosition))
+            if (drawable == null) return;
+            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element))
             {
                 RevertDrag();
             }
+            else
+            {
+                UndoStack.AddAction(new UndoableActions.MoveElementAction(drawable, dragStart, mousePosition));
+            }
             oldDragElementPlaceholder.Visible = false;
-            dragElement = null;
+            if (drawable is Element) dragElement = null;
+            else if (drawable is PathMidPointDrawable) dragMidPoint = null;
             plDraw.Cursor = Cursors.Arrow;
+        }
+
+        void plDraw_HandleStopDrag(object sender, MouseEventArgs e)
+        {
+            if (dragElement != null)
+                HandleStopDrag(dragElement);
+            else if (dragMidPoint != null)
+                HandleStopDrag(dragMidPoint);
+            ShowFlow();
         }
 
         void plDraw_HandleStartDrag(object sender, MouseEventArgs e)
@@ -353,7 +778,7 @@ namespace Flow_Network
             if (ActiveTool != ActiveToolType.Select)
                 return;
             if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
-            if (dragElement == null)
+            if (dragElement == null && dragMidPoint == null)
             {
                 dragElement = FindElementUnder(mousePosition);
                 if (dragElement != null)
@@ -363,40 +788,141 @@ namespace Flow_Network
                     oldDragElementPlaceholder.Location = dragStart;
                     oldDragElementPlaceholder.Image = dragElement.Icon;
                 }
+                else
+                {
+                    ConnectionZone.Path path = FindPathUnder(mousePosition);
+                    if (path != null)
+                    {
+                        PathMidPointDrawable point = path.GetClosestMidPointTo(mousePosition);
+                        if (point != null)
+                        {
+                            dragStart = point.Location;
+                            dragMidPoint = point;
+                        }
+                    }
+                }
             }
             else
             {
                 dragElement.Location = mousePosition;
             }
-
         }
 
-        void plDraw_MoveDragElement(object sender, MouseEventArgs e)
+        void plDraw_HandleMoveDragElement(object sender, MouseEventArgs e)
         {
             if (dragElement == null) return;
-            if (dragElement.Location != e.Location)
+            Point location = mousePosition;
+
+            if (dragElement.Location != location)
             {
-                dragElement.Location = e.Location;
+                dragElement.Location = location;
+
                 RefreshConnections();
+            }
+        }
+
+        Point oldMidPointLocation = new Point(0, 0);
+
+        void plDraw_HandleMoveDragMidPoint(object sender, MouseEventArgs e)
+        {
+            if (dragMidPoint == null) return;
+            Point location = mousePosition;
+
+            if (dragMidPoint.Location != location)
+            {
+                dragMidPoint.Location = location;
+
+                Element found = FindElementUnder(location);
+                if(found != null)
+                {
+                    dragMidPoint.Location = oldMidPointLocation;
+                }
+
+                RefreshDragMidPointPathCollisions();
+                RefreshConnections();
+
+                oldMidPointLocation = location;
+            }
+        }
+
+        private void RefreshDragMidPointPathCollisions()
+        {
+            dragMidPoint.Path.Adjust();
+        }
+
+        private void RefreshDragElementPathCollisions()
+        {
+            if (dragElement.Connections.Count() == 0) return;
+            foreach (Element element in AllElements)
+            {
+                if (element == dragElement) continue;
+                bool redraw = false;
+                foreach (ConnectionZone.Path path in dragElement.Connections)
+                {
+                    Point previous = path.From;
+
+                    foreach (Point point in path.PathPoints)
+                    {
+                        if (point == previous) continue;
+                        if (
+                            Collision.Intersects(previous, point, element.A, element.B) ||
+                            Collision.Intersects(previous, point, element.B, element.C) ||
+                            Collision.Intersects(previous, point, element.C, element.D) ||
+                            Collision.Intersects(previous, point, element.D, element.A)
+                            )
+                        {
+                            element.Draw(plDrawGraphics, plDraw.BackColor);
+                            break;
+                        }
+                        previous = point;
+                    }
+                    if (redraw) break;
+                }
             }
         }
 
         private void RevertDrag()
         {
-            if (dragElement == null) return;
+            if (dragMidPoint != null)
+            {
+                dragMidPoint.Location = dragStart;
+                oldDragElementPlaceholder.Visible = false;
+                
+                dragMidPoint.Path.Adjust(onDone: () => plDraw.Invalidate());
+                dragMidPoint = null;
+            }
+            else if (dragElement != null)
+            {
+                dragElement.DrawClear(plDrawGraphics, plDraw.BackColor);
+                foreach (ConnectionZone.Path path in dragElement.Connections)
+                {
+                    path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                }
 
-            dragElement.Location = dragStart;
-            oldDragElementPlaceholder.Visible = false;
-            dragElement = null;
+                foreach (Element q in FindCollisionsForPlacementOfElementUnder(dragElement.Location))
+                {
+                    if (q == dragElement) continue;
+                    q.Draw(plDrawGraphics, plDraw.BackColor);
+                }
 
-            RefreshConnections();
-
+                dragElement.Location = dragStart;
+                oldDragElementPlaceholder.Visible = false;
+                dragElement = null;
+                //plDraw.Invalidate();
+                RefreshConnections();
+            }
         }
 
         #endregion
 
         void plDraw_HandleDynamicIcon(object sender, MouseEventArgs evnt)
         {
+            if (ActiveTool == ActiveToolType.Pipe)
+            {
+                this.iconBelowCursor.Visible = false;
+                this.Cursor = Cursors.Arrow;
+                return;
+            }
             if (ActiveTool == ActiveToolType.Select)
             {
                 Element e = FindElementUnder(mousePosition);
@@ -405,10 +931,17 @@ namespace Flow_Network
                     this.Cursor = Cursors.SizeAll;
                 }
                 else
-                    this.Cursor = Cursors.Arrow;
+                {
+                    ConnectionZone.Path path = FindPathUnder(mousePosition);
+                    bool foundPoint = false;
+                    if (path != null)
+                        if (path.GetClosestMidPointTo(mousePosition) != null)
+                            foundPoint = true;
+                    if (!foundPoint)
+                        this.Cursor = Cursors.Arrow;
+                }
             }
 
-            mousePosition = evnt.Location;
             if (ActiveTool == ActiveToolType.None)
             {
                 iconBelowCursor.Visible = false;
@@ -417,7 +950,7 @@ namespace Flow_Network
             else if (ActiveTool == ActiveToolType.Delete)
             {
                 iconBelowCursor.Visible = false;
-                if (HasCollision(mousePosition))
+                if (HasElementForPlacementUnder(mousePosition))
                 {
                     this.Cursor = System.Windows.Forms.Cursors.No;
                 }
@@ -433,81 +966,98 @@ namespace Flow_Network
             else
             {
                 iconBelowCursor.Visible = true;
-                Point point = evnt.Location;
+                Point point = mousePosition;
                 point.Offset(plDraw.Location);
                 point.Offset(16, 16);
                 this.iconBelowCursor.Location = point;
-                if (HasCollision(mousePosition))
+
+                IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                if (dragMidPoint != null) collisionsForPlacement = new Element[]{FindElementUnder(mousePosition)}.Where(x=>x!=null);
+                if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;
+                    foreach (Element collision in collisionsForPlacement)
+                    {
+                        if (collision.DrawState == DrawState.Blocking) continue;
+                        collision.DrawState = DrawState.Blocking;
+                        collision.Draw(plDrawGraphics, plDraw.BackColor);
+                    }
                 }
-                else iconBelowCursor.BackColor = Color.Green;
+                else
+                {
+                    iconBelowCursor.BackColor = Color.Green;
+                }
+
+                foreach (Element collision in lastCollisionsForPlacement)
+                {
+                    if (collisionsForPlacement.Contains(collision)) continue;
+                    if (collision.DrawState == DrawState.Normal) continue;
+                    collision.DrawState = DrawState.Normal;
+                    collision.Draw(plDrawGraphics, plDraw.BackColor);
+                }
+                lastCollisionsForPlacement = collisionsForPlacement;
+
                 iconBelowCursor.BringToFront();
             }
         }
 
+        private IEnumerable<Element> lastCollisionsForPlacement = new Element[0];
+
         void plDraw_Redraw(object sender, PaintEventArgs e)
         {
-            foreach (var item in AllElements)
+            foreach (Element element in AllElements)
             {
-                e.Graphics.DrawImage(item.Icon, item.Location.X, item.Location.Y, item.Width, item.Height);
+                if (element == dragElement)
+                    continue;
+                else
+                    element.Draw(e.Graphics, plDraw.BackColor);
                 if (ActiveTool == ActiveToolType.Pipe)
-                    foreach (var con in item.ConnectionZones)
+                    foreach (ConnectionZone con in element.ConnectionZones)
                     {
-                        if (con.State == 0)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
-                        else if (con.State ==1)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled2, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
-                        else if (con.State ==2)
-                        {
-                            e.Graphics.DrawImage(Properties.Resources.toggled3, con.Location.X, con.Location.Y, con.Width, con.Height);
-                        }
-                        //if connection is taken make red, if connection is empty green, if connection is in use yellow
-                        //if mouse is on top - mark active
-
+                        con.Draw(e.Graphics, plDraw.BackColor);
                     }
             }
-
+            if (dragElement != null)
+                dragElement.OnlyDraw(e.Graphics, plDraw.BackColor);
             foreach (ConnectionZone.Path path in new List<ConnectionZone.Path>(AllPaths))
             {
-                Pen pen = Pens.Black;
-
-                if (pathToDelete == path)
-                    pen = new Pen(Color.Red, 3);
-                else
-                    pen = Pens.Black;
-
-                Point previous = path.From;
-                foreach (Point point in path.PathPoints)
-                {
-                    e.Graphics.DrawLine(pen, previous, point);
-                    previous = point;
-                }
+                path.Draw(e.Graphics, plDraw.BackColor);
             }
+            ShowFlow();
         }
-        private bool LineIntersectsAt(Point a, Point b, Point mouse)
+
+        private bool LineIntersectsAt(Point a, Point b, Point mouse, int lineWidth = 1)
         {
-            Point crossH1 = new Point(mouse.X, mouse.Y - 1);
-            Point crossH2 = new Point(mouse.X, mouse.Y + 1);
+            Point p;
+            return LineIntersectsAt(a, b, mouse, out p);
+        }
 
-            Point crossV1 = new Point(mouse.X - 1, mouse.Y);
-            Point crossV2 = new Point(mouse.X + 1, mouse.Y);
-
-            return (Collision.Intersects(a, b, crossH1, crossH2) || Collision.Intersects(a, b, crossV1, crossV2));
+        private bool LineIntersectsAt(Point a, Point b, Point mouse,out Point p, int lineWidth = 1)
+        {
+            return Collision.PointIsOnLine(a, b, mouse, out p);
         }
 
         #region AddElement Remove
 
         void RemoveElement(Element e)
         {
-            AllElements.Remove(e);
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
+        }
 
-            RefreshConnections(e);
+        void RemoveConnection(ConnectionZone.Path e)
+        {
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
+            UndoStack.AddAction(new UndoableActions.RemoveConnectionAction(e));
+        }
+
+        void RemoveMidPoint(PathMidPointDrawable e)
+        {
+            if (e == lastHovered) lastHovered = null;
+            if (e == currentHovered) currentHovered = null;
+            UndoStack.AddAction(new UndoableActions.RemoveMidPointAction(e));
         }
 
         void AddElement(Element e, Point position)
@@ -515,26 +1065,62 @@ namespace Flow_Network
             e.X = position.X;
             e.Y = position.Y;
 
-            AllElements.Add(e);
-
             UndoStack.AddAction(new UndoableActions.AddElementAction(e));
-
-            RefreshConnections(e);
         }
+
+        static object refreshLock = new object();
 
         private void RefreshConnections(Element e = null)
         {
-            if (e == null)
-                foreach (Element item in AllElements)
-                    item.RefreshConnections();
-            else
-                foreach (Element item in AllElements)
-                    if (item == e)
-                        continue;
-                    else
-                        item.RefreshConnections();
+            foreach (Element element in AllElements)
+            {
+                if (e != null)
+                    if (e == element) continue;
 
-            plDraw.Invalidate();
+                foreach (ConnectionZone.Path p in element.Connections)
+                {
+                    ConnectionZone.Path path = p;
+                    List<Point> current = new List<Point>(path.PreviousPointsToGoThrough);
+                    path.Adjust(false, onDone: () =>
+                    {
+                        this.Invoke(new Action(() =>
+                        {
+                            path.To.Parent.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.To.Parent.Draw(plDrawGraphics, plDraw.BackColor);
+                            path.From.Parent.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.From.Parent.Draw(plDrawGraphics, plDraw.BackColor);
+                            List<Point> newPoints = new List<Point>(path.PreviousPointsToGoThrough);
+                            path.PreviousPointsToGoThrough = current;
+                            path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.PreviousPointsToGoThrough = newPoints;
+                            path.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            path.Draw(plDrawGraphics, plDraw.BackColor);
+
+                            foreach (ConnectionZone.Path otherPath in AllPaths)
+                            {
+                                if (otherPath == path) continue;
+                                if (Collision.Intersects(path.From, path.To, otherPath.From, otherPath.To))
+                                {
+                                    otherPath.Draw(plDrawGraphics, plDraw.BackColor);
+                                }
+                            }
+                            List<Point> points = new List<Point>(path.PathPoints);
+                            foreach (Element el in AllElements)
+                            {
+                                foreach (Point pp in points)
+                                {
+                                    if (pp == el.A || pp == el.B || pp == el.C || pp == el.D)
+                                    {
+                                        el.OnlyDraw(plDrawGraphics, plDraw.BackColor);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        ));
+                    });
+                }
+            }
         }
 
         void AddElement<T>(Point position) where T : Element
@@ -566,13 +1152,24 @@ namespace Flow_Network
             if (ActiveTool == ActiveToolType.Select)
             {
                 RevertDrag();
+            }
+
+            if (ActiveTool == ActiveToolType.Pipe)
+            {
+                if (PathStart != null)
+                {
+                    ResetBlockedForSameFlowZones(true);
+                    PathStart.DrawState = DrawState.Normal;
+                }
+
+                PathStart = null;
                 return;
             }
 
             RightClickOptions options = ~RightClickOptions.Remove;
             rightClickMousePosition = mousePosition;
 
-            if (HasCollision(rightClickMousePosition))
+            if (HasElementForPlacementUnder(rightClickMousePosition))
             {
                 Element e = FindElementUnder(rightClickMousePosition);
                 if (e != null)
@@ -582,18 +1179,22 @@ namespace Flow_Network
                         options |= RightClickOptions.Edit;
                 }
             }
+            else if (FindPathUnder(rightClickMousePosition) != null)
+            {
+                HandleEdit(FindPathUnder(rightClickMousePosition));
+                return;
+            }
 
             if (rightClickPanel == null)
             {
                 rightClickPanel = new Panel();
-                rightClickPanel.LostFocus += (x, y) => rightClickPanel.Visible = false;
                 plDraw.Controls.Add(rightClickPanel);
 
                 rightClickPanel.Width = 100;
 
-                rightClickPanel.AddButton("Edit", (x, y) => 
+                rightClickPanel.AddButton("Edit", (x, y) =>
                 {
-                    HandleEdit();
+                    HandleEdit(FindElementUnder(rightClickMousePosition));
                 }).Name = "edit";
 
                 rightClickPanel.AddButton("Remove", (x, y) =>
@@ -641,7 +1242,7 @@ namespace Flow_Network
             else
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
 
-            if(options.HasFlag(RightClickOptions.Edit))
+            if (options.HasFlag(RightClickOptions.Edit))
                 rightClickPanel.Controls.Find("edit", false)[0].Enabled = true;
             else
                 rightClickPanel.Controls.Find("edit", false)[0].Enabled = false;
@@ -676,14 +1277,14 @@ namespace Flow_Network
         private Element FindElementUnder(Point mousePosition)
         {
             return AllElements.FirstOrDefault(q =>
-                {
-                    if (q == dragElement) return false;
+            {
+                if (q == dragElement) return false;
 
-                    if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
-                        if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
-                            return true;
-                    return false;
-                });
+                if (q.X <= mousePosition.X && q.X + q.Width >= mousePosition.X)
+                    if (q.Y <= mousePosition.Y && q.Y + q.Height >= mousePosition.Y)
+                        return true;
+                return false;
+            });
         }
         private ConnectionZone.Path FindPathUnder(Point mousePosition)
         {
@@ -693,7 +1294,23 @@ namespace Flow_Network
                 {
                     Point lineStart = path.PathPoints[i];
                     Point lineEnd = path.PathPoints[i + 1];
-                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition))
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, path.Width))
+                        return path;
+                }
+            }
+            return null;
+        }
+
+        private ConnectionZone.Path FindPathUnder(Point mousePosition, out Point intersection)
+        {
+            intersection = new Point(-1, -1);
+            foreach (ConnectionZone.Path path in AllPaths)
+            {
+                for (int i = 0; i < path.PathPoints.Count - 1; i++)
+                {
+                    Point lineStart = path.PathPoints[i];
+                    Point lineEnd = path.PathPoints[i + 1];
+                    if (LineIntersectsAt(lineStart, lineEnd, mousePosition, out intersection))
                         return path;
                 }
             }
@@ -728,7 +1345,21 @@ namespace Flow_Network
             });
         }
 
-        private bool HasCollision(Point mousePosition)
+        private IEnumerable<Element> FindCollisionsForPlacementOfElementUnder(Point mousePosition)
+        {
+            return AllElements.Where(q =>
+            {
+                if (q == dragElement) return false;
+                Point position = mousePosition;
+
+                if (q.X - q.Width <= position.X && q.X + q.Width >= position.X)
+                    if (q.Y - q.Height <= position.Y && q.Y + q.Height >= position.Y)
+                        return true;
+                return false;
+            });
+        }
+
+        private bool HasElementForPlacementUnder(Point mousePosition)
         {
             return FindCollisionForPlacementOfElementUnder(mousePosition) != null;
         }
@@ -777,8 +1408,8 @@ namespace Flow_Network
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
-                    { 
-                        a= nextLine.Split(',');
+                    {
+                        a = nextLine.Split(',');
                         if (a[0] == typeof(SinkElement).Name)
                         {
                             l = new SinkElement();
@@ -786,7 +1417,7 @@ namespace Flow_Network
                         if (a[0] == typeof(PumpElement).Name)
                         {
                             l = new PumpElement();
-                        } 
+                        }
                         if (a[0] == typeof(MergerElement).Name)
                         {
                             l = new MergerElement();
@@ -836,16 +1467,16 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            sw.WriteLine((item.GetType().Name + "," + x +","+ y));
+                            sw.WriteLine((item.GetType().Name + "," + x + "," + y));
                         }
-                            foreach (var con in AllPaths)
-                            {
-                                string a = con.From.Location.X.ToString();
-                                string b = con.From.Location.Y.ToString();
-                                string c = con.To.Location.X.ToString();
-                                string d = con.To.Location.Y.ToString();
-                                sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c +","+ d);
-                            }
+                        foreach (var con in AllPaths)
+                        {
+                            string a = con.From.Location.X.ToString();
+                            string b = con.From.Location.Y.ToString();
+                            string c = con.To.Location.X.ToString();
+                            string d = con.To.Location.Y.ToString();
+                            sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c + "," + d);
+                        }
                     }
                     myStream.Close();
                     MessageBox.Show("Saved");
@@ -854,30 +1485,29 @@ namespace Flow_Network
             }
         }
 
-    
+
     }
 }
 
-        static class Extentions
+static class Extentions
+{
+    public static Button AddButton(this Panel panel, string text, EventHandler onClick = null)
+    {
+        Button button = new Button();
+        button.Text = text;
+        button.Width = panel.Width;
+        button.Height = 20;
+        foreach (var item in panel.Controls)
         {
-            public static Button AddButton(this Panel panel, string text, EventHandler onClick = null)
-            {
-                Button button = new Button();
-                button.Text = text;
-                button.Width = panel.Width;
-                button.Height = 20;
-                foreach (var item in panel.Controls)
-                {
-                    Control c = item as Control;
-                    if(c != null)
-                        button.Top += c.Height;
-                }
-                if (onClick != null)
-                    button.Click += onClick;
-
-                panel.Controls.Add(button);
-
-                return button;
-            }
+            Control c = item as Control;
+            if (c != null)
+                button.Top += c.Height;
         }
+        if (onClick != null)
+            button.Click += onClick;
 
+        panel.Controls.Add(button);
+
+        return button;
+    }
+}

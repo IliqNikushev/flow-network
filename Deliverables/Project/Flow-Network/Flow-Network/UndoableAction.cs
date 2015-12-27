@@ -9,7 +9,7 @@ namespace Flow_Network
     public abstract class UndoableAction
     {
         /// <summary>True = Is done, False = is not done / undone</summary>
-        private bool isApplied = true;
+        protected bool isApplied = false;
         public bool IsUndone { get { return !isApplied; } }
         public bool IsDone { get { return isApplied; } }
 
