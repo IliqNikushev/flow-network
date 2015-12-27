@@ -466,14 +466,16 @@ namespace Flow_Network
         void HandleDeleteToolClick()
         {
             if (currentHovered == null) return;
-            else if (currentHovered is Element) RemoveElement(currentHovered as Element);
-            else if (currentHovered is ConnectionZone.Path) RemoveConnection(currentHovered as ConnectionZone.Path);
-            else if (currentHovered is PathMidPointDrawable) RemoveMidPoint(currentHovered as PathMidPointDrawable);
+            else if (currentHovered is Element)
+                RemoveElement(currentHovered as Element);
+            else if (currentHovered is ConnectionZone.Path)
+                RemoveConnection(currentHovered as ConnectionZone.Path);
+            else if (currentHovered is PathMidPointDrawable)
+                RemoveMidPoint(currentHovered as PathMidPointDrawable);
             else if (currentHovered is ConnectionZone) return;
             else
                 throw new NotImplementedException("Unknown hovered, " + currentHovered.GetType().Name);
             if (lastHovered == currentHovered) lastHovered = null;
-            currentHovered.DrawState = DrawState.Normal;
             currentHovered = null;
         }
 
