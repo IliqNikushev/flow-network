@@ -245,9 +245,6 @@ namespace Flow_Network
             if (currentHovered == null)
                 currentHovered = FindPathUnder(mousePosition);
 
-            if (currentHovered == lastHovered)
-                return;
-
             if (currentHovered is ConnectionZone.Path)
             {
                 ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
@@ -258,32 +255,32 @@ namespace Flow_Network
                 }
             }
 
-            if (lastHovered != currentHovered)
-            {
-                if (lastHovered != null)
-                {
-                    if (lastHovered is ConnectionZone)
-                    {
-                        ConnectionZone z = lastHovered as ConnectionZone;
-                        if (z == PathStart)
-                            z.DrawState = DrawState.Active;
-                        else if (z.IsConnected || z.FlowIsSameAs(PathStart) || (PathStart != null && ZoneParentIsUsedInPath(z)))
-                            z.DrawState = DrawState.Blocking;
-                        else
-                            z.DrawState = DrawState.Normal;
-                    }
-                    else
-                        if (lastHovered is ConnectionZone.Path)
-                            lastHovered.DrawState = DrawState.Normal;
-                        else if (lastHovered is Element)
-                            lastHovered.DrawState = DrawState.Normal;
-                        else
-                            lastHovered.DrawState = lastHovered.LastState;
-                    lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
-                }
+            if (currentHovered == lastHovered)
+                return;
 
-                lastHovered = currentHovered;
+            if (lastHovered != null)
+            {
+                if (lastHovered is ConnectionZone)
+                {
+                    ConnectionZone z = lastHovered as ConnectionZone;
+                    if (z == PathStart)
+                        z.DrawState = DrawState.Active;
+                    else if (z.IsConnected || z.FlowIsSameAs(PathStart) || (PathStart != null && ZoneParentIsUsedInPath(z)))
+                        z.DrawState = DrawState.Blocking;
+                    else
+                        z.DrawState = DrawState.Normal;
+                }
+                else
+                    if (lastHovered is ConnectionZone.Path)
+                        lastHovered.DrawState = DrawState.Normal;
+                    else if (lastHovered is Element)
+                        lastHovered.DrawState = DrawState.Normal;
+                    else
+                        lastHovered.DrawState = lastHovered.LastState;
+                lastHovered.Draw(plDrawGraphics, plDraw.BackColor);
             }
+
+            lastHovered = currentHovered;
 
             if (currentHovered == null) return;
 
@@ -466,14 +463,16 @@ namespace Flow_Network
         void HandleDeleteToolClick()
         {
             if (currentHovered == null) return;
-            else if (currentHovered is Element) RemoveElement(currentHovered as Element);
-            else if (currentHovered is ConnectionZone.Path) RemoveConnection(currentHovered as ConnectionZone.Path);
-            else if (currentHovered is PathMidPointDrawable) RemoveMidPoint(currentHovered as PathMidPointDrawable);
+            else if (currentHovered is Element)
+                RemoveElement(currentHovered as Element);
+            else if (currentHovered is ConnectionZone.Path)
+                RemoveConnection(currentHovered as ConnectionZone.Path);
+            else if (currentHovered is PathMidPointDrawable)
+                RemoveMidPoint(currentHovered as PathMidPointDrawable);
             else if (currentHovered is ConnectionZone) return;
             else
                 throw new NotImplementedException("Unknown hovered, " + currentHovered.GetType().Name);
             if (lastHovered == currentHovered) lastHovered = null;
-            currentHovered.DrawState = DrawState.Normal;
             currentHovered = null;
         }
 
@@ -881,9 +880,19 @@ namespace Flow_Network
                 point.Offset(plDraw.Location);
                 point.Offset(16, 16);
                 this.iconBelowCursor.Location = point;
+                bool checkForCollisions = ActiveTool != ActiveToolType.Delete && ActiveTool != ActiveToolType.Pipe;
 
-                IEnumerable<Element> collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
-                if (dragMidPoint != null) collisionsForPlacement = new Element[]{FindElementUnder(mousePosition)}.Where(x=>x!=null);
+                IEnumerable<Element> collisionsForPlacement = new Element[0];
+                if (checkForCollisions)
+                {
+                    if (dragMidPoint != null) 
+                        collisionsForPlacement = new Element[] { FindElementUnder(mousePosition) }.Where(x => x != null);
+                    else
+                        if(ActiveTool == ActiveToolType.Select && dragElement != null)
+                            collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                        else if(ActiveTool != ActiveToolType.Select)
+                            collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
+                }
                 if (collisionsForPlacement.Any())
                 {
                     iconBelowCursor.BackColor = Color.Red;

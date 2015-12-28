@@ -55,21 +55,12 @@ namespace Flow_Network
         /// <summary>If connected, returns the zone prior to the current on the path they are connected</summary>
         public ConnectionZone ConnectedZone { get; set; }
 
-        private ConnectionZone getFlowStart = null;
-
         private float GetInFlow
         {
             get
             {
-                float flow = 0;
-                if (ConnectedZone != null && this.getFlowStart != ConnectedZone)
-                {
-                    this.ConnectedZone.getFlowStart = this;
-                    flow = ConnectedZone.Flow;
-                    this.ConnectedZone.getFlowStart = null;
-                }
-
-                return flow;
+                if (this.ConnectedZone == null) return 0;
+                 return ConnectedZone.Flow;
             }
         }
 
@@ -79,7 +70,9 @@ namespace Flow_Network
             {
                 if (this.Parent is PumpElement)
                     return (this.Parent as PumpElement).Flow;
-                else if (this.Parent is AdjustableSplitter)
+
+                float flow = this.Parent.ConnectionZones.Where(x => x.IsInFlow).Sum(x => x.Flow);
+                if (this.Parent is AdjustableSplitter)
                 {
                     AdjustableSplitter splitter = this.Parent as AdjustableSplitter;
                     float percent = 1;
@@ -87,17 +80,11 @@ namespace Flow_Network
                         percent = (splitter.UpFlowPercent / 100f);
                     else if (this == splitter.Down)
                         percent = (splitter.DownFlowPercent / 100f);
-                    return splitter.In.Flow * percent;
+                    flow *= percent;
                 }
                 else if (this.Parent is SplitterElement)
-                    return (this.Parent as SplitterElement).In.Flow * 0.5f;
-                else if (this.Parent is MergerElement)
-                    if (this.IsOutFlow)
-                    {
-                        MergerElement merger = this.Parent as MergerElement;
-                        return merger.Up.Flow + merger.Down.Flow;
-                    }
-                return 0;
+                    flow *= 0.5f;
+                return flow;
             }
         }
 
