@@ -61,10 +61,22 @@ namespace Flow_Network
         /// 
         Graphics plDrawGraphics;
 
+        public float FlowCapacity { get { return (float)this.nudMaxFlow.Value; } set { this.nudMaxFlow.Value = (decimal)value; } }
+        public float InFlow { get { return float.Parse(this.tbInFlow.Text); } set { this.tbInFlow.Text = value.ToString(); } }
+        public float OutFlow { get { return float.Parse(this.tbOutFlow.Text); } set { this.tbOutFlow.Text = value.ToString(); } }
+
         public Main()
         {
-            this.pumpEditPopup.OnFlowAltered += () => RefreshConnections();
-            this.adjustableSplitterEditPopup.OnFlowAltered += () => RefreshConnections();
+            this.pumpEditPopup.OnFlowAltered += () =>
+                {
+                    RefreshFlow();
+                    RefreshConnections();
+                };
+            this.adjustableSplitterEditPopup.OnFlowAltered += () =>
+                {
+                    RefreshFlow();
+                    RefreshConnections();
+                };
             Resources.Initialize();
             InitializeComponent();
             this.plDrawGraphics = this.plDraw.CreateGraphics();
@@ -104,6 +116,8 @@ namespace Flow_Network
                 {
                     UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
 
+                    RefreshFlow();
+
                     if (action is UndoableActions.RemoveConnectionAction)
                     {
                         plDraw.Invalidate();
@@ -120,6 +134,8 @@ namespace Flow_Network
                 else if (lastAction is UndoableActions.AddElementAction)
                 {
                     UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    RefreshFlow();
 
                     if (action is UndoableActions.RemoveElementAction)
                     {
@@ -153,6 +169,8 @@ namespace Flow_Network
                 {
                     UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
 
+                    RefreshFlow();
+
                     if (action is UndoableActions.RemoveConnectionAction)
                     {
                         action.Connection.Draw(this.plDrawGraphics, this.plDraw.BackColor);
@@ -166,6 +184,8 @@ namespace Flow_Network
                 else if (lastAction is UndoableActions.AddElementAction)
                 {
                     UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
+
+                    RefreshFlow();
 
                     if (action is UndoableActions.RemoveElementAction)
                     {
@@ -962,6 +982,7 @@ namespace Flow_Network
         {
             if (e == lastHovered) lastHovered = null;
             if (e == currentHovered) currentHovered = null;
+
             UndoStack.AddAction(new UndoableActions.RemoveElementAction(e));
         }
 
@@ -985,6 +1006,22 @@ namespace Flow_Network
             e.Y = position.Y;
 
             UndoStack.AddAction(new UndoableActions.AddElementAction(e));
+        }
+
+        private void RefreshFlow()
+        {
+            InFlow = 0;
+            OutFlow = 0;
+            float inFlow = 0;
+            float outFlow = 0;
+            foreach (Element e in AllElements)
+                if (e is PumpElement)
+                    inFlow += (e as PumpElement).Flow;
+                else if (e is SinkElement)
+                    outFlow += (e as SinkElement).Flow;
+            InFlow = inFlow;
+            OutFlow = outFlow;
+            //todo if > max
         }
 
         static object refreshLock = new object();

@@ -14,5 +14,7 @@ namespace Flow_Network
         {
             this.In = new ConnectionZone(11, 12, this, true);
         }
+
+        public float Flow { get { return this.In.Flow; } }
     }
 }

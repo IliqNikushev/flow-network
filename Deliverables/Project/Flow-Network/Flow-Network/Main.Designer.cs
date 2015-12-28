@@ -37,8 +37,7 @@
             this.lbSink = new System.Windows.Forms.Label();
             this.lbPump = new System.Windows.Forms.Label();
             this.lbSelect = new System.Windows.Forms.Label();
-            this.tbMax = new System.Windows.Forms.TextBox();
-            this.tbCurrent = new System.Windows.Forms.TextBox();
+            this.tbInFlow = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
@@ -67,6 +66,9 @@
             this.label17 = new System.Windows.Forms.Label();
             this.pictureBox11 = new System.Windows.Forms.PictureBox();
             this.btnNew = new System.Windows.Forms.Button();
+            this.nudMaxFlow = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
+            this.tbOutFlow = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
@@ -78,6 +80,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbDelete)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -152,39 +155,32 @@
             this.lbSelect.TabIndex = 12;
             this.lbSelect.Text = "Select/Edit";
             // 
-            // tbMax
+            // tbInFlow
             // 
-            this.tbMax.Location = new System.Drawing.Point(90, 579);
-            this.tbMax.Name = "tbMax";
-            this.tbMax.ReadOnly = true;
-            this.tbMax.Size = new System.Drawing.Size(127, 20);
-            this.tbMax.TabIndex = 3;
-            // 
-            // tbCurrent
-            // 
-            this.tbCurrent.Location = new System.Drawing.Point(90, 533);
-            this.tbCurrent.Name = "tbCurrent";
-            this.tbCurrent.ReadOnly = true;
-            this.tbCurrent.Size = new System.Drawing.Size(127, 20);
-            this.tbCurrent.TabIndex = 2;
+            this.tbInFlow.Enabled = false;
+            this.tbInFlow.Location = new System.Drawing.Point(90, 533);
+            this.tbInFlow.Name = "tbInFlow";
+            this.tbInFlow.ReadOnly = true;
+            this.tbInFlow.Size = new System.Drawing.Size(127, 20);
+            this.tbInFlow.TabIndex = 2;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(14, 579);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 14);
+            this.label2.Size = new System.Drawing.Size(63, 14);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Max flow";
+            this.label2.Text = "Max in flow";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(14, 539);
+            this.label1.Location = new System.Drawing.Point(5, 536);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 14);
+            this.label1.Size = new System.Drawing.Size(79, 14);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Current flow";
+            this.label1.Text = "Current in flow";
             // 
             // label11
             // 
@@ -464,12 +460,46 @@
             this.btnNew.UseVisualStyleBackColor = true;
             this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
             // 
+            // nudMaxFlow
+            // 
+            this.nudMaxFlow.DecimalPlaces = 2;
+            this.nudMaxFlow.Location = new System.Drawing.Point(90, 577);
+            this.nudMaxFlow.Maximum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.nudMaxFlow.Name = "nudMaxFlow";
+            this.nudMaxFlow.Size = new System.Drawing.Size(127, 20);
+            this.nudMaxFlow.TabIndex = 31;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 556);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(72, 14);
+            this.label3.TabIndex = 32;
+            this.label3.Text = "Total out flow";
+            // 
+            // tbOutFlow
+            // 
+            this.tbOutFlow.Enabled = false;
+            this.tbOutFlow.Location = new System.Drawing.Point(90, 556);
+            this.tbOutFlow.Name = "tbOutFlow";
+            this.tbOutFlow.ReadOnly = true;
+            this.tbOutFlow.Size = new System.Drawing.Size(127, 20);
+            this.tbOutFlow.TabIndex = 33;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
+            this.Controls.Add(this.tbOutFlow);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.nudMaxFlow);
             this.Controls.Add(this.pictureBox11);
             this.Controls.Add(this.btnNew);
             this.Controls.Add(this.pictureBox10);
@@ -505,8 +535,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.lbSelect);
             this.Controls.Add(this.lbSink);
-            this.Controls.Add(this.tbMax);
-            this.Controls.Add(this.tbCurrent);
+            this.Controls.Add(this.tbInFlow);
             this.Controls.Add(this.lbPump);
             this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "Main";
@@ -522,6 +551,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbDelete)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -529,8 +559,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox tbMax;
-        private System.Windows.Forms.TextBox tbCurrent;
+        private System.Windows.Forms.TextBox tbInFlow;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pbDelete;
@@ -567,6 +596,9 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.PictureBox pictureBox11;
         private System.Windows.Forms.Button btnNew;
+        private System.Windows.Forms.NumericUpDown nudMaxFlow;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox tbOutFlow;
     }
 }
 
