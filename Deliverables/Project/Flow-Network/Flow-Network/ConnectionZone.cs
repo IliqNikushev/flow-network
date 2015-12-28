@@ -55,21 +55,12 @@ namespace Flow_Network
         /// <summary>If connected, returns the zone prior to the current on the path they are connected</summary>
         public ConnectionZone ConnectedZone { get; set; }
 
-        private ConnectionZone getFlowStart = null;
-
         private float GetInFlow
         {
             get
             {
-                float flow = 0;
-                if (ConnectedZone != null && this.getFlowStart != ConnectedZone)
-                {
-                    this.ConnectedZone.getFlowStart = this;
-                    flow = ConnectedZone.Flow;
-                    this.ConnectedZone.getFlowStart = null;
-                }
-
-                return flow;
+                if (this.ConnectedZone == null) return 0;
+                 return ConnectedZone.Flow;
             }
         }
 
