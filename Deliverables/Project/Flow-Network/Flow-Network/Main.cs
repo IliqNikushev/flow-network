@@ -1313,56 +1313,58 @@ namespace Flow_Network
                 FileStream fs = new FileStream(openFileDialog.FileName, FileMode.Open);
                 StreamReader sr = new StreamReader(fs);
                 string nextLine;
-                string[] a;
-                Element l = null;
-                ConnectionZone.Path p = null;
+                string[] lineSplit;
+                Element load = null;
+                ConnectionZone.Path pathload;
                 while ((nextLine = sr.ReadLine()) != null)
                 {
                     Console.WriteLine(nextLine);
                     {
-                        a = nextLine.Split(',');
+                        lineSplit = nextLine.Split(',');
                         
-                        if (a[0] == typeof(SinkElement).Name)
+                        if (lineSplit[0] == typeof(SinkElement).Name)
                         {
-                            l = new SinkElement();
-                            l.X = int.Parse(a[1]);
-                            l.Y = int.Parse(a[2]);
+                            load = new SinkElement();
+                            load.X = int.Parse(lineSplit[1]);
+                            load.Y = int.Parse(lineSplit[2]);
                         }
-                        else if (a[0] == typeof(PumpElement).Name)
+                        else if (lineSplit[0] == typeof(PumpElement).Name)
                         {
-                            l = new PumpElement();
-                            l.X = int.Parse(a[1]);
-                            l.Y = int.Parse(a[2]);
+                            load = new PumpElement();
+                            load.X = int.Parse(lineSplit[1]);
+                            load.Y = int.Parse(lineSplit[2]);
                         }
-                        else if (a[0] == typeof(MergerElement).Name)
+                        else if (lineSplit[0] == typeof(MergerElement).Name)
                         {
-                            l = new MergerElement();
-                            l.X = int.Parse(a[1]);
-                            l.Y = int.Parse(a[2]);
+                            load = new MergerElement();
+                            load.X = int.Parse(lineSplit[1]);
+                            load.Y = int.Parse(lineSplit[2]);
                         }
-                        else if (a[0] == typeof(SplitterElement).Name)
+                        else if (lineSplit[0] == typeof(SplitterElement).Name)
                         {
-                            l = new SplitterElement();
-                            l.X = int.Parse(a[1]);
-                            l.Y = int.Parse(a[2]);
+                            load = new SplitterElement();
+                            load.X = int.Parse(lineSplit[1]);
+                            load.Y = int.Parse(lineSplit[2]);
                         }
-                        else if (a[0] == typeof(AdjustableSplitter).Name)
+                        else if (lineSplit[0] == typeof(AdjustableSplitter).Name)
                         {
-                            l = new AdjustableSplitter();
-                            l.X = int.Parse(a[1]);
-                            l.Y = int.Parse(a[2]);
+                            load = new AdjustableSplitter();
+                            load.X = int.Parse(lineSplit[1]);
+                            load.Y = int.Parse(lineSplit[2]);
                         }
-                        else if (a[0] == "Path")
-                        { 
-                            Point from = new Point(int.Parse(a[1]),int.Parse(a[2]));
-                            Point to = new Point(int.Parse(a[3]),int.Parse(a[4]));
-                            ConnectionZone f = FindConnectionZoneUnder(from);
-                            ConnectionZone t = FindConnectionZoneUnder(to);
-                            p = new ConnectionZone.Path(f, t);
-                            AllPaths.Add(p);
+                        else if (lineSplit[0] == typeof(ConnectionZone.Path).Name)
+                        {
+                            Point from = new Point(int.Parse(lineSplit[1]), int.Parse(lineSplit[2]));
+                            Point to = new Point(int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
+                            ConnectionZone From = FindConnectionZoneUnder(from);
+                            ConnectionZone To = FindConnectionZoneUnder(to);
+                            pathload = new ConnectionZone.Path(From,To);
+                            pathload.AddToSystem();
+                            PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[5]), int.Parse(lineSplit[6]), pathload);
+                            pathload.UserDefinedMidPoints.Add(midpoint);
+                            RefreshConnections();
                         }
-                        AllElements.Add(l);
-                        
+                        AllElements.Add(load);
                     }
                 }
                 plDraw.Invalidate();
@@ -1388,23 +1390,25 @@ namespace Flow_Network
                             string y = item.Location.Y.ToString();
                             sw.WriteLine((item.GetType().Name + "," + x + "," + y));
                         }
-                        foreach (var con in AllPaths)
+                        foreach (var connection in AllPaths)
                         {
-                            string a = con.From.Location.X.ToString();
-                            string b = con.From.Location.Y.ToString();
-                            string c = con.To.Location.X.ToString();
-                            string d = con.To.Location.Y.ToString();
-                            sw.WriteLine(con.GetType().Name + "," + a + "," + b + "," + c + "," + d + "," + con.From.Parent.ToString() + "," + con.To.Parent.ToString());
+                            string a = connection.From.Location.X.ToString();
+                            string b = connection.From.Location.Y.ToString();
+                            string c = connection.To.Location.X.ToString();
+                            string d = connection.To.Location.Y.ToString();
+                            foreach (var midpoint in connection.UserDefinedMidPoints)
+                            {
+                                string mid_x = midpoint.X.ToString();
+                                string mid_y = midpoint.Y.ToString();
+                                sw.WriteLine(connection.GetType().Name + "," + a + "," + b + "," + c + "," + d + "," + mid_x + "," + mid_y);
+                            }
                         }
                     }
                     myStream.Close();
                     MessageBox.Show("Saved");
                 }
-
             }
         }
-
-
     }
 }
 
