@@ -1333,11 +1333,14 @@ namespace Flow_Network
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
-            DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
-            if (dr == DialogResult.Yes)
+            if (UndoStack.CanUndo)
             {
-                btnSave_Click(sender, e);
+                MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
+                DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
+                if (dr == DialogResult.Yes)
+                {
+                    btnSave_Click(sender, e);
+                }
             }
                 AllPaths.Clear();
                 AllElements.Clear();
@@ -1347,11 +1350,14 @@ namespace Flow_Network
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-            MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
-            DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
-            if (dr == DialogResult.Yes)
+            if (UndoStack.CanUndo)
             {
-                btnSave_Click(sender, e);
+                MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
+                DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
+                if (dr == DialogResult.Yes)
+                {
+                    btnSave_Click(sender, e);
+                }
             }
             AllPaths.Clear();
             AllElements.Clear();
