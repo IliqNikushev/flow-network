@@ -1423,6 +1423,11 @@ namespace Flow_Network
                             }
                             RefreshConnections();
                         }
+                        else if (lineSplit[0] == "Max flow")
+                        {
+                            this.FlowCapacity = float.Parse(lineSplit[1]); 
+                            RefreshFlow();
+                        }
                         AllElements.Add(load);
                     }
                 }
@@ -1470,6 +1475,9 @@ namespace Flow_Network
                             }
                                 sw.WriteLine(text);
                             }
+                        string flowcapacity = this.FlowCapacity.ToString();
+                        sw.WriteLine("Max flow" + "," + flowcapacity);
+                        RefreshFlow();
                         }
                     }
                     myStream.Close();
