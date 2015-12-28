@@ -1305,13 +1305,21 @@ namespace Flow_Network
                 AllPaths.Clear();
                 AllElements.Clear();
                 plDraw.Invalidate();
+                UndoStack.Clear();
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
+            MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
+            DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
+            if (dr == DialogResult.Yes)
+            {
+                btnSave_Click(sender, e);
+            }
             AllPaths.Clear();
             AllElements.Clear();
             plDraw.Invalidate();
+            UndoStack.Clear();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
             openFileDialog.Filter = "pipeline file(*.pipelane)|*.pipelane";
@@ -1340,6 +1348,7 @@ namespace Flow_Network
                         else if (lineSplit[0] == typeof(PumpElement).Name)
                         {
                             load = new PumpElement();
+                            (load as PumpElement).Flow = int.Parse(lineSplit[3]);
                             load.X = int.Parse(lineSplit[1]);
                             load.Y = int.Parse(lineSplit[2]);
                         }
@@ -1368,8 +1377,9 @@ namespace Flow_Network
                             ConnectionZone From = FindConnectionZoneUnder(from);
                             ConnectionZone To = FindConnectionZoneUnder(to);
                             pathload = new ConnectionZone.Path(From,To);
+                            pathload.MaxFlow = int.Parse(lineSplit[5]);
                             pathload.AddToSystem();
-                            for (int i = 5; i < lineSplit.Count()-1;i=i+2 )
+                            for (int i = 6; i < lineSplit.Count()-1;i=i+2 )
                             {
                                 PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[i]), int.Parse(lineSplit[i+1]), pathload);
                                 pathload.UserDefinedMidPoints.Add(midpoint);
@@ -1400,7 +1410,12 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            sw.WriteLine((item.GetType().Name + "," + x + "," + y));
+                            if(item is PumpElement)
+                            {
+                                string flow = (item as PumpElement).Flow.ToString();
+                                sw.WriteLine((item.GetType().Name + "," + x + "," + y + "," + flow));
+                            }
+                            else sw.WriteLine((item.GetType().Name + "," + x + "," + y));
                         }
                         foreach (var connection in AllPaths)
                         {
@@ -1408,7 +1423,8 @@ namespace Flow_Network
                             string b = connection.From.Location.Y.ToString();
                             string c = connection.To.Location.X.ToString();
                             string d = connection.To.Location.Y.ToString();
-                            string text = connection.GetType().Name + "," + a + "," + b + "," + c + "," + d;
+                            string maxflow = connection.MaxFlow.ToString();
+                            string text = connection.GetType().Name + "," + a + "," + b + "," + c + "," + d + "," + maxflow;
                             foreach (var midpoint in connection.UserDefinedMidPoints)
                             {
                                 string mid_x = midpoint.X.ToString();
