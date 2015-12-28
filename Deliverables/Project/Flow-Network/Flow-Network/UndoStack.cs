@@ -78,5 +78,13 @@ namespace Flow_Network
             else
                 OnRedoAltered(redoStack.Count, redoStack.Peek());
         }
+
+        public static void Clear()
+        {
+            redoStack.Clear();
+            activitiesStack.Clear();
+            OnUndoAltered(activitiesStack.Count, null);
+            OnRedoAltered(activitiesStack.Count, null);
+        }
     }
 }
