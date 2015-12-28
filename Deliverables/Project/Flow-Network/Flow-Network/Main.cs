@@ -1369,8 +1369,11 @@ namespace Flow_Network
                             ConnectionZone To = FindConnectionZoneUnder(to);
                             pathload = new ConnectionZone.Path(From,To);
                             pathload.AddToSystem();
-                            PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[5]), int.Parse(lineSplit[6]), pathload);
-                            pathload.UserDefinedMidPoints.Add(midpoint);
+                            for (int i = 5; i < lineSplit.Count()-1;i=i+2 )
+                            {
+                                PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[i]), int.Parse(lineSplit[i+1]), pathload);
+                                pathload.UserDefinedMidPoints.Add(midpoint);
+                            }
                             RefreshConnections();
                         }
                         AllElements.Add(load);
@@ -1405,11 +1408,14 @@ namespace Flow_Network
                             string b = connection.From.Location.Y.ToString();
                             string c = connection.To.Location.X.ToString();
                             string d = connection.To.Location.Y.ToString();
+                            string text = connection.GetType().Name + "," + a + "," + b + "," + c + "," + d;
                             foreach (var midpoint in connection.UserDefinedMidPoints)
                             {
                                 string mid_x = midpoint.X.ToString();
                                 string mid_y = midpoint.Y.ToString();
-                                sw.WriteLine(connection.GetType().Name + "," + a + "," + b + "," + c + "," + d + "," + mid_x + "," + mid_y);
+                                text += "," + mid_x + "," + mid_y;
+                            }
+                                sw.WriteLine(text);
                             }
                         }
                     }
@@ -1419,7 +1425,7 @@ namespace Flow_Network
             }
         }
     }
-}
+
 
 static class Extentions
 {
