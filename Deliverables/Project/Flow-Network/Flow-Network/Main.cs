@@ -339,17 +339,21 @@ namespace Flow_Network
                 else if (ActiveTool == ActiveToolType.Pipe)
                     state = DrawState.Hovered;
                 else if (ActiveTool == ActiveToolType.Select)
+                    state = DrawState.Normal;
+            }
+            else if (currentHovered is PathMidPointDrawable)
+            {
+                if (ActiveTool == ActiveToolType.Delete)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Pipe)
+                    state = DrawState.Blocking;
+                else if (ActiveTool == ActiveToolType.Select)
                 {
-                    ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
-                    PathMidPointDrawable closest = path.GetClosestMidPointTo(mousePosition);
-                    if (closest != null)
-                    {
-                        plDraw.Cursor = Cursors.SizeAll;
-                    }
-                    else
-                        plDraw.Cursor = Cursors.Arrow;
+                    plDraw.Cursor = Cursors.SizeAll;
                     state = DrawState.Hovered;
                 }
+                if(ActiveTool != ActiveToolType.Select)
+                    plDraw.Cursor = Cursors.Arrow;
             }
             if (state == DrawState.None)
                 state = DrawState.Normal;
@@ -560,18 +564,18 @@ namespace Flow_Network
 
         void HandlePipeToolClick()
         {
-            //TO DO: end if cycle;
-            ConnectionZone hovered = FindConnectionZoneUnder(mousePosition);
+            ConnectionZone hovered = currentHovered as ConnectionZone;
             if (hovered == null)
             {
-                Point intersection;
-                ConnectionZone.Path path = FindPathUnder(mousePosition, out intersection);
+                if (currentHovered is PathMidPointDrawable) return;
+
+                ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
                 if (path != null)
                 {
                     PathMidPointDrawable midPoint = path.GetClosestMidPointTo(mousePosition);
                     if (midPoint == null)
                     {
-                        int index = path.AddUserMidPoint(intersection);
+                        int index = path.AddUserMidPoint(mousePosition);
                         UndoStack.AddAction(new UndoableActions.AddMidPointAction(path.UserDefinedMidPoints[index]));
                     }
                 }
@@ -584,63 +588,63 @@ namespace Flow_Network
             if (PathStart == null) PathStart = hovered;
             else PathEnd = hovered;
 
-            if(PathEnd != null)
-                if (PathEnd.IsOutFlow)
-                {
-                    PathEnd = PathStart;
-                    PathStart = hovered;
-                }
-
-            if (PathStart != null && PathEnd == null)
-            {
-                PathStart.DrawState = DrawState.Active;
+            if (PathStart != null)
                 SetBlockedForSameFlowZones(true);
-            }
-            if (PathStart != null && PathEnd != null)
+
+            if (PathEnd == null)
             {
-                if (PathStart.FlowIsSameAs(PathEnd))
-                {
-                    PathEnd = null;
-                    return;
-                }
-                if (PathStart.Parent == PathEnd.Parent)
-                {
-                    PathEnd = null;
-                    return;
-                }
-                if (PathResultsInCirular())
-                {
-                    PathEnd = null;
-                    return;
-                }
-                ResetBlockedForSameFlowZones(true);
-
-                PathStart.DrawState = DrawState.Blocking;
-                PathEnd.DrawState = DrawState.Blocking;
-                ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
-                PathStart.Draw(plDrawGraphics, plDraw.BackColor);
-                PathEnd.Draw(plDrawGraphics, plDraw.BackColor);
-                result.OnCreated += () =>
-                {
-                    result.Draw(plDrawGraphics, plDraw.BackColor);
-                };
-
-                result.OnBeforeAdjusted += () =>
-                {
-                    result.DrawClear(plDrawGraphics, plDraw.BackColor);
-                };
-
-                result.OnAdjusted += () =>
-                {
-                    result.Draw(plDrawGraphics, plDraw.BackColor);
-                };
-
-                result.Adjust();
-                UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
-
-                PathStart = null;
-                PathEnd = null;
+                return;
             }
+            if (PathStart.FlowIsSameAs(PathEnd))
+            {
+                PathEnd = null;
+                return;
+            }
+
+            if (PathStart.Parent == PathEnd.Parent)
+            {
+                PathEnd = null;
+                return;
+            }
+            if (PathResultsInCirular())
+            {
+                PathEnd = null;
+                return;
+            }
+
+            if (PathEnd.IsOutFlow)
+            {
+                PathEnd = PathStart;
+                PathStart = hovered;
+            }
+
+            ResetBlockedForSameFlowZones(true);
+
+            PathStart.DrawState = DrawState.Blocking;
+            PathEnd.DrawState = DrawState.Blocking;
+            ConnectionZone.Path result = new ConnectionZone.Path(PathStart, PathEnd);
+            PathStart.Draw(plDrawGraphics, plDraw.BackColor);
+            PathEnd.Draw(plDrawGraphics, plDraw.BackColor);
+            result.OnCreated += () =>
+            {
+                result.Draw(plDrawGraphics, plDraw.BackColor);
+            };
+
+            result.OnBeforeAdjusted += () =>
+            {
+                result.DrawClear(plDrawGraphics, plDraw.BackColor);
+            };
+
+            result.OnAdjusted += () =>
+            {
+                result.Draw(plDrawGraphics, plDraw.BackColor);
+            };
+
+            result.Adjust();
+            UndoStack.AddAction(new UndoableActions.AddConnectionAction(result));
+
+            PathStart = null;
+            PathEnd = null;
 
         }
 
@@ -710,7 +714,7 @@ namespace Flow_Network
             if (e.Button != System.Windows.Forms.MouseButtons.Left) return;
             if (dragElement == null && dragMidPoint == null)
             {
-                dragElement = FindElementUnder(mousePosition);
+                dragElement = currentHovered as Element;
                 if (dragElement != null)
                 {
                     dragStart = dragElement.Location;
@@ -720,15 +724,11 @@ namespace Flow_Network
                 }
                 else
                 {
-                    ConnectionZone.Path path = FindPathUnder(mousePosition);
-                    if (path != null)
+                    PathMidPointDrawable point = currentHovered as PathMidPointDrawable;
+                    if (point != null)
                     {
-                        PathMidPointDrawable point = path.GetClosestMidPointTo(mousePosition);
-                        if (point != null)
-                        {
-                            dragStart = point.Location;
-                            dragMidPoint = point;
-                        }
+                        dragStart = point.Location;
+                        dragMidPoint = point;
                     }
                 }
             }

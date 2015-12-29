@@ -272,8 +272,12 @@ namespace Flow_Network
             {
                 foreach (PathMidPointDrawable point in this.UserDefinedMidPoints)
                 {
-                    Rectangle r = new Rectangle(point.X, point.Y, point.Width, point.Height);
-                    if (r.Contains(position))
+                    float deltaX = point.Location.X - position.X;
+                    float deltaY = point.Location.Y - position.Y;
+                    deltaX *= deltaX;
+                    deltaY *= deltaY;
+                    float delta = (float)Math.Sqrt(deltaX + deltaY);
+                    if (delta < point.Width)
                         return point;
                 }
 
@@ -636,13 +640,16 @@ namespace Flow_Network
 
             }
 
+            private float previousFlowWhenClearing = 0;
+
             protected override void OnDrawClear(Graphics g, Color backgroundColor)
             {
                 lock (adjusterThreadLock)
                 {
                     Brush onClearBrush = new SolidBrush(backgroundColor);
                     Point p = GetTextLocation();
-                    SizeF textSize = g.MeasureString(this.Flow.ToString(), font);
+                    SizeF textSize = g.MeasureString(this.previousFlowWhenClearing.ToString(), font);
+                    this.previousFlowWhenClearing = this.Flow;
                     g.FillRectangle(onClearBrush, p.X, p.Y, textSize.Width, textSize.Height);
                     if (this.PreviousPointsToGoThrough.Count == 0) this.PreviousPointsToGoThrough.AddRange(this.PathPoints);
                     Pen onClearPen = new Pen(backgroundColor, Path.DEFAULT_WIDTH);
