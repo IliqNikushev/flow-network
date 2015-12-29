@@ -21,6 +21,14 @@ namespace Flow_Network
                     this.Y <= point.Y && this.Y >= point.Y + this.Height;
         }
 
+        public bool Contains(PathMidPointDrawable midpoint)
+        {
+            bool state = Contains(midpoint.Location);
+            if (state) return true;
+
+            return new Rectangle(this.X, this.Y, this.Width, this.Height).IntersectsWith(new Rectangle(midpoint.Location.X, midpoint.Location.Y, midpoint.Width, midpoint.Height));
+        }
+
         private IEnumerable<ConnectionZone> connectionZones;
 
         public IEnumerable<Element> ConnectedElements

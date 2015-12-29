@@ -197,6 +197,8 @@ namespace Flow_Network
                         plDraw.Invalidate();
                     }
                 }
+                else if (lastAction is UndoableActions.AddMidPointAction)
+                    plDraw.Invalidate();
 
                 else if (lastAction is UndoableActions.MoveElementAction)
                 {
@@ -685,7 +687,8 @@ namespace Flow_Network
         void HandleStopDrag(IconDrawable drawable)
         {
             if (drawable == null) return;
-            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element))
+            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element) || 
+                (drawable is Element && AllPaths.Where(x=>x.UserDefinedMidPoints.Where(y=>dragElement.Contains(y)).Any()).Any()))
             {
                 RevertDrag();
             }
