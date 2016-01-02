@@ -36,6 +36,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudDown)).BeginInit();
             this.SuspendLayout();
             // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(56, 1);
+            // 
             // nudUp
             // 
             this.nudUp.Location = new System.Drawing.Point(11, 21);
@@ -46,7 +50,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 5);
+            this.label1.Location = new System.Drawing.Point(4, 5);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(43, 13);
             this.label1.TabIndex = 1;
@@ -82,7 +86,12 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.nudUp);
             this.Name = "AdjustableSplitterEditPopup";
-            this.Size = new System.Drawing.Size(64, 90);
+            this.Size = new System.Drawing.Size(75, 90);
+            this.Controls.SetChildIndex(this.nudUp, 0);
+            this.Controls.SetChildIndex(this.label1, 0);
+            this.Controls.SetChildIndex(this.label2, 0);
+            this.Controls.SetChildIndex(this.nudDown, 0);
+            this.Controls.SetChildIndex(this.btnClose, 0);
             ((System.ComponentModel.ISupportInitialize)(this.nudUp)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudDown)).EndInit();
             this.ResumeLayout(false);

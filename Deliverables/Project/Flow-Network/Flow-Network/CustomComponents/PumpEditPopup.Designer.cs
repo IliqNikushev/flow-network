@@ -33,6 +33,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.nudFlow)).BeginInit();
             this.SuspendLayout();
             // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(79, 0);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
@@ -66,7 +70,10 @@
             this.Controls.Add(this.nudFlow);
             this.Controls.Add(this.label1);
             this.Name = "PumpEditPopup";
-            this.Size = new System.Drawing.Size(85, 40);
+            this.Size = new System.Drawing.Size(98, 40);
+            this.Controls.SetChildIndex(this.label1, 0);
+            this.Controls.SetChildIndex(this.nudFlow, 0);
+            this.Controls.SetChildIndex(this.btnClose, 0);
             ((System.ComponentModel.ISupportInitialize)(this.nudFlow)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

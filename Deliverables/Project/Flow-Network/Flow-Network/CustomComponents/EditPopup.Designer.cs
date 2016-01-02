@@ -28,10 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(66, 0);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(19, 21);
+            this.btnClose.TabIndex = 0;
+            this.btnClose.Text = "X";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // EditPopup
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.btnClose);
+            this.Name = "EditPopup";
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        protected System.Windows.Forms.Button btnClose;
+
+
+
     }
 }

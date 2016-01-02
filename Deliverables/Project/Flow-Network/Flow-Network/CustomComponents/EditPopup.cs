@@ -61,5 +61,10 @@ namespace Flow_Network.CustomComponents
             }
             base.Show();
         }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+        }
     }
 }

@@ -86,6 +86,19 @@ namespace Flow_Network
 
             InitializeComponent();
 
+            foreach (Control control in this.Controls)
+            {
+                if (control != plDraw)
+                {
+                    control.Click += (x, y) => plDraw_HandleLoseFocus(x, y);
+                    control.MouseMove += (x, y) =>
+                        {
+                            mousePosition = new Point(-1, -1);
+                            plDraw_HandleLoseFocus(this, null);
+                        };
+                }
+            }
+
             this.nudMaxFlow.ValueChanged += (x, y) => RefreshPipeline();
             this.nudSafetyLimit.ValueChanged += (x, y) => RefreshPipeline();
 
@@ -113,7 +126,11 @@ namespace Flow_Network
             plDraw.MouseUp += plDraw_HandleStopDrag;
             plDraw.Paint += plDraw_Redraw;
             plDraw.MouseEnter += plDraw_HandleGainFocus;
-            plDraw.MouseLeave += plDraw_HandleLoseFocus;
+            this.MouseMove += (x, y) =>
+            {
+                mousePosition = new Point(-1, -1);
+                plDraw_HandleLoseFocus(this, null);
+            };
 
             UndoStack.OnUndoAltered += (numberLeft, lastAction) =>
             {
@@ -228,7 +245,20 @@ namespace Flow_Network
 
         void plDraw_HandleLoseFocus(object sender, EventArgs e)
         {
+            if (sender == plDraw)
+            {
+                if(mousePosition.X != -1)
+                    return;
+            }
             iconBelowCursor.Visible = false;
+            if (rightClickPanel != null)
+                rightClickPanel.Visible = false;
+            if (adjustableSplitterEditPopup != null)
+                adjustableSplitterEditPopup.Visible = false;
+            if (pumpEditPopup != null)
+                pumpEditPopup.Visible = false;
+            if (pipeEditPopup != null)
+                pipeEditPopup.Visible = false;
         }
 
         void plDraw_HandleGainFocus(object sender, EventArgs e)
@@ -1171,15 +1201,12 @@ namespace Flow_Network
             RightClickOptions options = ~RightClickOptions.Remove;
             rightClickMousePosition = mousePosition;
 
-            if (HasElementForPlacementUnder(rightClickMousePosition))
+            Element e = FindElementUnder(rightClickMousePosition);
+            if (e != null)
             {
-                Element e = FindElementUnder(rightClickMousePosition);
-                if (e != null)
-                {
-                    options = RightClickOptions.Remove;
-                    if (e is AdjustableSplitter || e is PumpElement)
-                        options |= RightClickOptions.Edit;
-                }
+                options = RightClickOptions.Remove;
+                if (e is AdjustableSplitter || e is PumpElement)
+                    options |= RightClickOptions.Edit;
             }
             else if (FindPathUnder(rightClickMousePosition) != null)
             {
@@ -1201,11 +1228,11 @@ namespace Flow_Network
 
                 rightClickPanel.AddButton("Remove", (x, y) =>
                 {
-                    Element e = FindElementUnder(rightClickMousePosition);
-                    if (e == null) return;
+                    Element el = FindElementUnder(rightClickMousePosition);
+                    if (el == null) return;
                     else
                     {
-                        RemoveElement(e);
+                        RemoveElement(el);
                     }
                 }).Name = "remove";
                 rightClickPanel.AddButton("Add Pump", (x, y) => { AddElement<PumpElement>(rightClickMousePosition); });
@@ -1244,7 +1271,7 @@ namespace Flow_Network
             else
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
 
-            if (options.HasFlag(RightClickOptions.Adjustable))
+            if (!options.HasFlag(RightClickOptions.Remove))
             {
                 if (HasElementForPlacementUnder(rightClickMousePosition))
                 {

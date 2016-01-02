@@ -40,6 +40,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericValuePicker)).BeginInit();
             this.SuspendLayout();
             // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(106, 0);
+            // 
             // lblCurrentPercent
             // 
             this.lblCurrentPercent.AutoSize = true;
@@ -142,6 +146,16 @@
             this.Controls.Add(this.lblCurrentPercent);
             this.Name = "PipeEditPopup";
             this.Size = new System.Drawing.Size(126, 148);
+            this.Controls.SetChildIndex(this.lblCurrentPercent, 0);
+            this.Controls.SetChildIndex(this.numericValuePicker, 0);
+            this.Controls.SetChildIndex(this.lblCurrentFlow, 0);
+            this.Controls.SetChildIndex(this.lblMax, 0);
+            this.Controls.SetChildIndex(this.lblMin, 0);
+            this.Controls.SetChildIndex(this.label3, 0);
+            this.Controls.SetChildIndex(this.lblCurrentText, 0);
+            this.Controls.SetChildIndex(this.label5, 0);
+            this.Controls.SetChildIndex(this.label6, 0);
+            this.Controls.SetChildIndex(this.btnClose, 0);
             ((System.ComponentModel.ISupportInitialize)(this.numericValuePicker)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

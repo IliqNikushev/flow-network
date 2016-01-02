@@ -112,6 +112,9 @@
     <EmbeddedResource Include="CustomComponents\AdjustableSplitterEditPopup.resx">
       <DependentUpon>AdjustableSplitterEditPopup.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CustomComponents\EditPopup.resx">
+      <DependentUpon>EditPopup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="CustomComponents\PumpEditPopup.resx">
       <DependentUpon>PumpEditPopup.cs</DependentUpon>
     </EmbeddedResource>
