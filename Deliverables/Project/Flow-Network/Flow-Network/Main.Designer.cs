@@ -42,18 +42,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.plDraw = new System.Windows.Forms.Panel();
-            this.pictureBox10 = new System.Windows.Forms.PictureBox();
-            this.pictureBox9 = new System.Windows.Forms.PictureBox();
             this.btnLoad = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
-            this.pbMerger = new System.Windows.Forms.PictureBox();
-            this.pbAdjSplitter = new System.Windows.Forms.PictureBox();
-            this.pbSplitter = new System.Windows.Forms.PictureBox();
-            this.pbPipe = new System.Windows.Forms.PictureBox();
-            this.pbSink = new System.Windows.Forms.PictureBox();
-            this.pbPump = new System.Windows.Forms.PictureBox();
-            this.pbDelete = new System.Windows.Forms.PictureBox();
-            this.pbSelect = new System.Windows.Forms.PictureBox();
             this.undoButton = new System.Windows.Forms.Button();
             this.redoButton = new System.Windows.Forms.Button();
             this.label12 = new System.Windows.Forms.Label();
@@ -64,13 +54,28 @@
             this.numberActionsRedone = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
-            this.pictureBox11 = new System.Windows.Forms.PictureBox();
             this.btnNew = new System.Windows.Forms.Button();
             this.nudMaxFlow = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.tbOutFlow = new System.Windows.Forms.TextBox();
             this.nudSafetyLimit = new System.Windows.Forms.NumericUpDown();
             this.label4 = new System.Windows.Forms.Label();
+            this.infoBox = new System.Windows.Forms.PictureBox();
+            this.pictureBox11 = new System.Windows.Forms.PictureBox();
+            this.pictureBox10 = new System.Windows.Forms.PictureBox();
+            this.pictureBox9 = new System.Windows.Forms.PictureBox();
+            this.pbMerger = new System.Windows.Forms.PictureBox();
+            this.pbAdjSplitter = new System.Windows.Forms.PictureBox();
+            this.pbSplitter = new System.Windows.Forms.PictureBox();
+            this.pbPipe = new System.Windows.Forms.PictureBox();
+            this.pbSink = new System.Windows.Forms.PictureBox();
+            this.pbPump = new System.Windows.Forms.PictureBox();
+            this.pbDelete = new System.Windows.Forms.PictureBox();
+            this.pbSelect = new System.Windows.Forms.PictureBox();
+            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.infoBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
@@ -81,9 +86,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbPump)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDelete)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -204,28 +206,6 @@
             this.plDraw.Size = new System.Drawing.Size(815, 556);
             this.plDraw.TabIndex = 2;
             // 
-            // pictureBox10
-            // 
-            this.pictureBox10.Enabled = false;
-            this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
-            this.pictureBox10.Location = new System.Drawing.Point(301, 8);
-            this.pictureBox10.Name = "pictureBox10";
-            this.pictureBox10.Size = new System.Drawing.Size(33, 24);
-            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox10.TabIndex = 3;
-            this.pictureBox10.TabStop = false;
-            // 
-            // pictureBox9
-            // 
-            this.pictureBox9.Enabled = false;
-            this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
-            this.pictureBox9.Location = new System.Drawing.Point(380, 8);
-            this.pictureBox9.Name = "pictureBox9";
-            this.pictureBox9.Size = new System.Drawing.Size(33, 24);
-            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox9.TabIndex = 2;
-            this.pictureBox9.TabStop = false;
-            // 
             // btnLoad
             // 
             this.btnLoad.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
@@ -251,6 +231,207 @@
             this.btnSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
+            // 
+            // undoButton
+            // 
+            this.undoButton.Location = new System.Drawing.Point(480, 1);
+            this.undoButton.Name = "undoButton";
+            this.undoButton.Size = new System.Drawing.Size(75, 23);
+            this.undoButton.TabIndex = 4;
+            this.undoButton.Text = "Undo";
+            this.undoButton.UseVisualStyleBackColor = true;
+            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
+            // 
+            // redoButton
+            // 
+            this.redoButton.Location = new System.Drawing.Point(480, 21);
+            this.redoButton.Name = "redoButton";
+            this.redoButton.Size = new System.Drawing.Size(75, 23);
+            this.redoButton.TabIndex = 20;
+            this.redoButton.Text = "Redo";
+            this.redoButton.UseVisualStyleBackColor = true;
+            this.redoButton.Click += new System.EventHandler(this.redoButton_Click);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(558, 5);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(71, 14);
+            this.label12.TabIndex = 21;
+            this.label12.Text = "items to undo";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(662, 5);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(84, 14);
+            this.label13.TabIndex = 22;
+            this.label13.Text = "Last thing done:";
+            // 
+            // numberActionsToUndoLbl
+            // 
+            this.numberActionsToUndoLbl.AutoSize = true;
+            this.numberActionsToUndoLbl.Location = new System.Drawing.Point(627, 5);
+            this.numberActionsToUndoLbl.Name = "numberActionsToUndoLbl";
+            this.numberActionsToUndoLbl.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsToUndoLbl.TabIndex = 23;
+            this.numberActionsToUndoLbl.Text = "####";
+            // 
+            // lastActionToUndoLbl
+            // 
+            this.lastActionToUndoLbl.AutoSize = true;
+            this.lastActionToUndoLbl.Location = new System.Drawing.Point(752, 5);
+            this.lastActionToUndoLbl.Name = "lastActionToUndoLbl";
+            this.lastActionToUndoLbl.Size = new System.Drawing.Size(43, 14);
+            this.lastActionToUndoLbl.TabIndex = 24;
+            this.lastActionToUndoLbl.Text = "............";
+            // 
+            // lastActionUndone
+            // 
+            this.lastActionUndone.AutoSize = true;
+            this.lastActionUndone.Location = new System.Drawing.Point(752, 24);
+            this.lastActionUndone.Name = "lastActionUndone";
+            this.lastActionUndone.Size = new System.Drawing.Size(43, 14);
+            this.lastActionUndone.TabIndex = 28;
+            this.lastActionUndone.Text = "............";
+            // 
+            // numberActionsRedone
+            // 
+            this.numberActionsRedone.AutoSize = true;
+            this.numberActionsRedone.Location = new System.Drawing.Point(627, 24);
+            this.numberActionsRedone.Name = "numberActionsRedone";
+            this.numberActionsRedone.Size = new System.Drawing.Size(31, 14);
+            this.numberActionsRedone.TabIndex = 27;
+            this.numberActionsRedone.Text = "####";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(662, 24);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(84, 14);
+            this.label16.TabIndex = 26;
+            this.label16.Text = "Last thing done:";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(558, 24);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(69, 14);
+            this.label17.TabIndex = 25;
+            this.label17.Text = "items to redo";
+            // 
+            // btnNew
+            // 
+            this.btnNew.Location = new System.Drawing.Point(223, 5);
+            this.btnNew.Name = "btnNew";
+            this.btnNew.Size = new System.Drawing.Size(72, 31);
+            this.btnNew.TabIndex = 29;
+            this.btnNew.Text = "NEW";
+            this.btnNew.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.btnNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.btnNew.UseVisualStyleBackColor = true;
+            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
+            // 
+            // nudMaxFlow
+            // 
+            this.nudMaxFlow.DecimalPlaces = 2;
+            this.nudMaxFlow.Location = new System.Drawing.Point(90, 577);
+            this.nudMaxFlow.Maximum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.nudMaxFlow.Name = "nudMaxFlow";
+            this.nudMaxFlow.Size = new System.Drawing.Size(127, 20);
+            this.nudMaxFlow.TabIndex = 31;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(5, 556);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(72, 14);
+            this.label3.TabIndex = 32;
+            this.label3.Text = "Total out flow";
+            // 
+            // tbOutFlow
+            // 
+            this.tbOutFlow.Enabled = false;
+            this.tbOutFlow.Location = new System.Drawing.Point(90, 556);
+            this.tbOutFlow.Name = "tbOutFlow";
+            this.tbOutFlow.ReadOnly = true;
+            this.tbOutFlow.Size = new System.Drawing.Size(127, 20);
+            this.tbOutFlow.TabIndex = 33;
+            // 
+            // nudSafetyLimit
+            // 
+            this.nudSafetyLimit.DecimalPlaces = 2;
+            this.nudSafetyLimit.Location = new System.Drawing.Point(90, 603);
+            this.nudSafetyLimit.Maximum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.nudSafetyLimit.Name = "nudSafetyLimit";
+            this.nudSafetyLimit.Size = new System.Drawing.Size(127, 20);
+            this.nudSafetyLimit.TabIndex = 35;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(5, 605);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(81, 14);
+            this.label4.TabIndex = 34;
+            this.label4.Text = "Pipe safety limit";
+            // 
+            // infoBox
+            // 
+            this.infoBox.Image = global::Flow_Network.Properties.Resources.Information_icon;
+            this.infoBox.Location = new System.Drawing.Point(169, 8);
+            this.infoBox.Name = "infoBox";
+            this.infoBox.Size = new System.Drawing.Size(48, 48);
+            this.infoBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.infoBox.TabIndex = 36;
+            this.infoBox.TabStop = false;
+            this.infoBox.Click += new System.EventHandler(this.infoBox_Click);
+            // 
+            // pictureBox11
+            // 
+            this.pictureBox11.Enabled = false;
+            this.pictureBox11.Image = global::Flow_Network.Properties.Resources.save;
+            this.pictureBox11.Location = new System.Drawing.Point(227, 8);
+            this.pictureBox11.Name = "pictureBox11";
+            this.pictureBox11.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox11.TabIndex = 30;
+            this.pictureBox11.TabStop = false;
+            // 
+            // pictureBox10
+            // 
+            this.pictureBox10.Enabled = false;
+            this.pictureBox10.Image = global::Flow_Network.Properties.Resources.save;
+            this.pictureBox10.Location = new System.Drawing.Point(301, 8);
+            this.pictureBox10.Name = "pictureBox10";
+            this.pictureBox10.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox10.TabIndex = 3;
+            this.pictureBox10.TabStop = false;
+            // 
+            // pictureBox9
+            // 
+            this.pictureBox9.Enabled = false;
+            this.pictureBox9.Image = global::Flow_Network.Properties.Resources.load;
+            this.pictureBox9.Location = new System.Drawing.Point(380, 8);
+            this.pictureBox9.Name = "pictureBox9";
+            this.pictureBox9.Size = new System.Drawing.Size(33, 24);
+            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox9.TabIndex = 2;
+            this.pictureBox9.TabStop = false;
             // 
             // pbMerger
             // 
@@ -348,180 +529,13 @@
             this.pbSelect.TabStop = false;
             this.pbSelect.Click += new System.EventHandler(this.pboxToolClick);
             // 
-            // undoButton
-            // 
-            this.undoButton.Location = new System.Drawing.Point(480, 1);
-            this.undoButton.Name = "undoButton";
-            this.undoButton.Size = new System.Drawing.Size(75, 23);
-            this.undoButton.TabIndex = 4;
-            this.undoButton.Text = "Undo";
-            this.undoButton.UseVisualStyleBackColor = true;
-            this.undoButton.Click += new System.EventHandler(this.undoButton_Click);
-            // 
-            // redoButton
-            // 
-            this.redoButton.Location = new System.Drawing.Point(480, 21);
-            this.redoButton.Name = "redoButton";
-            this.redoButton.Size = new System.Drawing.Size(75, 23);
-            this.redoButton.TabIndex = 20;
-            this.redoButton.Text = "Redo";
-            this.redoButton.UseVisualStyleBackColor = true;
-            this.redoButton.Click += new System.EventHandler(this.redoButton_Click);
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(558, 5);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(71, 14);
-            this.label12.TabIndex = 21;
-            this.label12.Text = "items to undo";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(662, 5);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(84, 14);
-            this.label13.TabIndex = 22;
-            this.label13.Text = "Last thing done:";
-            // 
-            // numberActionsToUndoLbl
-            // 
-            this.numberActionsToUndoLbl.AutoSize = true;
-            this.numberActionsToUndoLbl.Location = new System.Drawing.Point(627, 5);
-            this.numberActionsToUndoLbl.Name = "numberActionsToUndoLbl";
-            this.numberActionsToUndoLbl.Size = new System.Drawing.Size(31, 14);
-            this.numberActionsToUndoLbl.TabIndex = 23;
-            this.numberActionsToUndoLbl.Text = "####";
-            // 
-            // lastActionToUndoLbl
-            // 
-            this.lastActionToUndoLbl.AutoSize = true;
-            this.lastActionToUndoLbl.Location = new System.Drawing.Point(752, 5);
-            this.lastActionToUndoLbl.Name = "lastActionToUndoLbl";
-            this.lastActionToUndoLbl.Size = new System.Drawing.Size(43, 14);
-            this.lastActionToUndoLbl.TabIndex = 24;
-            this.lastActionToUndoLbl.Text = "............";
-            // 
-            // lastActionUndone
-            // 
-            this.lastActionUndone.AutoSize = true;
-            this.lastActionUndone.Location = new System.Drawing.Point(752, 24);
-            this.lastActionUndone.Name = "lastActionUndone";
-            this.lastActionUndone.Size = new System.Drawing.Size(43, 14);
-            this.lastActionUndone.TabIndex = 28;
-            this.lastActionUndone.Text = "............";
-            // 
-            // numberActionsRedone
-            // 
-            this.numberActionsRedone.AutoSize = true;
-            this.numberActionsRedone.Location = new System.Drawing.Point(627, 24);
-            this.numberActionsRedone.Name = "numberActionsRedone";
-            this.numberActionsRedone.Size = new System.Drawing.Size(31, 14);
-            this.numberActionsRedone.TabIndex = 27;
-            this.numberActionsRedone.Text = "####";
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(662, 24);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(84, 14);
-            this.label16.TabIndex = 26;
-            this.label16.Text = "Last thing done:";
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(558, 24);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(69, 14);
-            this.label17.TabIndex = 25;
-            this.label17.Text = "items to redo";
-            // 
-            // pictureBox11
-            // 
-            this.pictureBox11.Enabled = false;
-            this.pictureBox11.Image = global::Flow_Network.Properties.Resources.save;
-            this.pictureBox11.Location = new System.Drawing.Point(227, 8);
-            this.pictureBox11.Name = "pictureBox11";
-            this.pictureBox11.Size = new System.Drawing.Size(33, 24);
-            this.pictureBox11.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox11.TabIndex = 30;
-            this.pictureBox11.TabStop = false;
-            // 
-            // btnNew
-            // 
-            this.btnNew.Location = new System.Drawing.Point(223, 5);
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(72, 31);
-            this.btnNew.TabIndex = 29;
-            this.btnNew.Text = "NEW";
-            this.btnNew.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.btnNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnNew.UseVisualStyleBackColor = true;
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-            // 
-            // nudMaxFlow
-            // 
-            this.nudMaxFlow.DecimalPlaces = 2;
-            this.nudMaxFlow.Location = new System.Drawing.Point(90, 577);
-            this.nudMaxFlow.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
-            this.nudMaxFlow.Name = "nudMaxFlow";
-            this.nudMaxFlow.Size = new System.Drawing.Size(127, 20);
-            this.nudMaxFlow.TabIndex = 31;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(5, 556);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(72, 14);
-            this.label3.TabIndex = 32;
-            this.label3.Text = "Total out flow";
-            // 
-            // tbOutFlow
-            // 
-            this.tbOutFlow.Enabled = false;
-            this.tbOutFlow.Location = new System.Drawing.Point(90, 556);
-            this.tbOutFlow.Name = "tbOutFlow";
-            this.tbOutFlow.ReadOnly = true;
-            this.tbOutFlow.Size = new System.Drawing.Size(127, 20);
-            this.tbOutFlow.TabIndex = 33;
-            // 
-            // nudSafetyLimit
-            // 
-            this.nudSafetyLimit.DecimalPlaces = 2;
-            this.nudSafetyLimit.Location = new System.Drawing.Point(90, 603);
-            this.nudSafetyLimit.Maximum = new decimal(new int[] {
-            0,
-            0,
-            0,
-            0});
-            this.nudSafetyLimit.Name = "nudSafetyLimit";
-            this.nudSafetyLimit.Size = new System.Drawing.Size(127, 20);
-            this.nudSafetyLimit.TabIndex = 35;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(5, 605);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(81, 14);
-            this.label4.TabIndex = 34;
-            this.label4.Text = "Pipe safety limit";
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
+            this.Controls.Add(this.infoBox);
             this.Controls.Add(this.nudSafetyLimit);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.tbOutFlow);
@@ -567,6 +581,10 @@
             this.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.Name = "Main";
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.infoBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).EndInit();
@@ -577,9 +595,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbPump)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbDelete)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -629,6 +644,7 @@
         private System.Windows.Forms.TextBox tbOutFlow;
         private System.Windows.Forms.NumericUpDown nudSafetyLimit;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.PictureBox infoBox;
     }
 }
 

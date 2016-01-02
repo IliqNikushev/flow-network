@@ -71,6 +71,12 @@
       <DependentUpon>PumpEditPopup.cs</DependentUpon>
     </Compile>
     <Compile Include="Drawable.cs" />
+    <Compile Include="InfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InfoForm.Designer.cs">
+      <DependentUpon>InfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="PathMidPointDrawable.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -108,6 +114,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CustomComponents\PumpEditPopup.resx">
       <DependentUpon>PumpEditPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InfoForm.resx">
+      <DependentUpon>InfoForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -227,6 +236,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\1448051922_close1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Information-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

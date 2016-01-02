@@ -16,7 +16,7 @@ namespace Flow_Network
     /// </summary>
     public partial class Main : Form
     {
-        enum ActiveToolType
+        public enum ActiveToolType
         {
             Pump,
             Splitter,
@@ -432,6 +432,8 @@ namespace Flow_Network
                 ActiveTool = ActiveToolType.Delete;
             else
                 ActiveTool = ActiveToolType.None;
+            if (infoForm != null)
+                SetInfo();
             clickedPbox.BackColor = Color.Gold;
             if (previousTool == ActiveTool) return;
             if (previousTool != ActiveToolType.Pipe && ActiveTool == ActiveToolType.Pipe)
@@ -1242,6 +1244,15 @@ namespace Flow_Network
             else
                 rightClickPanel.Controls.Find("remove", false)[0].Enabled = false;
 
+            if (options.HasFlag(RightClickOptions.Adjustable))
+            {
+                if (HasElementForPlacementUnder(rightClickMousePosition))
+                {
+                    rightClickPanel.Visible = false;
+                    return;
+                }
+            }
+
             if (options.HasFlag(RightClickOptions.Edit))
                 rightClickPanel.Controls.Find("edit", false)[0].Enabled = true;
             else
@@ -1547,6 +1558,21 @@ namespace Flow_Network
                 myStream.Close();
                 MessageBox.Show("Saved");
             }
+        }
+
+        InfoForm infoForm;
+
+        private void SetInfo()
+        {
+            if (infoForm == null) infoForm = new InfoForm();
+            else if (infoForm.IsDisposed) infoForm = new InfoForm();
+            infoForm.SetTool(ActiveTool);
+        }
+
+        private void infoBox_Click(object sender, EventArgs e)
+        {
+            SetInfo();
+            infoForm.Show();
         }
     }
 }
