@@ -148,19 +148,11 @@ namespace Flow_Network
                 set
                 {
                     if (value < 0) value = 0;
-
-                    float previous = this.maxFlow;
                     this.maxFlow = value;
-
-                    if (previous != value)
-                        OnMaxFlowChanged(this, previous, value);
                 }
             }
 
             public float Flow { get { return this.To.Flow; } }
-
-            /// <summary>Called when the max flow has been altered</summary>
-            public event FlowAlteredEvent OnMaxFlowChanged = (x, y, z) => { };
 
             /// <summary>Returns a path starting at the FROM zone to the TO zone, with all midpoints inbetween</summary>
             public List<Point> PathPoints

@@ -12,7 +12,6 @@ namespace Flow_Network.CustomComponents
 {
     public partial class PumpEditPopup : EditPopup
     {
-        
         public PumpElement Pump { get { return this.Value as PumpElement; } set { this.Value = value; } }
         public PumpEditPopup(PumpElement pump) : base(pump)
         {
@@ -24,7 +23,11 @@ namespace Flow_Network.CustomComponents
         protected override void OnObjectChanged()
         {
             this.nudFlow.Value = (decimal)this.Pump.Flow;
+        }
 
+        public void AdjustFlow(float value)
+        {
+            this.nudFlow.Value += (decimal)value;
         }
     }
 }

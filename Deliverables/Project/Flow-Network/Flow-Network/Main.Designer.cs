@@ -69,6 +69,8 @@
             this.nudMaxFlow = new System.Windows.Forms.NumericUpDown();
             this.label3 = new System.Windows.Forms.Label();
             this.tbOutFlow = new System.Windows.Forms.TextBox();
+            this.nudSafetyLimit = new System.Windows.Forms.NumericUpDown();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbMerger)).BeginInit();
@@ -81,6 +83,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).BeginInit();
             this.SuspendLayout();
             // 
             // label10
@@ -491,12 +494,36 @@
             this.tbOutFlow.Size = new System.Drawing.Size(127, 20);
             this.tbOutFlow.TabIndex = 33;
             // 
+            // nudSafetyLimit
+            // 
+            this.nudSafetyLimit.DecimalPlaces = 2;
+            this.nudSafetyLimit.Location = new System.Drawing.Point(90, 603);
+            this.nudSafetyLimit.Maximum = new decimal(new int[] {
+            0,
+            0,
+            0,
+            0});
+            this.nudSafetyLimit.Name = "nudSafetyLimit";
+            this.nudSafetyLimit.Size = new System.Drawing.Size(127, 20);
+            this.nudSafetyLimit.TabIndex = 35;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(5, 605);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(81, 14);
+            this.label4.TabIndex = 34;
+            this.label4.Text = "Pipe safety limit";
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 14F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Silver;
             this.ClientSize = new System.Drawing.Size(1084, 626);
+            this.Controls.Add(this.nudSafetyLimit);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.tbOutFlow);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.nudMaxFlow);
@@ -552,6 +579,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbSelect)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox11)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudMaxFlow)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudSafetyLimit)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -599,6 +627,8 @@
         private System.Windows.Forms.NumericUpDown nudMaxFlow;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tbOutFlow;
+        private System.Windows.Forms.NumericUpDown nudSafetyLimit;
+        private System.Windows.Forms.Label label4;
     }
 }
 

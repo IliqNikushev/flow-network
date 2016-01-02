@@ -36,7 +36,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 0);
+            this.label1.Location = new System.Drawing.Point(27, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(43, 13);
             this.label1.TabIndex = 0;
@@ -46,15 +46,15 @@
             // 
             this.nudFlow.Location = new System.Drawing.Point(7, 16);
             this.nudFlow.Maximum = new decimal(new int[] {
-            9999,
+            999999999,
             0,
             0,
             0});
             this.nudFlow.Name = "nudFlow";
-            this.nudFlow.Size = new System.Drawing.Size(46, 20);
+            this.nudFlow.Size = new System.Drawing.Size(74, 20);
             this.nudFlow.TabIndex = 1;
             this.nudFlow.Value = new decimal(new int[] {
-            9999,
+            999999999,
             0,
             0,
             0});
@@ -66,7 +66,7 @@
             this.Controls.Add(this.nudFlow);
             this.Controls.Add(this.label1);
             this.Name = "PumpEditPopup";
-            this.Size = new System.Drawing.Size(60, 40);
+            this.Size = new System.Drawing.Size(85, 40);
             ((System.ComponentModel.ISupportInitialize)(this.nudFlow)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

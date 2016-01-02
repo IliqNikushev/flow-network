@@ -15,6 +15,11 @@ namespace Flow_Network
         public ConnectionZone Out { get; private set; }
 
         ///<summary>Flow of the pump </summary>
-        public float Flow { get; set; }
+        private float flow;
+        public float Flow
+        {
+            get { return this.flow; }
+            set { if (value < 0) value = 0; this.flow = value; }
+        }
     }
 }

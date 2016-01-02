@@ -37,7 +37,7 @@ namespace Flow_Network
         /// </summary>
         public static List<ConnectionZone.Path> AllPaths = new List<ConnectionZone.Path>();
 
-        
+
         private ActiveToolType ActiveTool = ActiveToolType.None;
 
         private PictureBox iconBelowCursor;
@@ -69,16 +69,27 @@ namespace Flow_Network
         {
             this.pumpEditPopup.OnFlowAltered += () =>
                 {
-                    RefreshFlow();
-                    RefreshConnections();
+                    RefreshPipeline();
+                    if (InFlow > FlowCapacity)
+                    {
+                        float delta = FlowCapacity - InFlow;
+                        if (this.pumpEditPopup.Pump.Flow - delta >= 0)
+                            this.pumpEditPopup.AdjustFlow(delta);
+                        else
+                        {
+                            //todo something wrong with
+                        }
+                    }
                 };
-            this.adjustableSplitterEditPopup.OnFlowAltered += () =>
-                {
-                    RefreshFlow();
-                    RefreshConnections();
-                };
+            this.adjustableSplitterEditPopup.OnFlowAltered += () => RefreshPipeline();
             Resources.Initialize();
+
             InitializeComponent();
+
+            this.nudMaxFlow.ValueChanged += (x, y) => RefreshPipeline();
+            this.nudSafetyLimit.ValueChanged += (x, y) => RefreshPipeline();
+
+            this.nudMaxFlow.Maximum = decimal.MaxValue;
             this.plDrawGraphics = this.plDraw.CreateGraphics();
             oldDragElementPlaceholder = new PictureBox();
             oldDragElementPlaceholder.Height = Element.DefaultSize.Y;
@@ -135,7 +146,7 @@ namespace Flow_Network
                 {
                     UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
 
-                    RefreshFlow();
+                    RefreshPipeline();
 
                     if (action is UndoableActions.RemoveElementAction)
                     {
@@ -169,7 +180,7 @@ namespace Flow_Network
                 {
                     UndoableActions.AddConnectionAction action = lastAction as UndoableActions.AddConnectionAction;
 
-                    RefreshFlow();
+                    RefreshPipeline();
 
                     if (action is UndoableActions.RemoveConnectionAction)
                     {
@@ -185,7 +196,7 @@ namespace Flow_Network
                 {
                     UndoableActions.AddElementAction action = lastAction as UndoableActions.AddElementAction;
 
-                    RefreshFlow();
+                    RefreshPipeline();
 
                     if (action is UndoableActions.RemoveElementAction)
                     {
@@ -207,8 +218,14 @@ namespace Flow_Network
                 }
             };
         }
-        
-        
+
+        private void RefreshPipeline()
+        {
+            RefreshFlow();
+            RefreshConnections();
+        }
+
+
         void plDraw_HandleLoseFocus(object sender, EventArgs e)
         {
             iconBelowCursor.Visible = false;
@@ -294,7 +311,15 @@ namespace Flow_Network
                 }
                 else
                     if (lastHovered is ConnectionZone.Path)
-                        lastHovered.DrawState = DrawState.Normal;
+                    {
+                        ConnectionZone.Path path = lastHovered as ConnectionZone.Path;
+                        if (path.Flow > path.MaxFlow)
+                            path.DrawState = DrawState.Blocking;
+                        else if (path.Flow > (float)nudSafetyLimit.Value)
+                            path.DrawState = DrawState.Delete;
+                        else
+                            lastHovered.DrawState = DrawState.Normal;
+                    }
                     else if (lastHovered is Element)
                         lastHovered.DrawState = DrawState.Normal;
                     else
@@ -336,7 +361,12 @@ namespace Flow_Network
             }
             else if (currentHovered is ConnectionZone.Path)
             {
-                if (ActiveTool == ActiveToolType.Delete)
+                ConnectionZone.Path path = currentHovered as ConnectionZone.Path;
+                if (path.Flow > path.MaxFlow)
+                    state = DrawState.Blocking;
+                else if (path.Flow > (float)nudSafetyLimit.Value)
+                    state = DrawState.Delete;
+                else if (ActiveTool == ActiveToolType.Delete)
                     state = DrawState.Delete;
                 else if (ActiveTool == ActiveToolType.Pipe)
                     state = DrawState.Hovered;
@@ -354,7 +384,7 @@ namespace Flow_Network
                     plDraw.Cursor = Cursors.SizeAll;
                     state = DrawState.Hovered;
                 }
-                if(ActiveTool != ActiveToolType.Select)
+                if (ActiveTool != ActiveToolType.Select)
                     plDraw.Cursor = Cursors.Arrow;
             }
             if (state == DrawState.None)
@@ -472,7 +502,7 @@ namespace Flow_Network
         void ShowEditPopup(Object value, CustomComponents.EditPopup popup)
         {
             if (activePopup != null)
-                if(activePopup != popup)
+                if (activePopup != popup)
                     activePopup.Value = null;
 
             activePopup = popup;
@@ -546,8 +576,8 @@ namespace Flow_Network
             processed.Add(element);
             foreach (ConnectionZone zone in element.ConnectionZones)
             {
-                if(zone.IsOutFlow)
-                    if(zone.ConnectedZone != null)
+                if (zone.IsOutFlow)
+                    if (zone.ConnectedZone != null)
                         if (ElementIsUsedInPath(zone.ConnectedZone.Parent, processed))
                             return true;
             }
@@ -556,7 +586,7 @@ namespace Flow_Network
 
         bool ZoneParentIsUsedInPath(ConnectionZone zone)
         {
-            return ElementIsUsedInPath(zone.Parent, new HashSet<Element>(new Element[]{PathStart.Parent}));
+            return ElementIsUsedInPath(zone.Parent, new HashSet<Element>(new Element[] { PathStart.Parent }));
         }
 
         bool PathResultsInCirular()
@@ -647,7 +677,6 @@ namespace Flow_Network
 
             PathStart = null;
             PathEnd = null;
-
         }
 
         private void ResetBlockedForSameFlowZones(bool redraw)
@@ -670,7 +699,7 @@ namespace Flow_Network
         {
             foreach (Element e in AllElements)
             {
-                bool isUsed = ElementIsUsedInPath(e, new HashSet<Element>(new Element[]{PathStart.Parent}));
+                bool isUsed = ElementIsUsedInPath(e, new HashSet<Element>(new Element[] { PathStart.Parent }));
                 foreach (ConnectionZone zone in e.ConnectionZones)
                 {
                     if (zone == PathStart) continue;
@@ -687,8 +716,8 @@ namespace Flow_Network
         void HandleStopDrag(IconDrawable drawable)
         {
             if (drawable == null) return;
-            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element) || 
-                (drawable is Element && AllPaths.Where(x=>x.UserDefinedMidPoints.Where(y=>dragElement.Contains(y)).Any()).Any()))
+            if (FindElementUnder(mousePosition) != null || (HasElementForPlacementUnder(mousePosition) && drawable is Element) ||
+                (drawable is Element && AllPaths.Where(x => x.UserDefinedMidPoints.Where(y => dragElement.Contains(y)).Any()).Any()))
             {
                 RevertDrag();
             }
@@ -766,7 +795,7 @@ namespace Flow_Network
                 dragMidPoint.Location = location;
 
                 Element found = FindElementUnder(location);
-                if(found != null)
+                if (found != null)
                 {
                     dragMidPoint.Location = oldMidPointLocation;
                 }
@@ -820,7 +849,7 @@ namespace Flow_Network
             {
                 dragMidPoint.Location = dragStart;
                 oldDragElementPlaceholder.Visible = false;
-                
+
                 dragMidPoint.Path.Adjust(onDone: () => plDraw.Invalidate());
                 dragMidPoint = null;
             }
@@ -908,12 +937,12 @@ namespace Flow_Network
                 IEnumerable<Element> collisionsForPlacement = new Element[0];
                 if (checkForCollisions)
                 {
-                    if (dragMidPoint != null) 
+                    if (dragMidPoint != null)
                         collisionsForPlacement = new Element[] { FindElementUnder(mousePosition) }.Where(x => x != null);
                     else
-                        if(ActiveTool == ActiveToolType.Select && dragElement != null)
+                        if (ActiveTool == ActiveToolType.Select && dragElement != null)
                             collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
-                        else if(ActiveTool != ActiveToolType.Select)
+                        else if (ActiveTool != ActiveToolType.Select)
                             collisionsForPlacement = FindCollisionsForPlacementOfElementUnder(mousePosition);
                 }
                 if (collisionsForPlacement.Any())
@@ -974,7 +1003,7 @@ namespace Flow_Network
             return LineIntersectsAt(a, b, mouse, out p);
         }
 
-        private bool LineIntersectsAt(Point a, Point b, Point mouse,out Point p, int lineWidth = 1)
+        private bool LineIntersectsAt(Point a, Point b, Point mouse, out Point p, int lineWidth = 1)
         {
             return Collision.PointIsOnLine(a, b, mouse, out p);
         }
@@ -1024,7 +1053,19 @@ namespace Flow_Network
                     outFlow += (e as SinkElement).Flow;
             InFlow = inFlow;
             OutFlow = outFlow;
-            //todo if > max
+
+            foreach (ConnectionZone.Path path in AllPaths)
+            {
+                if (path.Flow > path.MaxFlow)
+                {
+                    path.DrawState = DrawState.Blocking;
+                }
+                else if (path.Flow > (float)nudSafetyLimit.Value)
+                {
+                    path.DrawState = DrawState.Delete;
+                }
+            }
+            //todo conflict with hover?
         }
 
         static object refreshLock = new object();
@@ -1336,22 +1377,11 @@ namespace Flow_Network
 
         private void btnNew_Click(object sender, EventArgs e)
         {
-            if (UndoStack.CanUndo)
-            {
-                MessageBoxButtons button = MessageBoxButtons.YesNoCancel;
-                DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
-                if (dr == DialogResult.Yes)
-                {
-                    btnSave_Click(sender, e);
-                }
-            }
-                AllPaths.Clear();
-                AllElements.Clear();
-                plDraw.Invalidate();
-                UndoStack.Clear();
+            PromptForSave();
+            ClearPipeline();
         }
 
-        private void btnLoad_Click(object sender, EventArgs e)
+        void PromptForSave()
         {
             if (UndoStack.CanUndo)
             {
@@ -1359,13 +1389,23 @@ namespace Flow_Network
                 DialogResult dr = MessageBox.Show("anything need to be saved?", "new", button);
                 if (dr == DialogResult.Yes)
                 {
-                    btnSave_Click(sender, e);
+                    btnSave_Click(null, null);
                 }
             }
+        }
+
+        void ClearPipeline()
+        {
             AllPaths.Clear();
             AllElements.Clear();
             plDraw.Invalidate();
             UndoStack.Clear();
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            PromptForSave();
+            ClearPipeline();
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.InitialDirectory = System.IO.Directory.GetCurrentDirectory();
             openFileDialog.Filter = "pipeline file(*.pipelane)|*.pipelane";
@@ -1377,44 +1417,34 @@ namespace Flow_Network
                 StreamReader sr = new StreamReader(fs);
                 string nextLine;
                 string[] lineSplit;
-                Element load = null;
-                ConnectionZone.Path pathload;
+
                 while ((nextLine = sr.ReadLine()) != null)
                 {
+                    Element load = null;
                     Console.WriteLine(nextLine);
                     {
                         lineSplit = nextLine.Split(',');
-                        
+
                         if (lineSplit[0] == typeof(SinkElement).Name)
                         {
                             load = new SinkElement();
-                            load.X = int.Parse(lineSplit[1]);
-                            load.Y = int.Parse(lineSplit[2]);
                         }
                         else if (lineSplit[0] == typeof(PumpElement).Name)
                         {
                             load = new PumpElement();
                             (load as PumpElement).Flow = int.Parse(lineSplit[3]);
-                            load.X = int.Parse(lineSplit[1]);
-                            load.Y = int.Parse(lineSplit[2]);
                         }
                         else if (lineSplit[0] == typeof(MergerElement).Name)
                         {
                             load = new MergerElement();
-                            load.X = int.Parse(lineSplit[1]);
-                            load.Y = int.Parse(lineSplit[2]);
                         }
                         else if (lineSplit[0] == typeof(SplitterElement).Name)
                         {
                             load = new SplitterElement();
-                            load.X = int.Parse(lineSplit[1]);
-                            load.Y = int.Parse(lineSplit[2]);
                         }
                         else if (lineSplit[0] == typeof(AdjustableSplitter).Name)
                         {
                             load = new AdjustableSplitter();
-                            load.X = int.Parse(lineSplit[1]);
-                            load.Y = int.Parse(lineSplit[2]);
                         }
                         else if (lineSplit[0] == typeof(ConnectionZone.Path).Name)
                         {
@@ -1422,24 +1452,49 @@ namespace Flow_Network
                             Point to = new Point(int.Parse(lineSplit[3]), int.Parse(lineSplit[4]));
                             ConnectionZone From = FindConnectionZoneUnder(from);
                             ConnectionZone To = FindConnectionZoneUnder(to);
-                            pathload = new ConnectionZone.Path(From,To);
+                            ConnectionZone.Path pathload = new ConnectionZone.Path(From, To);
+
+                            pathload.OnCreated += () =>
+                            {
+                                pathload.Draw(plDrawGraphics, plDraw.BackColor);
+                            };
+
+                            pathload.OnBeforeAdjusted += () =>
+                            {
+                                pathload.DrawClear(plDrawGraphics, plDraw.BackColor);
+                            };
+
+                            pathload.OnAdjusted += () =>
+                            {
+                                pathload.Draw(plDrawGraphics, plDraw.BackColor);
+                            };
+
                             pathload.MaxFlow = int.Parse(lineSplit[5]);
                             pathload.AddToSystem();
-                            for (int i = 6; i < lineSplit.Count()-1;i=i+2 )
+                            for (int i = 6; i < lineSplit.Count() - 1; i = i + 2)
                             {
-                                PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[i]), int.Parse(lineSplit[i+1]), pathload);
+                                PathMidPointDrawable midpoint = new PathMidPointDrawable(int.Parse(lineSplit[i]), int.Parse(lineSplit[i + 1]), pathload);
                                 pathload.UserDefinedMidPoints.Add(midpoint);
                             }
-                            RefreshConnections();
+                            pathload.Adjust();
+                            continue;
                         }
                         else if (lineSplit[0] == "Max flow")
                         {
-                            this.FlowCapacity = float.Parse(lineSplit[1]); 
-                            RefreshFlow();
+                            this.FlowCapacity = float.Parse(lineSplit[1]);
+                            continue;
                         }
+                        else if (lineSplit[0] == "Safety Limit")
+                        {
+                            this.nudSafetyLimit.Value = (decimal)float.Parse(lineSplit[1]);
+                            continue;
+                        }
+                        load.X = int.Parse(lineSplit[1]);
+                        load.Y = int.Parse(lineSplit[2]);
                         AllElements.Add(load);
                     }
                 }
+                RefreshPipeline();
                 plDraw.Invalidate();
                 fs.Close();
             }
@@ -1461,7 +1516,7 @@ namespace Flow_Network
                         {
                             string x = item.Location.X.ToString();
                             string y = item.Location.Y.ToString();
-                            if(item is PumpElement)
+                            if (item is PumpElement)
                             {
                                 string flow = (item as PumpElement).Flow.ToString();
                                 sw.WriteLine((item.GetType().Name + "," + x + "," + y + "," + flow));
@@ -1482,19 +1537,19 @@ namespace Flow_Network
                                 string mid_y = midpoint.Y.ToString();
                                 text += "," + mid_x + "," + mid_y;
                             }
-                                sw.WriteLine(text);
-                            }
+                            sw.WriteLine(text);
+                        }
                         string flowcapacity = this.FlowCapacity.ToString();
                         sw.WriteLine("Max flow" + "," + flowcapacity);
-                        RefreshFlow();
-                        }
+                        sw.WriteLine("Safety Limit, " + nudSafetyLimit.Value);
                     }
-                    myStream.Close();
-                    MessageBox.Show("Saved");
                 }
+                myStream.Close();
+                MessageBox.Show("Saved");
             }
         }
     }
+}
 
 
 static class Extentions

@@ -38,7 +38,7 @@ namespace Flow_Network.CustomComponents
                 if (CurrentPath == null) return 0;
                 if (CurrentPath.MaxFlow == 0) return 0;
                 int value = (int)((CurrentPath.Flow / CurrentPath.MaxFlow) * 100);
-                if (value > 100) value = 100;
+                if (value > 100) value = 101;
                 return value;
             }
         }
@@ -74,7 +74,10 @@ namespace Flow_Network.CustomComponents
 
             CurrentPath.MaxFlow = (float)numericValuePicker.Value;
 
-            this.lblCurrentPercent.Text = FlowPercent + "%";
+            if(FlowPercent > 100)
+                this.lblCurrentPercent.Text = ">100%";
+            else
+                this.lblCurrentPercent.Text = FlowPercent + "%";
             this.lblCurrentPercent.Top = ArrowTop;
 
             this.lblCurrentFlow.Text = "("+Flow+")";
